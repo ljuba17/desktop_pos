@@ -7,3 +7,23 @@
 | `style:`    | Promena stila (npr. formatiranje koda)                  | `style: Uklonjene nepotrebne praznine`              |
 | `test:`     | Dodavanje ili izmena testova                            | `test: Dodati testovi za unos artikala`             |
 | `chore:`    | Ostale izmene koje nisu ni jedno od gore                | `chore: Dodata .gitignore pravila`                  |
+
+Uklanjanje fajla u ovom slucaju git_commit.bat iz repozitorijuma
+
+git rm --cached git_commit.bat
+echo git_commit.bat >> .gitignore
+git commit -m "chore: Uklonjena lokalna skripta iz repozitorijuma"
+
+🧭 2. Pregled dosadašnjih verzija (commit-a)
+
+git log
+
+🔄 3. Povratak na stariju verziju (READ-ONLY za test)
+
+git checkout <commit_hash>
+git checkout 7e7823b  - na primer broj tog commit_hash
+git checkout master  - povratak na stvarnu verziju
+
+♻️ 4. Povratak na staru verziju kao zvaničnu (undo promena)
+
+git reset --hard <commit_hash>
