@@ -1,0 +1,2707 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>avansDialog</class>
+ <widget class="QDialog" name="avansDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>756</width>
+    <height>604</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Avansni račun</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../resources/logo.png</normaloff>../resources/logo.png</iconset>
+  </property>
+  <widget class="QWidget" name="sideWidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>151</width>
+     <height>601</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(220, 242, 242);</string>
+   </property>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>131</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Avansni račun</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="prviBtn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>100</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	border-style:outset;
+	background-color: rgb(107, 134, 134);
+	color: rgb(245, 250, 254);
+	border-color:none;
+	padding:2px;
+}
+QPushButton:checked {
+    background-color:rgb(245, 250, 254);
+	color: rgb(0, 0, 0);
+	border-width:2px;
+	border-top-color:rgb(107, 134, 134);
+	border-bottom-color:rgb(107, 134, 134);
+	border-left-color:rgb(107, 134, 134);
+	border-right-color:rgb(245, 250, 254);
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+}</string>
+    </property>
+    <property name="text">
+     <string>Prvi avansni račun</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <property name="autoExclusive">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="naredniBtn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>140</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	border-style:outset;
+	background-color: rgb(107, 134, 134);
+	color: rgb(245, 250, 254);
+	border-color:none;
+	padding:2px;
+}
+QPushButton:checked {
+    background-color:rgb(245, 250, 254);
+	color: rgb(0, 0, 0);
+	border-width:2px;
+	border-top-color:rgb(107, 134, 134);
+	border-bottom-color:rgb(107, 134, 134);
+	border-left-color:rgb(107, 134, 134);
+	border-right-color:rgb(245, 250, 254);
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+}</string>
+    </property>
+    <property name="text">
+     <string>Naredni avansni račun</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="autoExclusive">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="refundacijaBtn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>180</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	border-style:outset;
+	background-color: rgb(107, 134, 134);
+	color: rgb(245, 250, 254);
+	border-color:none;
+	padding:2px;
+}
+QPushButton:checked {
+    background-color:rgb(245, 250, 254);
+	color: rgb(0, 0, 0);
+	border-width:2px;
+	border-top-color:rgb(107, 134, 134);
+	border-bottom-color:rgb(107, 134, 134);
+	border-left-color:rgb(107, 134, 134);
+	border-right-color:rgb(245, 250, 254);
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+}</string>
+    </property>
+    <property name="text">
+     <string>Refundacija računa</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="autoExclusive">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="konacniBtn">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>220</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	border-style:outset;
+	background-color: rgb(107, 134, 134);
+	color: rgb(245, 250, 254);
+	border-color:none;
+	padding:2px;
+}
+QPushButton:checked {
+    background-color:rgb(245, 250, 254);
+	color: rgb(0, 0, 0);
+	border-width:2px;
+	border-top-color:rgb(107, 134, 134);
+	border-bottom-color:rgb(107, 134, 134);
+	border-left-color:rgb(107, 134, 134);
+	border-right-color:rgb(245, 250, 254);
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+}</string>
+    </property>
+    <property name="text">
+     <string>Konačni račun</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="autoExclusive">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnKraj">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>530</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton#btnKraj {
+	background-color: #b30b00;
+	color: rgb(255, 255, 255);
+    border-style:outset;
+	border-width:2px;
+	border-radius:10px;
+	border-color:black;
+	padding:10px;
+}
+QPushButton#btnKraj:hover {
+    background-color: #e60c00; 
+}
+QPushButton#btnKraj:pressed {
+    background-color:#ab0900; 
+}</string>
+    </property>
+    <property name="text">
+     <string>Izlaz</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pregledBtn">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>260</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+	border-style:outset;
+	background-color: rgb(107, 134, 134);
+	color: rgb(245, 250, 254);
+	border-color:none;
+	padding:2px;
+}
+QPushButton:checked {
+    background-color:rgb(245, 250, 254);
+	color: rgb(0, 0, 0);
+	border-width:2px;
+	border-top-color:rgb(107, 134, 134);
+	border-bottom-color:rgb(107, 134, 134);
+	border-left-color:rgb(107, 134, 134);
+	border-right-color:rgb(245, 250, 254);
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+}</string>
+    </property>
+    <property name="text">
+     <string>Pregled računa</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="autoExclusive">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="bodyWidget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>150</x>
+     <y>0</y>
+     <width>601</width>
+     <height>601</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(245, 250, 254);</string>
+   </property>
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>601</width>
+      <height>601</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="currentIndex">
+     <number>4</number>
+    </property>
+    <widget class="QWidget" name="prviRN">
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>230</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+        <bold>true</bold>
+        <underline>true</underline>
+       </font>
+      </property>
+      <property name="text">
+       <string>Prvi avansni račun</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="sifraEdit">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>90</y>
+        <width>91</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>41</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Šifra</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="nazivEdit">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>90</y>
+        <width>331</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="jmEdit">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>90</y>
+        <width>70</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="stopaEdit">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>140</y>
+        <width>61</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>49</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Količina</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="kolicinaEdit">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>140</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="cenaEdit">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>140</y>
+        <width>131</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>140</y>
+        <width>49</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Cena</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="slovoEdit">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>140</y>
+        <width>31</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="dodajBtn">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>140</y>
+        <width>75</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton#dodajBtn {
+	background-color: #37c127;
+	color: rgb(4, 4, 4);
+    border-style:outset;
+	border-width:2px;
+	border-radius:5px;
+	border-color:#237117;
+	padding:4px;
+}
+QPushButton#dodajBtn:hover {
+    background-color: #45e72f; 
+}
+QPushButton#dodajBtn:pressed {
+    background-color:#319e20; 
+}</string>
+      </property>
+      <property name="text">
+       <string>Dodaj</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>41</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Avans</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboAvans">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>50</y>
+        <width>511</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="placeholderText">
+       <string>Izaberite vrstu uplaćenog avansa</string>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10:avans  Iznos avansa po PDV stopi od 20%</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>11:avans  Iznos avansa po PDV stopi od 10% </string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>12:avans  Iznos avansa za promet oslobođen PDV</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>13:avans  Iznos avansa za obveznike koji nisu u sistemu PDV-a</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="Line" name="line">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>170</y>
+        <width>581</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>190</y>
+        <width>31</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Tip</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="tipCombo">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>190</y>
+        <width>511</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="placeholderText">
+       <string>Izaberite tip kupca</string>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10 PIB Kupca</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>11 JMBG</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>12 PIB i JBKS (budžet)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>14 PIB za poljoprivrednike imaoce gazdinstva</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>15 JMBG za poljoprivrednike imaoce gazdinstva</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>16 BPG Broj poljoprivrednog gazdinstva</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>20 Broj lične karte (domaće lice)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>21 Broj izbegličke legitimacije (domaće lice)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>22 EBS (strano fizičko lice sa prijavljenim boravkom)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>23 Broj pasoša</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>30 Broj pasoša (strano fizičko lice)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>31 Broj diplomatske legitimacije (strano fizičko lice- diplomata)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>32 Broj lične karte MKD (Makedonski drž.)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>33 Broj lične karte MNE (Crnogorski drž.)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>34 Broj lične karte ALB (Albanski drž.)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>35 Broj lične karte BIH (BiH drž.)</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>36 Broj lične karte EU + Norveška, Švajcarska i Island</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>40 Poreski ID strane države (TIN)</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLineEdit" name="tipEdit">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>230</y>
+        <width>41</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="oznakaEdit">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>230</y>
+        <width>241</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="kupacBtn">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>230</y>
+        <width>31</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Izaberi kupca</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(170, 255, 127);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset>
+        <normaloff>../resources/kupci.png</normaloff>../resources/kupci.png</iconset>
+      </property>
+     </widget>
+     <widget class="Line" name="line_2">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>260</y>
+        <width>581</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="stavkeTable">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>280</y>
+        <width>581</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <column>
+       <property name="text">
+        <string>id</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Šifra</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Naziv</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Količina</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Cena</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Obriši</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Slovo</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+     </widget>
+     <widget class="QTextEdit" name="dodatniEdit">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>410</y>
+        <width>221</width>
+        <height>151</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>Ako to kupac zahteva, ovde se mogu upisati artikli koji su predmet avansnih plaćanja.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>410</y>
+        <width>51</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Svega</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="totalEdit">
+      <property name="geometry">
+       <rect>
+        <x>452</x>
+        <y>410</y>
+        <width>121</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>450</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Gotovina</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="gotovinaEdit">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>450</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>480</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Kartica</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="karticaEdit">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>480</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_14">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>510</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Ček</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="racunEdit">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>540</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>540</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Faktura</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="cekEdit">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>510</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnStampa">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>460</y>
+        <width>111</width>
+        <height>90</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="statusTip">
+       <string>Kada su svi potrebni parametri za štampu fiskalnog računa ispunjeni na ovo dugme štampate fiskalni račun za kupca. Štampa je moguća samo ako je zbir svih vrsta plaćanja jednak ili veći ukupnom iznosu računa.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton#btnStampa {
+	background-color: #b30b00;
+	color: rgb(255, 255, 255);
+    border-style:outset;
+	border-width:2px;
+	border-radius:10px;
+	border-color:black;
+	padding:10px;
+}
+QPushButton#btnStampa:hover {
+    background-color: #e60c00; 
+}
+QPushButton#btnStampa:pressed {
+    background-color:#ab0900; 
+}</string>
+      </property>
+      <property name="text">
+       <string>Štampa
+avansnog
+računa</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>48</width>
+        <height>48</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>F9</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="naredniRN">
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>231</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+        <bold>true</bold>
+        <underline>true</underline>
+       </font>
+      </property>
+      <property name="text">
+       <string>Naredni avansni račun</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="stopaEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>140</y>
+        <width>61</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_16">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>41</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Avans</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="sifraEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>90</y>
+        <width>91</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>41</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Šifra</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="slovoEdit_2">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>140</y>
+        <width>31</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_18">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>140</y>
+        <width>49</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Cena</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="nazivEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>90</y>
+        <width>331</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_19">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>49</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Količina</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboAvans_2">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>50</y>
+        <width>511</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="placeholderText">
+       <string>Izaberite vrstu uplaćenog avansa</string>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10:avans  Iznos avansa po PDV stopi od 20%</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>11:avans  Iznos avansa po PDV stopi od 10% </string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>12:avans  Iznos avansa za promet oslobođen PDV</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>13:avans  Iznos avansa za obveznike koji nisu u sistemu PDV-a</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="Line" name="line_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>170</y>
+        <width>581</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="jmEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>90</y>
+        <width>70</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="kolicinaEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>140</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="dodajBtn_2">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>140</y>
+        <width>75</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton#dodajBtn_2 {
+	background-color: #37c127;
+	color: rgb(4, 4, 4);
+    border-style:outset;
+	border-width:2px;
+	border-radius:5px;
+	border-color:#237117;
+	padding:4px;
+}
+QPushButton#dodajBtn_2:hover {
+    background-color: #45e72f; 
+}
+QPushButton#dodajBtn_2:pressed {
+    background-color:#319e20; 
+}</string>
+      </property>
+      <property name="text">
+       <string>Dodaj</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="cenaEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>140</y>
+        <width>131</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_20">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>190</y>
+        <width>81</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Tip kupca</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="tipEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>190</y>
+        <width>41</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="oznakaEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>190</y>
+        <width>241</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_21">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>230</y>
+        <width>81</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>PFR broj</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="brrapuEdit">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>230</y>
+        <width>201</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vremeTranEdit">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>230</y>
+        <width>251</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="Line" name="line_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>260</y>
+        <width>581</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="stavkeTable_2">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>280</y>
+        <width>581</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <column>
+       <property name="text">
+        <string>id</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Šifra</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Naziv</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Količina</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Cena</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Obriši</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Slovo</string>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>10</pointsize>
+        </font>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+     </widget>
+     <widget class="QTextEdit" name="dodatniEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>410</y>
+        <width>221</width>
+        <height>151</height>
+       </rect>
+      </property>
+      <property name="placeholderText">
+       <string>Ako to kupac zahteva, ovde se mogu upisati artikli koji su predmet avansnih plaćanja.</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="totalEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>452</x>
+        <y>410</y>
+        <width>121</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_22">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>410</y>
+        <width>51</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Svega</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_23">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>450</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Gotovina</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="gotovinaEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>450</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="karticaEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>480</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_24">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>480</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Kartica</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="cekEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>510</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_25">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>510</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Ček</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="racunEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>540</y>
+        <width>113</width>
+        <height>24</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_26">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>540</y>
+        <width>71</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Faktura</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnStampa_2">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>460</y>
+        <width>111</width>
+        <height>90</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="statusTip">
+       <string>Kada su svi potrebni parametri za štampu fiskalnog računa ispunjeni na ovo dugme štampate fiskalni račun za kupca. Štampa je moguća samo ako je zbir svih vrsta plaćanja jednak ili veći ukupnom iznosu računa.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton#btnStampa_2 {
+	background-color: #b30b00;
+	color: rgb(255, 255, 255);
+    border-style:outset;
+	border-width:2px;
+	border-radius:10px;
+	border-color:black;
+	padding:10px;
+}
+QPushButton#btnStampa_2:hover {
+    background-color: #e60c00; 
+}
+QPushButton#btnStampa_2:pressed {
+    background-color:#ab0900; 
+}</string>
+      </property>
+      <property name="text">
+       <string>Štampa
+avansnog
+računa</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>48</width>
+        <height>48</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>F9</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="izaberiRnBtn">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>190</y>
+        <width>161</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton#izaberiRnBtn{
+	background-color: #FF5733;
+	color: black;
+	border-style: outset;
+	border-width: 2px;
+	border-radius: 5px;
+	border-color: red;
+	padding: 4px;
+}
+QPushButton#izaberiRnBtn:hover {
+    background-color: #ff8037; 
+}
+QPushButton#izaberiRnBtn:pressed {
+    background-color:#ff2205; 
+}</string>
+      </property>
+      <property name="text">
+       <string>Izaberi referentni račun</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="refundacijaRN">
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>231</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+        <bold>true</bold>
+        <underline>true</underline>
+       </font>
+      </property>
+      <property name="text">
+       <string>Refundacija avansnog računa</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="brrapuEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>90</y>
+        <width>201</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_28">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>81</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>PFR broj</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="oznakaEdit_3">
+      <property name="geometry">
+       <rect>
+        <x>150</x>
+        <y>50</y>
+        <width>241</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="tipEdit_3">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>50</y>
+        <width>41</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="vremeTranEdit_2">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>90</y>
+        <width>251</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="izaberiRnBtn_2">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>50</y>
+        <width>161</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton#izaberiRnBtn_2{
+	background-color: #FF5733;
+	color: black;
+	border-style: outset;
+	border-width: 2px;
+	border-radius: 5px;
+	border-color: red;
+	padding: 4px;
+}
+QPushButton#izaberiRnBtn_2:hover {
+    background-color: #ff8037; 
+}
+QPushButton#izaberiRnBtn_2:pressed {
+    background-color:#ff2205; 
+}</string>
+      </property>
+      <property name="text">
+       <string>Izaberi referentni račun</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_29">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>81</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Tip kupca</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_5">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>120</y>
+        <width>581</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="stavkeTable_3">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>581</width>
+        <height>161</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <column>
+       <property name="text">
+        <string>id</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Šifra</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Naziv</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Količina</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Cena</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+     </widget>
+     <widget class="QLabel" name="label_30">
+      <property name="geometry">
+       <rect>
+        <x>408</x>
+        <y>320</y>
+        <width>51</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Svega</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="totalEdit_3">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>320</y>
+        <width>121</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnStampa_3">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>390</y>
+        <width>201</width>
+        <height>90</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="statusTip">
+       <string>Kada su svi potrebni parametri za štampu fiskalnog računa ispunjeni na ovo dugme štampate fiskalni račun za kupca. Štampa je moguća samo ako je zbir svih vrsta plaćanja jednak ili veći ukupnom iznosu računa.</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton#btnStampa_3 {
+	background-color: #b30b00;
+	color: rgb(255, 255, 255);
+    border-style:outset;
+	border-width:2px;
+	border-radius:10px;
+	border-color:black;
+	padding:10px;
+}
+QPushButton#btnStampa_3:hover {
+    background-color: #e60c00; 
+}
+QPushButton#btnStampa_3:pressed {
+    background-color:#ab0900; 
+}</string>
+      </property>
+      <property name="text">
+       <string>Štampa
+refundacije
+avansnog računa</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>48</width>
+        <height>48</height>
+       </size>
+      </property>
+      <property name="shortcut">
+       <string>F9</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_31">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>320</y>
+        <width>311</width>
+        <height>261</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pomoću dugmeta &lt;span style=&quot; color:#ff0000;&quot;&gt;'Izaberi referentni račun'&lt;/span&gt;&lt;/p&gt;&lt;p&gt;izabrati poslednji avansni račun za izabrani avans.&lt;/p&gt;&lt;p&gt;Posle štampe&lt;span style=&quot; color:#ff0000;&quot;&gt; refundirani avansni račun&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;se ne daje kupcu&lt;/span&gt;!&lt;/p&gt;&lt;p&gt;Ukoliko se radi o refundaciji avansnog računa&lt;/p&gt;&lt;p&gt;koji je odštampan sa greškom, onda takav račun&lt;/p&gt;&lt;p&gt;treba refundirati ali je kod tipa kupca oznaka 10&lt;/p&gt;&lt;p&gt;a u polje oznaka kupca unosi se &lt;span style=&quot; color:#ff0000;&quot;&gt;Vaš PIB&lt;/span&gt;. Odmah&lt;/p&gt;&lt;p&gt;posle treba odštampati ispravan fiskalni račun.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+      </property>
+      <property name="wordWrap">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="konacniRN">
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>231</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+        <bold>true</bold>
+        <underline>true</underline>
+        <strikeout>false</strikeout>
+       </font>
+      </property>
+      <property name="text">
+       <string>Konačni račun</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="pregledRN">
+     <widget class="QLabel" name="label_27">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>10</y>
+        <width>231</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <italic>true</italic>
+        <bold>true</bold>
+        <underline>true</underline>
+        <strikeout>false</strikeout>
+       </font>
+      </property>
+      <property name="text">
+       <string>Pregled avansnih računa</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QTreeWidget" name="avansiTree">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>80</y>
+        <width>591</width>
+        <height>331</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+        <bold>false</bold>
+       </font>
+      </property>
+      <column>
+       <property name="text">
+        <string>PFR broj</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Vreme transakcije</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Datum</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Uplata</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Referentni račun</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Kod kupca</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Kupac</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Godina</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Broj</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Tip racuna</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Tip transakcije</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QPushButton" name="greskaBtn">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>131</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+	background-color: #FF5733;
+   color: white;
+   border-style: outset;
+   border-width: 4px;
+   border-radius: 5px;
+   border-color: red;
+   padding: 4px;
+}
+QPushButton:hover {
+	background-color: rgb(255, 221, 213);
+	color: black;
+}</string>
+      </property>
+      <property name="text">
+       <string>Račun sa greškom</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="rnzaRefBtn">
+      <property name="geometry">
+       <rect>
+        <x>160</x>
+        <y>40</y>
+        <width>431</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton {
+	background-color: rgb(255, 228, 189);
+   color: black;
+   border-style: outset;
+   border-width: 4px;
+   border-radius: 5px;
+   border-color: red;
+   padding: 4px;
+}
+QPushButton:hover {
+	background-color: red;
+	color: white;
+	border-color: rgb(255, 228, 189);
+}</string>
+      </property>
+      <property name="text">
+       <string>Izaberi poslednji avans  za refundaciju pred izdavanje konačnog računa</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="stavkeRnTable">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>420</y>
+        <width>591</width>
+        <height>171</height>
+       </rect>
+      </property>
+      <column>
+       <property name="text">
+        <string>Šifra</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Naziv</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Količina</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Cena</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Vrednost</string>
+       </property>
+       <property name="background">
+        <color>
+         <red>185</red>
+         <green>203</green>
+         <blue>204</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>artikliid</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>tarifa</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>porez</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>porezproc</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>porezid</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>grupa</string>
+       </property>
+      </column>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>btnKraj</sender>
+   <signal>clicked()</signal>
+   <receiver>avansDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>87</x>
+     <y>507</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>78</x>
+     <y>618</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

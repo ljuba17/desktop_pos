@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pazarDialog</class>
+ <widget class="QDialog" name="pazarDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>531</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Pregled pazara</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(220, 242, 242);</string>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>30</y>
+     <width>71</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Od datuma</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>30</y>
+     <width>71</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Do datuma</string>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="oddatEdit">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>30</y>
+     <width>115</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCalendarWidget QWidget {
+    background-color: white;
+    color: black;
+}
+QCalendarWidget QAbstractItemView {
+    selection-background-color: #0078D7;
+    selection-color: white;
+    background-color: white;
+    color: black;
+}
+QCalendarWidget QToolButton {
+    background-color: #0078D7;
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+}
+QCalendarWidget QToolButton:hover {
+    background-color: #005a9e;
+}
+QCalendarWidget QHeaderView {
+    background-color: #F0F0F0;
+}</string>
+   </property>
+   <property name="displayFormat">
+    <string>dd.MM.yyyy.</string>
+   </property>
+   <property name="calendarPopup">
+    <bool>true</bool>
+   </property>
+   <property name="date">
+    <date>
+     <year>2025</year>
+     <month>1</month>
+     <day>1</day>
+    </date>
+   </property>
+  </widget>
+  <widget class="QDateEdit" name="dodatEdit">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>30</y>
+     <width>115</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCalendarWidget QWidget {
+    background-color: white;
+    color: black;
+}
+QCalendarWidget QAbstractItemView {
+    selection-background-color: #0078D7;
+    selection-color: white;
+    background-color: white;
+    color: black;
+}
+QCalendarWidget QToolButton {
+    background-color: #0078D7;
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+}
+QCalendarWidget QToolButton:hover {
+    background-color: #005a9e;
+}
+QCalendarWidget QHeaderView {
+    background-color: #F0F0F0;
+}</string>
+   </property>
+   <property name="displayFormat">
+    <string>dd.MM.yyyy.</string>
+   </property>
+   <property name="calendarPopup">
+    <bool>true</bool>
+   </property>
+   <property name="date">
+    <date>
+     <year>2025</year>
+     <month>1</month>
+     <day>1</day>
+    </date>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnObradi">
+   <property name="geometry">
+    <rect>
+     <x>680</x>
+     <y>30</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(110, 174, 204);</string>
+   </property>
+   <property name="text">
+    <string>   Obradi</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/obradi.png</normaloff>../resources/obradi.png</iconset>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnStampa">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>30</y>
+     <width>101</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(231, 231, 115);</string>
+   </property>
+   <property name="text">
+    <string>   Štampa</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/printer.png</normaloff>../resources/printer.png</iconset>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="tablePazar">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>90</y>
+     <width>981</width>
+     <height>431</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
+   <attribute name="horizontalHeaderDefaultSectionSize">
+    <number>120</number>
+   </attribute>
+   <column>
+    <property name="text">
+     <string>Prodavac</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Gotovina</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Kartica</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Ček</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Prenos na račun</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Instant plaćanje</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Vaučer</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+  </widget>
+  <widget class="QPushButton" name="btnCancel">
+   <property name="geometry">
+    <rect>
+     <x>890</x>
+     <y>30</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);</string>
+   </property>
+   <property name="text">
+    <string>   Zatvori</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/cancel.png</normaloff>../resources/cancel.png</iconset>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

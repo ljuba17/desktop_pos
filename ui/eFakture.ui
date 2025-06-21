@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>efaktureDialog</class>
+ <widget class="QDialog" name="efaktureDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>560</width>
+    <height>320</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Slanje e-Fakture </string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../resources/logo.png</normaloff>../resources/logo.png</iconset>
+  </property>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>560</width>
+     <height>320</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(249, 246, 238);</string>
+   </property>
+   <widget class="QCheckBox" name="crfCheck">
+    <property name="geometry">
+     <rect>
+      <x>230</x>
+      <y>230</y>
+      <width>91</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Šalji u CRF</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>130</y>
+      <width>49</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Prilog 1</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="prilog1Edit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>130</y>
+      <width>401</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>180</y>
+      <width>49</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Prilog 2</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="prilog2Edit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>180</y>
+      <width>401</width>
+      <height>24</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="prilog1Btn">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>130</y>
+      <width>30</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(142, 193, 255);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../icons/search.png</normaloff>../icons/search.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="prilog2Btn">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>180</y>
+      <width>30</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(142, 193, 255);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../icons/search.png</normaloff>../icons/search.png</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="posaljiBtn">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>270</y>
+      <width>140</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+        background-color: #3498db;
+        color: white;
+        border-style:outset;
+	    border-width:2px;
+        border-radius: 6px;
+		border-color:#1f09c6;
+        padding: 6px 14px;
+    }
+    QPushButton:hover {
+        background-color: #2980b9;
+    }
+    QPushButton:pressed {
+        background-color: #2471a3;
+    }</string>
+    </property>
+    <property name="text">
+     <string>Pošalji putem API</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="xmlBtn">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>270</y>
+      <width>140</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+        background-color: #E6E6FA;
+        color: black;
+        border-style:outset;
+	    border-width:2px;
+        border-radius: 6px;
+		border-color:#aa00ff;
+        padding: 6px 14px;
+    }
+    QPushButton:hover {
+        background-color: #CBC3E3;
+    }
+    QPushButton:pressed {
+        background-color: #AA98A9;
+    }</string>
+    </property>
+    <property name="text">
+     <string>Generiši XML fajl</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="odustaniBtn">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>270</y>
+      <width>90</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+        background-color: #D2042D;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 14px;
+    }
+    QPushButton:hover {
+        background-color: #C21E56;
+    }
+    QPushButton:pressed {
+        background-color: #953553;
+    }</string>
+    </property>
+    <property name="text">
+     <string>Odustani</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="info1Label">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>10</y>
+      <width>560</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="info2Label">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>36</y>
+      <width>560</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

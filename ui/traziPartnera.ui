@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>traziPartneraDialog</class>
+ <widget class="QDialog" name="traziPartneraDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>606</width>
+    <height>250</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Pretraga poslovnih partnera</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../resources/logo.png</normaloff>../resources/logo.png</iconset>
+  </property>
+  <widget class="QWidget" name="widget" native="true">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>606</width>
+     <height>250</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(238, 238, 238);</string>
+   </property>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>51</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Pretraga</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="pretragaEdit">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>10</y>
+      <width>301</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <italic>false</italic>
+     </font>
+    </property>
+    <property name="placeholderText">
+     <string>Pretraga partnera po nazivu i PIB-u</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="partneriTable">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>591</width>
+      <height>191</height>
+     </rect>
+    </property>
+    <column>
+     <property name="text">
+      <string>id</string>
+     </property>
+     <property name="background">
+      <color>
+       <red>182</red>
+       <green>208</green>
+       <blue>226</blue>
+      </color>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Naziv</string>
+     </property>
+     <property name="background">
+      <color>
+       <red>182</red>
+       <green>208</green>
+       <blue>226</blue>
+      </color>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>PIB</string>
+     </property>
+     <property name="background">
+      <color>
+       <red>182</red>
+       <green>208</green>
+       <blue>226</blue>
+      </color>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>JBKJS</string>
+     </property>
+     <property name="background">
+      <color>
+       <red>182</red>
+       <green>208</green>
+       <blue>226</blue>
+      </color>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Izaberi</string>
+     </property>
+     <property name="background">
+      <color>
+       <red>182</red>
+       <green>208</green>
+       <blue>226</blue>
+      </color>
+     </property>
+    </column>
+   </widget>
+   <widget class="QPushButton" name="odustaniBtn">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>10</y>
+      <width>75</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+        background-color: #D2042D;
+        color: white;
+        border: 2px solid dark red;
+        border-radius: 1px;
+    }
+    QPushButton:hover {
+        background-color: #C21E56;
+    }
+    QPushButton:pressed {
+        background-color: #953553;
+    }</string>
+    </property>
+    <property name="text">
+     <string>Odustani</string>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

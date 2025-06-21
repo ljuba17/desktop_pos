@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>neobradjeniDialog</class>
+ <widget class="QDialog" name="neobradjeniDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>802</width>
+    <height>478</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Neobradjeni računi</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../resources/logo.png</normaloff>../resources/logo.png</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(220, 242, 242);</string>
+  </property>
+  <widget class="QTableWidget" name="tableHDR">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>781</width>
+     <height>192</height>
+    </rect>
+   </property>
+   <attribute name="horizontalHeaderDefaultSectionSize">
+    <number>100</number>
+   </attribute>
+   <column>
+    <property name="text">
+     <string>Broj</string>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Kasa</string>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Datum i vreme unosa</string>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Ukupni iznos</string>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Ponovi račun</string>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Obriši</string>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Tip transakcije</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Vrednost gotovina</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Vrednost kartica</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Vrednost faktura</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Vrednost ček</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Tip računa</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Kod kupca</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Oznaka kupca</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>IP štampača</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Lservis</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QTableWidget" name="stavkeTable">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>210</y>
+     <width>781</width>
+     <height>261</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Šifra</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Naziv</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Količina</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Cena</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Vrednost</string>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="background">
+     <color>
+      <red>185</red>
+      <green>203</green>
+      <blue>204</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Popust (din)</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Slovo poreza</string>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

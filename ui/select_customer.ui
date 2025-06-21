@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>selectCustomerDialog</class>
+ <widget class="QDialog" name="selectCustomerDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>425</width>
+    <height>306</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <pointsize>12</pointsize>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Izaberi kupca</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(207, 229, 229);</string>
+  </property>
+  <widget class="QComboBox" name="tipCombo">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>40</y>
+     <width>391</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string/>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>10 PIB Kupca</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>11 JMBG</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>12 PIB i JBKS (budžet)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>14 PIB za poljoprivrednike imaoce gazdinstva</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>15 JMBG za poljoprivrednike imaoce gazdinstva</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>16 BPG Broj poljoprivrednog gazdinstva</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>20 Broj lične karte (domaće lice)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>21 Broj izbegličke legitimacije (domaće lice)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>22 EBS (strano fizičko lice sa prijavljenim boravkom)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>23 Broj pasoša</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>30 Broj pasoša (strano fizičko lice)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>31 Broj diplomatske legitimacije (strano fizičko lice- diplomata)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>32 Broj lične karte MKD (Makedonski drž.)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>33 Broj lične karte MNE (Crnogorski drž.)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>34 Broj lične karte ALB (Albanski drž.)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>35 Broj lične karte BIH (BiH drž.)</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>36 Broj lične karte EU + Norv., Svajc. i Island</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>40 Poreski ID strane države (TIN)</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="labelTip">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>81</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>81</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Tip kupca</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTip_2">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>70</y>
+     <width>50</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>50</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Tip</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="tipEdit">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>70</y>
+     <width>51</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="kupacTipEdit">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>70</y>
+     <width>281</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>281</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>110</y>
+     <width>411</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTip_3">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>130</y>
+     <width>141</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>81</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Tip kupca (opciono)</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="tipOpcionoCombo">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>160</y>
+     <width>401</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>281</width>
+     <height>24</height>
+    </size>
+   </property>
+   <item>
+    <property name="text">
+     <string/>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>20 Broj SNPDV</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>21 Broj LNPDV</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>30 Broj PPO-PDV</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>31 Broj ZPPO-PDV</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>32 Broj MPPO-PDV</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>33 Broj IPPO-PDV</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>50 Broj korporacijske kartice</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>60 Period za refundiranje korpor. kartica</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLineEdit" name="kupacTipOpcionoEdit">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>190</y>
+     <width>281</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>281</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+  </widget>
+  <widget class="QLabel" name="labelTip_4">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>50</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>50</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Tip</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="tipOpcionoEdit">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>190</y>
+     <width>51</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>24</width>
+     <height>24</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="okButton">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>260</y>
+     <width>75</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton#okButton {
+background-color: rgb(51, 103, 76);
+color: rgb(255, 255, 255);
+font: 700 9pt &quot;Segoe UI&quot;;
+}
+QPushButton#okButton:hover {
+	background-color:white; 
+	color: #33674c; 
+}
+QPushButton#okButton:pressed {
+    background-color:white; 
+	color: #33674c; 
+}</string>
+   </property>
+   <property name="text">
+    <string>Potvrdi</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="cancelButton">
+   <property name="geometry">
+    <rect>
+     <x>320</x>
+     <y>260</y>
+     <width>75</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton#cancelButton {
+background-color: rgb(236, 46, 32);
+color: rgb(255, 255, 255);
+font: 700 9pt &quot;Segoe UI&quot;;
+}
+QPushButton#cancelButton:hover {
+      background-color:white; 
+	color: red ;
+}
+QPushButton#cancelButton:pressed {
+    background-color:white; 
+	color: red ;
+}</string>
+   </property>
+   <property name="text">
+    <string>Odustani</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

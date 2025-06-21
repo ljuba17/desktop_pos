@@ -1,0 +1,15 @@
+# Virtuelno okruženje
+env/
+
+# Python keš
+__pycache__/
+*.pyc
+
+# PDF izveštaji
+izvestaji/
+
+# Ostalo
+*.log
+*.bak
+.DS_Store
+Thumbs.db
