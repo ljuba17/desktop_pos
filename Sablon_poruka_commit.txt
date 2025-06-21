@@ -1,0 +1,9 @@
+| Prefix      | Značenje                                                | Primer poruke                                       |
+| ----------- | ------------------------------------------------------- | --------------------------------------------------- |
+| `feat:`     | Dodavanje nove funkcionalnosti                          | `feat: Dodata forma za unos partnera`               |
+| `fix:`      | Ispravka greške                                         | `fix: Popravljen izračun PDV-a u fakturi`           |
+| `refactor:` | Refaktorisanje (preuređenje koda bez promene ponašanja) | `refactor: Preimenovana klasa za štampu`            |
+| `docs:`     | Izmena dokumentacije                                    | `docs: Ažuriran README sa uputstvom za instalaciju` |
+| `style:`    | Promena stila (npr. formatiranje koda)                  | `style: Uklonjene nepotrebne praznine`              |
+| `test:`     | Dodavanje ili izmena testova                            | `test: Dodati testovi za unos artikala`             |
+| `chore:`    | Ostale izmene koje nisu ni jedno od gore                | `chore: Dodata .gitignore pravila`                  |
