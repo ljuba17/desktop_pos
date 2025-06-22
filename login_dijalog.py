@@ -19,7 +19,7 @@ class Ui_login(object):
         login.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.label = QtWidgets.QLabel(parent=login)
         self.label.setGeometry(QtCore.QRect(20, 20, 361, 451))
-        self.label.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(107, 134, 134, 255), stop:1 rgba(220, 242, 242,255));\n"
+        self.label.setStyleSheet("background-color: rgb(255, 255, 255);;\n"
 "border-radius: 10px;\n"
 "border-top-left-radius:50px;\n"
 "border-bottom-right-radius:50px;")
