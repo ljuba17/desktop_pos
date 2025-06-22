@@ -33,6 +33,7 @@ from functools import partial
 import warnings
 
 
+
 # 📌 Automatsko prepoznavanje apsolutne putanje
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 dotenv_path = os.path.join(BASE_DIR, ".env")
@@ -56,6 +57,7 @@ LATIN_TO_CYRILLIC_MAP = {
         "Đ": "Ђ", #"\u0402",  # Ђ - Opšta stopa (20%)
         "E": "Е" #"\u0415",  # Е - Posebna stopa (10%)
     }
+
 
 # Funkcija za slanje pina
 def salji_pin():
@@ -182,37 +184,48 @@ class EditableDelegate(QStyledItemDelegate):
         return None
 
 class MainWindow(QMainWindow):
-    app = QApplication(sys.argv)
-    # ✅ Postavljanje univerzalnog stila
-    app.setStyle("Fusion")
-
-    # ✅ Postavljanje podrazumevanog fonta
-    app.setFont(QFont("Segoe UI", 10))
-
-    combo_qss = """
-    QComboBox {
-        background-color: #ffffff;
-        color: #000000;
-        padding: 4px;
-        border: 1px solid #a5a5a5;
-        border-radius: 4px;
-    }
-
-    QComboBox QAbstractItemView {
-        background-color: #ffffff;
-        color: #000000;
-        selection-background-color: #b9cbcc;
-        selection-color: #000000;
-    }
-    """
-    app.setStyleSheet(combo_qss)
-
+    
     def __init__(self):
         super().__init__()
 
         # 📌 Učitavanje UI fajla
         ui_path = os.path.join(BASE_DIR, "ui", "main_window.ui")
         uic.loadUi(ui_path, self)
+
+        if __name__ == "__main__":
+            from login import LoginDialog
+            app = QApplication(sys.argv)
+            app.setStyle("Fusion")
+            app.setFont(QFont("Segoe UI", 10))
+
+            combo_qss = """
+            QComboBox {
+                background-color: #ffffff;
+                color: #000000;
+                padding: 4px;
+                border: 1px solid #a5a5a5;
+                border-radius: 4px;
+            }
+
+            QComboBox QAbstractItemView {
+                background-color: #ffffff;
+                color: #000000;
+                selection-background-color: #b9cbcc;
+                selection-color: #000000;
+            }
+            """
+            app.setStyleSheet(combo_qss)
+
+            from login import LoginDialog  # Ova import ostaje
+
+            login = LoginDialog()
+            if login.exec():
+                from desktop_main import MainWindow
+                window = MainWindow()
+                window.showMaximized()
+                sys.exit(app.exec())
+            else:
+                sys.exit()
         
         # Provera da li stavka actionPIN postoji
         if not hasattr(self, 'actionPIN'):
