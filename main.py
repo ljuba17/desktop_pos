@@ -189,6 +189,24 @@ class MainWindow(QMainWindow):
     # ✅ Postavljanje podrazumevanog fonta
     app.setFont(QFont("Segoe UI", 10))
 
+    combo_qss = """
+    QComboBox {
+        background-color: #ffffff;
+        color: #000000;
+        padding: 4px;
+        border: 1px solid #a5a5a5;
+        border-radius: 4px;
+    }
+
+    QComboBox QAbstractItemView {
+        background-color: #ffffff;
+        color: #000000;
+        selection-background-color: #b9cbcc;
+        selection-color: #000000;
+    }
+    """
+    app.setStyleSheet(combo_qss)
+
     def __init__(self):
         super().__init__()
 

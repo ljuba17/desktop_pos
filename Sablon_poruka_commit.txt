@@ -7,6 +7,8 @@
 | `style:`    | Promena stila (npr. formatiranje koda)                  | `style: Uklonjene nepotrebne praznine`              |
 | `test:`     | Dodavanje ili izmena testova                            | `test: Dodati testovi za unos artikala`             |
 | `chore:`    | Ostale izmene koje nisu ni jedno od gore                | `chore: Dodata .gitignore pravila`                  |
+Poruku napisati pod navodnicima npr "style: Popravka stila za ComboBox"
+
 
 Uklanjanje fajla u ovom slucaju git_commit.bat iz repozitorijuma
 
