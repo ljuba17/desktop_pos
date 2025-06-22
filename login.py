@@ -37,14 +37,14 @@ class LoginDialog(QDialog):
         korisnicko_ime = self.ui.unEdit.text()
         lozinka = self.ui.passEdit.text()
 
-        print(f"Provera korisnika: {korisnicko_ime}")
+        #print(f"Provera korisnika: {korisnicko_ime}")
 
         if not korisnicko_ime or not lozinka:
             QMessageBox.warning(self, "Greška", "Unesite korisničko ime i lozinku.")
             return
 
         try:
-            print("Pokušavam da se povežem na bazu...")
+            #print("Pokušavam da se povežem na bazu...")
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
                 user=os.getenv("DB_USER"),
@@ -52,22 +52,22 @@ class LoginDialog(QDialog):
                 host=os.getenv("DB_HOST"),
                 port=os.getenv("DB_PORT")
             )
-            print("Uspostavljena konekcija sa bazom.")
+            #print("Uspostavljena konekcija sa bazom.")
 
             cursor = conn.cursor()
             # Imaj u vidu da je šema 'kasa' i moraš precizirati u upitu
             cursor.execute("SELECT password, is_active FROM kasa.auth_user WHERE username = %s", (korisnicko_ime,))
             korisnik = cursor.fetchone()
 
-            print(f"Rezultat upita: {korisnik}")
+            #print(f"Rezultat upita: {korisnik}")
 
             if korisnik and korisnik[1]:
                 sifrovana_lozinka = korisnik[0]
-                print(f"Provera lozinke za korisnika: {korisnicko_ime}")
+                #print(f"Provera lozinke za korisnika: {korisnicko_ime}")
 
                 if check_password(lozinka, sifrovana_lozinka):
-                    QMessageBox.information(self, "Uspeh", f"Prijavljeni ste kao {korisnicko_ime}")
-                    print("Lozinka je tačna.")
+                    #QMessageBox.information(self, "Uspeh", f"Prijavljeni ste kao {korisnicko_ime}")
+                    #print("Lozinka je tačna.")
                     self.accept()
                 else:
                     QMessageBox.critical(self, "Greška", "Pogrešna lozinka.")
