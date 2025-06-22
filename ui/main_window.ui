@@ -85,7 +85,7 @@
              <x>0</x>
              <y>10</y>
              <width>371</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="font">
@@ -104,7 +104,7 @@
              <x>0</x>
              <y>50</y>
              <width>151</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="font">
@@ -184,7 +184,7 @@ background-color: rgb(255, 255, 255);
              <x>260</x>
              <y>50</y>
              <width>113</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -208,7 +208,7 @@ background-color: rgb(255, 255, 255);
              <x>0</x>
              <y>90</y>
              <width>151</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="font">
@@ -230,7 +230,7 @@ background-color: rgb(255, 255, 255);
              <x>260</x>
              <y>90</y>
              <width>113</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -260,7 +260,7 @@ background-color: rgb(255, 255, 255);
              <x>0</x>
              <y>130</y>
              <width>151</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -335,7 +335,7 @@ background-color: rgb(255, 255, 255);
              <x>90</x>
              <y>10</y>
              <width>101</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -362,7 +362,7 @@ background-color: rgb(255, 255, 255);
              <x>230</x>
              <y>10</y>
              <width>141</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="font">
@@ -402,7 +402,7 @@ background-color: rgb(255, 255, 255);
              <x>230</x>
              <y>50</y>
              <width>141</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -426,7 +426,7 @@ background-color: rgb(255, 255, 255);
              <x>230</x>
              <y>90</y>
              <width>141</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -571,7 +571,7 @@ QPushButton#btnKorpa:pressed {
              <x>140</x>
              <y>10</y>
              <width>111</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -614,7 +614,7 @@ QPushButton#btnKorpa:pressed {
              <x>140</x>
              <y>40</y>
              <width>111</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -657,7 +657,7 @@ QPushButton#btnKorpa:pressed {
              <x>140</x>
              <y>70</y>
              <width>111</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -700,7 +700,7 @@ QPushButton#btnKorpa:pressed {
              <x>140</x>
              <y>100</y>
              <width>111</width>
-             <height>21</height>
+             <height>24</height>
             </rect>
            </property>
            <property name="sizePolicy">
@@ -1858,9 +1858,9 @@ QPushButton#btnAvans:pressed {
              <property name="geometry">
               <rect>
                <x>10</x>
-               <y>10</y>
+               <y>5</y>
                <width>241</width>
-               <height>21</height>
+               <height>24</height>
               </rect>
              </property>
              <property name="font">
@@ -1886,9 +1886,9 @@ QPushButton#btnAvans:pressed {
              <property name="geometry">
               <rect>
                <x>10</x>
-               <y>40</y>
+               <y>35</y>
                <width>241</width>
-               <height>21</height>
+               <height>24</height>
               </rect>
              </property>
              <property name="font">

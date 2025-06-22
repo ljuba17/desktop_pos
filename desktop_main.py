@@ -198,23 +198,10 @@ class MainWindow(QMainWindow):
             app.setStyle("Fusion")
             app.setFont(QFont("Segoe UI", 10))
 
-            combo_qss = """
-            QComboBox {
-                background-color: #ffffff;
-                color: #000000;
-                padding: 4px;
-                border: 1px solid #a5a5a5;
-                border-radius: 4px;
-            }
+            qss_path = os.path.join(os.path.dirname(__file__), "style.qss")
 
-            QComboBox QAbstractItemView {
-                background-color: #ffffff;
-                color: #000000;
-                selection-background-color: #b9cbcc;
-                selection-color: #000000;
-            }
-            """
-            app.setStyleSheet(combo_qss)
+            with open(qss_path, "r", encoding="utf-8") as f:
+                app.setStyleSheet(f.read())
 
             from login import LoginDialog  # Ova import ostaje
 
@@ -788,7 +775,7 @@ class MainWindow(QMainWindow):
 
                 edit_pos = self.sifraEdit.mapToGlobal(self.sifraEdit.rect().bottomLeft())
                 self.suggestions_list.move(edit_pos.x(), edit_pos.y())
-                self.suggestions_list.resize(self.sifraEdit.width(), 150)
+                self.suggestions_list.resize(max(400, self.sifraEdit.width()), 200)
                 self.suggestions_list.show()
                 self.suggestions_list.setCurrentRow(0)
             else:

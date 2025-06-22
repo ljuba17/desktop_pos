@@ -1,0 +1,44 @@
+/* QComboBox */
+QComboBox {
+    background-color: #ffffff;
+    color: #000000;
+    padding: 4px;
+    border: 1px solid #a5a5a5;
+    border-radius: 4px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    color: #000000;
+    selection-background-color: #b9cbcc;
+    selection-color: #000000;
+}
+
+/* QLineEdit */
+QLineEdit {
+    background-color: transparent;
+    border: 2px solid rgba(0, 0, 0, 0);
+    border-bottom: 2px solid #333;
+    color: #000;
+    padding-bottom: 1px;
+}
+
+QLineEdit:focus {
+    border-bottom: 2px solid #0078d7;
+}
+
+/* QListWidget */
+QListWidget {
+    background-color: #ffffff;
+    border: 1px solid #a5a5a5;
+}
+
+QListWidget::item {
+    padding: 6px;
+}
+
+QListWidget::item:selected {
+    background-color: #4da6ff;
+    color: white;
+    font-weight: bold;
+}
