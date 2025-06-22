@@ -14,6 +14,9 @@ class Ui_login(object):
         login.setObjectName("login")
         login.resize(400, 500)
         login.setStyleSheet("")
+        # Remove window frame
+        login.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
+        login.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.label = QtWidgets.QLabel(parent=login)
         self.label.setGeometry(QtCore.QRect(20, 20, 361, 451))
         self.label.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(107, 134, 134, 255), stop:1 rgba(220, 242, 242,255));\n"
