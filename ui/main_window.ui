@@ -421,6 +421,9 @@ background-color: rgb(255, 255, 255);
            </property>
           </widget>
           <widget class="QLineEdit" name="popCeoRnEdit">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="geometry">
             <rect>
              <x>230</x>

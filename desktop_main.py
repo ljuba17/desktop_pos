@@ -2,9 +2,10 @@ import sys
 import os
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QListWidget, QListWidgetItem, QPushButton,
-    QTableWidgetItem, QButtonGroup, QDialog, QMessageBox, QHeaderView, QStyledItemDelegate
+    QTableWidgetItem, QButtonGroup, QDialog, QMessageBox, QHeaderView, QStyledItemDelegate,
+    QLineEdit
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6 import uic
 import psycopg2
 import random
@@ -295,6 +296,10 @@ class MainWindow(QMainWindow):
         self.popustEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.iznosEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.popCeoRnEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self.procPopEdit.focusInEvent = self.selektuj_tekst_u_fokusu(self.procPopEdit)
+        self.iznosEdit.focusInEvent = self.selektuj_tekst_u_fokusu(self.iznosEdit)
+        self.label_3.setHidden(True)
+        self.popCeoRnEdit.setHidden(True)
         self.gotovinaEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.karticaEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
         self.cekEdit.setAlignment(Qt.AlignmentFlag.AlignRight)
@@ -580,6 +585,12 @@ class MainWindow(QMainWindow):
         
     def zatvori_aplikaciju(self):
         self.close()
+    # Selekcija cele vrednosti u popustima
+    def selektuj_tekst_u_fokusu(self, line_edit):
+        def event_handler(event):
+            QLineEdit.focusInEvent(line_edit, event)
+            QTimer.singleShot(0, line_edit.selectAll)
+        return event_handler
         
     def ucitaj_konfiguraciju_popusta(self):
         try:
