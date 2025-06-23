@@ -74,15 +74,24 @@ class RefundiraniAvansDialog(QDialog):
             )
             cursor = conn.cursor()
 
-            # 🔍 Čitanje našeg PIB-a iz fvr
-            cursor.execute("SELECT pib FROM \"kasa\".\"fvr\" LIMIT 1")
+            # 🔍 Naš PIB iz tabele fvr
+            cursor.execute("SELECT pib FROM kasa.fvr LIMIT 1")
             pib_red = cursor.fetchone()
             if not pib_red:
                 QMessageBox.warning(self, "Upozorenje", "Nije pronađen PIB iz tabele fvr.")
                 return
             nas_pib = pib_red[0]
 
-            # 🔍 Čitanje refundiranih avansnih računa koji nisu naši
+            # 🔍 Mapa iskorišćenih refundacija: {refbrracpu: brracpu_konacnog}
+            cursor.execute("""
+                SELECT refbrracpu, brracpu
+                FROM kasa.kasasum
+                WHERE tipracuna = '0' AND tiptransakcije = '0'
+                AND refbrracpu IS NOT NULL
+            """)
+            iskoriscene_ref = dict(cursor.fetchall())
+
+            # 🔍 Učitavanje refundacija
             cursor.execute("""
                 SELECT brracpu, vremetransakcije, ukiznos, kodkupca, oznakakupca, broj, god, refbrracpu
                 FROM kasa.kasasum
@@ -95,22 +104,22 @@ class RefundiraniAvansDialog(QDialog):
             """, (SIFOBJEKTA, nas_pib))
 
             podaci = cursor.fetchall()
-            self.refundiraniTable.setRowCount(0)  # Očistimo prethodni sadržaj
+            self.refundiraniTable.setRowCount(0)
 
             for row_idx, (brracpu, vreme, iznos, kodkupca, oznakakupca, broj, god, refbrracpu) in enumerate(podaci):
                 self.refundiraniTable.insertRow(row_idx)
 
-                # Dodavanje običnih ćelija
+                # Standardne ćelije
                 self.refundiraniTable.setItem(row_idx, 0, QTableWidgetItem(brracpu))
                 self.refundiraniTable.setItem(row_idx, 1, QTableWidgetItem(str(vreme)))
                 self.refundiraniTable.setItem(row_idx, 2, QTableWidgetItem(str(kodkupca)))
                 self.refundiraniTable.setItem(row_idx, 3, QTableWidgetItem(oznakakupca))
                 self.refundiraniTable.setItem(row_idx, 4, QTableWidgetItem(f"{iznos:.2f}"))
-                self.refundiraniTable.setItem(row_idx, 7, QTableWidgetItem(f"{broj}"))
-                self.refundiraniTable.setItem(row_idx, 8, QTableWidgetItem(f"{god}"))
-                self.refundiraniTable.setItem(row_idx, 9, QTableWidgetItem(f"{refbrracpu}"))
+                self.refundiraniTable.setItem(row_idx, 7, QTableWidgetItem(str(broj)))
+                self.refundiraniTable.setItem(row_idx, 8, QTableWidgetItem(str(god)))
+                self.refundiraniTable.setItem(row_idx, 9, QTableWidgetItem(str(refbrracpu)))
 
-                # 🔘 Dugme "Prikaži sliku"
+                # 🔘 Dugme: Prikaži sliku
                 btn_slikaracuna = QPushButton("Prikaži sliku")
                 btn_slikaracuna.setStyleSheet("""
                     QPushButton {
@@ -132,25 +141,56 @@ class RefundiraniAvansDialog(QDialog):
                 self.refundiraniTable.setCellWidget(row_idx, 5, btn_slikaracuna)
                 btn_slikaracuna.clicked.connect(lambda _, r=row_idx: self.oznaci_red(r))
 
-                # 🔘 Dugme "Izaberi"
+                # 🔘 Dugme: Izaberi
                 btn_izaberi = QPushButton("Izaberi")
-                btn_izaberi.setStyleSheet("""
-                    QPushButton {
-                        background-color: orange;
-                        color: black;
-                        border: 2px solid gray;
-                        border-radius: 5px;
-                        padding: 5px;
-                        font-weight: bold;
-                    }
-                    QPushButton:hover {
-                        background-color: darkorange;
-                    }
-                    QPushButton:pressed {
-                        background-color: #ff8c00;
-                    }
-                """)
-                btn_izaberi.clicked.connect(partial(self.izaberi_racun, row_idx))
+
+                if brracpu in iskoriscene_ref:
+                    final_brracpu = iskoriscene_ref[brracpu]
+
+                    # Stil i onemogućavanje za iskorišćeni
+                    btn_izaberi.setStyleSheet("""
+                        QPushButton {
+                            background-color: #cccccc;
+                            color: #666666;
+                            border: 2px solid #aaaaaa;
+                            border-radius: 5px;
+                            padding: 5px;
+                            font-weight: bold;
+                        }
+                    """)
+                    btn_izaberi.setEnabled(True)
+                    btn_izaberi.clicked.connect(lambda _, broj=final_brracpu: QMessageBox.warning(
+                        self,
+                        "Iskorišćen avans",
+                        f"Ovaj račun refundacije je već iskorišćen za konačni račun: {broj}"
+                    ))
+
+                    # Siva pozadina reda
+                    for col in range(self.refundiraniTable.columnCount()):
+                        item = self.refundiraniTable.item(row_idx, col)
+                        if item:
+                            item.setBackground(QColor("#e0e0e0"))
+                            item.setToolTip(f"❗ Iskorišćen za konačni račun {final_brracpu}")
+                else:
+                    # Stil za aktivno dugme
+                    btn_izaberi.setStyleSheet("""
+                        QPushButton {
+                            background-color: orange;
+                            color: black;
+                            border: 2px solid gray;
+                            border-radius: 5px;
+                            padding: 5px;
+                            font-weight: bold;
+                        }
+                        QPushButton:hover {
+                            background-color: darkorange;
+                        }
+                        QPushButton:pressed {
+                            background-color: #ff8c00;
+                        }
+                    """)
+                    btn_izaberi.clicked.connect(partial(self.izaberi_racun, row_idx))
+
                 self.refundiraniTable.setCellWidget(row_idx, 6, btn_izaberi)
 
             cursor.close()

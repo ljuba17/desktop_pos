@@ -869,7 +869,14 @@ class MainWindow(QMainWindow):
                 if item:
                     self.artikal_izabran(item)
         else:
-            super().keyPressEvent(event)
+            # 🎯 Ako je fokus na btnKorpa i korisnik pritisne Enter
+            if self.btnKorpa.hasFocus() and event.key() in [Qt.Key.Key_Return, Qt.Key.Key_Enter]:
+                self.btnKorpa.click()
+            # 🎯 Ako korisnik pritisne +
+            elif event.key() == Qt.Key.Key_Plus:
+                self.dodaj_u_kasa1()
+            else:
+                super().keyPressEvent(event)
     
     #################################################################################################
     # Dodavanje artikla u bazu i prikaz u tabeli prozora, brisanje stavki i azuriranje totala    

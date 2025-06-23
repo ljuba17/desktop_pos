@@ -517,6 +517,12 @@ QPushButton#btnKorpa:hover {
 QPushButton#btnKorpa:pressed {
     background-color:#CEE5FD; /* Plava */
 	color: white; /* Bela boja teksta */
+}
+QPushButton#btnKorpa:focus {
+    border: 3px solid yellow;
+    background-color: rgb(150, 180, 180);
+    color: black;
+    font-weight: bold;
 }</string>
            </property>
            <property name="text">
