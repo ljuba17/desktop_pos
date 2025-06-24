@@ -80,9 +80,9 @@ Razvijena u Python / PyQt6 okruženju, uz PostgreSQL bazu podataka.
 7. Pokretanje aplikacije iz terminala:
 
    ```bash
-   py main.py
+   py desktop_main.py
    # ili
-   python main.py
+   python desktop_main.py
 
 8. 👨‍💻 Autor
 
