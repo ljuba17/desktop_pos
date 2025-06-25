@@ -480,9 +480,9 @@ class MainWindow(QMainWindow):
                 background-color: #A0B0C1;
                 color: white;
                 border-style: outset;
-                border-width: 2px;
-                border-radius: 10px;
-                border-color: black;
+                border-width: 4px;
+                border-radius: 15px;
+                border-color: #83909e;
                 padding: 10px;
             }
         """
@@ -491,9 +491,9 @@ class MainWindow(QMainWindow):
                 background-color: #ffaa00;
                 color: white;
                 border-style: outset;
-                border-width: 2px;
+                border-width: 4px;
                 border-radius: 15px;
-                border-color: blue;
+                border-color: #ffc053;
                 padding: 10px;
             }
         """

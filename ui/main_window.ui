@@ -485,9 +485,9 @@ background-color: rgb(255, 255, 255);
            <property name="geometry">
             <rect>
              <x>90</x>
-             <y>3</y>
+             <y>2</y>
              <width>181</width>
-             <height>42</height>
+             <height>45</height>
             </rect>
            </property>
            <property name="font">
@@ -504,15 +504,15 @@ background-color: rgb(255, 255, 255);
 	border-style:outset;
 	background-color: rgb(107, 134, 134);
 	color: white; /* Bela boja teksta */
-	border-width:2px;
+	border-width:4px;
 	border-radius:10px;
-	border-color:black;
+	border-color:#8aacac;
 	padding:10px;
 }
 QPushButton#btnKorpa:hover {
    	background-color: rgb(127, 175, 176);
-	color: #0523a8;
-	font-size: 18px; /* Veličina fonta */
+	color: white;
+	font-size: 16px; /* Veličina fonta */
 }
 QPushButton#btnKorpa:pressed {
     background-color:#CEE5FD; /* Plava */
@@ -794,9 +794,9 @@ QPushButton#btnKorpa:focus {
           <widget class="QPushButton" name="btnStampa">
            <property name="geometry">
             <rect>
-             <x>270</x>
+             <x>265</x>
              <y>30</y>
-             <width>90</width>
+             <width>101</width>
              <height>90</height>
             </rect>
            </property>
@@ -811,19 +811,19 @@ QPushButton#btnKorpa:focus {
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton#btnStampa {
-	background-color: #b30b00;
+	background-color: #65aac2;
 	color: rgb(255, 255, 255);
     border-style:outset;
-	border-width:2px;
-	border-radius:10px;
-	border-color:black;
+	border-width:4px;
+	border-radius:15px;
+	border-color:#497b8c;
 	padding:10px;
 }
 QPushButton#btnStampa:hover {
-    background-color: #e60c00; 
+    background-color: #99b6c2; 
 }
 QPushButton#btnStampa:pressed {
-    background-color:#ab0900; 
+    background-color:#5bacc2; 
 }</string>
            </property>
            <property name="text">
@@ -1082,12 +1082,12 @@ border-color: rgb(35, 35, 35);</string>
     font-weight: bold; /* Podebljani tekst */
     border-style:outset;
 	border-width:4px;
-	border-color: rgb(53, 0, 158);
+	border-color: #93afe2;
 	border-radius:15px;
 	padding:10px;
 }
 QPushButton#btnIzaberiKupca:hover {
-    background-color: #feffd8; /* Svetlija zelena kad se prelazi mišem */
+    background-color: #b5d3f1; /* Svetlija zelena kad se prelazi mišem */
 color: red; /* Crvena boja teksta */
 font-size: 22px; /* Veličina fonta */
 }
@@ -1373,6 +1373,9 @@ background-color: rgb(177, 197, 200);</string>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(101, 170, 194);</string>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QFrame" name="tableFrame">
@@ -1407,7 +1410,7 @@ background-color: rgb(177, 197, 200);</string>
                 <string>Tabela u kojoj su prikazane stavke računa.</string>
                </property>
                <property name="styleSheet">
-                <string notr="true"/>
+                <string notr="true">background-color: rgb(231, 229, 215);</string>
                </property>
                <property name="rowCount">
                 <number>0</number>
