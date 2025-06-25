@@ -279,8 +279,8 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
         self.hdrTable.setColumnWidth(0, 210)  # Broj računa PU
         self.hdrTable.setColumnWidth(1, 170)  # Vreme transakcije
         self.hdrTable.setColumnWidth(2, 120)  # Vrednost
-        self.hdrTable.setColumnWidth(3, 92)  # Prikaži sliku
-        self.hdrTable.setColumnWidth(4, 92)  # Prikaži stavke
+        self.hdrTable.setColumnWidth(3, 95)  # Prikaži sliku
+        self.hdrTable.setColumnWidth(4, 99)  # Prikaži stavke
         self.hdrTable.setColumnWidth(6, 92)  # Izaberi
         self.hdrTable.setColumnWidth(8, 92)  # Kopiraj
         
@@ -295,7 +295,7 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
                 if item:
                     font = item.font()
                     font.setBold(False)
-                    font.setPointSize(10)
+                    font.setPointSize(9)
                     item.setFont(font)
 
         # Stilizujemo samo izabrani red
@@ -304,7 +304,7 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
             if item:
                 font = item.font()
                 font.setBold(True)
-                font.setPointSize(11)  # Veći font za istaknuti red
+                font.setPointSize(10)  # Veći font za istaknuti red
                 item.setFont(font)
 
     def filter_hdr_table(self):
