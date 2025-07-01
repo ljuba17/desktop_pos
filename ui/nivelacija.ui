@@ -41,7 +41,7 @@ border-radius:10px;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>20</y>
+     <y>25</y>
      <width>61</width>
      <height>22</height>
     </rect>
@@ -66,7 +66,7 @@ border:none;
    <property name="geometry">
     <rect>
      <x>90</x>
-     <y>20</y>
+     <y>25</y>
      <width>110</width>
      <height>22</height>
     </rect>
@@ -116,10 +116,13 @@ QCalendarWidget QHeaderView {
    <property name="geometry">
     <rect>
      <x>430</x>
-     <y>20</y>
+     <y>25</y>
      <width>211</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
    </property>
    <property name="styleSheet">
     <string notr="true">QPushButton#btnObradi {
@@ -152,10 +155,13 @@ QPushButton#btnObradi:pressed {
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>20</y>
+     <y>25</y>
      <width>91</width>
      <height>31</height>
     </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
    </property>
    <property name="styleSheet">
     <string notr="true">background-color: rgb(255, 255, 255);

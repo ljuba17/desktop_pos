@@ -19,7 +19,7 @@ class Ui_login(object):
         login.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
         self.label = QtWidgets.QLabel(parent=login)
         self.label.setGeometry(QtCore.QRect(20, 20, 361, 451))
-        self.label.setStyleSheet("background-color: rgb(255, 255, 255);\n"
+        self.label.setStyleSheet("background-color: rgb(245, 254, 255);\n"
 "border-radius: 10px;\n"
 "border-top-left-radius:50px;\n"
 "border-bottom-right-radius:50px;")
@@ -64,19 +64,19 @@ class Ui_login(object):
         font.setBold(True)
         self.pushButton.setFont(font)
         self.pushButton.setStyleSheet("QPushButton#pushButton {\n"
-"    background-color: #A0B0C1;\n"
+"    background-color: #82a4e3;\n"
 "    color: black;\n"
 "    border-style: outset;\n"
 "    border-width: 4px;\n"
 "    border-radius: 10px;\n"
-"    border-color: #6b8686;\n"
+"    border-color: #4c6084;\n"
 "    padding: 10px;\n"
 "}\n"
 "QPushButton#pushButton:hover {\n"
-"    background-color: #b7cadd; \n"
+"    background-color: #a2c4e0; \n"
 "}\n"
 "QPushButton#pushButton:pressed {\n"
-"    background-color:#319e20; \n"
+"    background-color:#5bacc2; \n"
 "}")
         self.pushButton.setObjectName("pushButton")
 
