@@ -14,7 +14,7 @@
    <string>Artikli prodati u periodu (zbirno)</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(220, 242, 242);</string>
+   <string notr="true">background-color: #e3e7f1;</string>
   </property>
   <widget class="QPushButton" name="btnCancel">
    <property name="geometry">

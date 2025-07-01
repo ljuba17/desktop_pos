@@ -19,7 +19,7 @@
    <string>Izaberi kupca</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(207, 229, 229);</string>
+   <string notr="true">background-color: #e3e7f1;</string>
   </property>
   <widget class="QComboBox" name="tipCombo">
    <property name="geometry">

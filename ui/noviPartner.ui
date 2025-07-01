@@ -32,7 +32,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(240, 255, 255);</string>
+    <string notr="true">background-color: #e3e7f1;</string>
    </property>
    <widget class="QLabel" name="label">
     <property name="geometry">

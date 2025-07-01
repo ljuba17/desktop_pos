@@ -24,7 +24,7 @@
     <normaloff>../resources/logo.png</normaloff>../resources/logo.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(220, 242, 242);</string>
+   <string notr="true">background-color: #e3e7f1;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
@@ -48,7 +48,7 @@ background-color: rgb(255, 179, 0);
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(220, 242, 242);</string>
+       <string notr="true">background-color: #e3e7f1;</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -69,7 +69,7 @@ background-color: rgb(255, 179, 0);
            </sizepolicy>
           </property>
           <property name="styleSheet">
-           <string notr="true">alternate-background-color: rgb(182, 227, 227);</string>
+           <string notr="true"/>
           </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
@@ -83,7 +83,7 @@ background-color: rgb(255, 179, 0);
            </property>
            <property name="geometry">
             <rect>
-             <x>0</x>
+             <x>2</x>
              <y>10</y>
              <width>371</width>
              <height>24</height>
@@ -102,7 +102,7 @@ background-color: rgb(255, 179, 0);
           <widget class="QLineEdit" name="sifraEdit">
            <property name="geometry">
             <rect>
-             <x>0</x>
+             <x>2</x>
              <y>50</y>
              <width>151</width>
              <height>24</height>
@@ -206,7 +206,7 @@ background-color: rgb(255, 255, 255);
           <widget class="QLineEdit" name="kolicinaEdit">
            <property name="geometry">
             <rect>
-             <x>0</x>
+             <x>2</x>
              <y>90</y>
              <width>151</width>
              <height>24</height>
@@ -258,7 +258,7 @@ background-color: rgb(255, 255, 255);
            </property>
            <property name="geometry">
             <rect>
-             <x>0</x>
+             <x>2</x>
              <y>130</y>
              <width>151</width>
              <height>24</height>
@@ -304,7 +304,7 @@ background-color: rgb(255, 255, 255);
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">border-bottom-color: rgb(107, 134, 134);</string>
+           <string notr="true"/>
           </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
@@ -315,7 +315,7 @@ background-color: rgb(255, 255, 255);
           <widget class="QLabel" name="label">
            <property name="geometry">
             <rect>
-             <x>0</x>
+             <x>2</x>
              <y>10</y>
              <width>81</width>
              <height>21</height>
@@ -333,7 +333,7 @@ background-color: rgb(255, 255, 255);
           <widget class="QLineEdit" name="procPopEdit">
            <property name="geometry">
             <rect>
-             <x>90</x>
+             <x>92</x>
              <y>10</y>
              <width>101</width>
              <height>24</height>
@@ -382,7 +382,7 @@ background-color: rgb(255, 255, 255);
           <widget class="QLabel" name="label_2">
            <property name="geometry">
             <rect>
-             <x>0</x>
+             <x>2</x>
              <y>50</y>
              <width>191</width>
              <height>21</height>
@@ -428,7 +428,7 @@ background-color: rgb(255, 255, 255);
            <property name="geometry">
             <rect>
              <x>230</x>
-             <y>90</y>
+             <y>80</y>
              <width>141</width>
              <height>24</height>
             </rect>
@@ -451,8 +451,8 @@ background-color: rgb(255, 255, 255);
           <widget class="QLabel" name="label_3">
            <property name="geometry">
             <rect>
-             <x>0</x>
-             <y>90</y>
+             <x>2</x>
+             <y>80</y>
              <width>191</width>
              <height>21</height>
             </rect>
@@ -502,22 +502,22 @@ background-color: rgb(255, 255, 255);
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton#btnKorpa {
-	background-color: #65aac2;
-	color: rgb(255, 255, 255);
+	background-color: #82a4e3;
+	color: black;
     border-style:outset;
 	border-width:4px;
 	border-radius:15px;
-	border-color:#497b8c;
+	border-color:#4c6084;
 	padding:10px;
 }
 QPushButton#btnKorpa:hover {
-   	background-color: #99b6c2; 
-	color: white;
+   	background-color: #a2c4e0; 
+	color: black;
 	font-size: 16px; /* Veličina fonta */
 }
 QPushButton#btnKorpa:pressed {
     background-color:#5bacc2; /* Plava */
-	color: white; /* Bela boja teksta */
+	color: black; /* Bela boja teksta */
 }
 QPushButton#btnKorpa:focus {
     border: 3px solid yellow;
@@ -568,6 +568,9 @@ QPushButton#btnKorpa:focus {
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
           </property>
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
@@ -812,16 +815,16 @@ QPushButton#btnKorpa:focus {
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton#btnStampa {
-	background-color: #65aac2;
-	color: rgb(255, 255, 255);
+	background-color: #82a4e3;
+	color: black;
     border-style:outset;
 	border-width:4px;
 	border-radius:15px;
-	border-color:#497b8c;
+	border-color:#4c6084;
 	padding:10px;
 }
 QPushButton#btnStampa:hover {
-    background-color: #99b6c2; 
+    background-color: #a2c4e0; 
 }
 QPushButton#btnStampa:pressed {
     background-color:#5bacc2; 
@@ -879,8 +882,7 @@ računa</string>
             <string>Briši izabranog kupca</string>
            </property>
            <property name="styleSheet">
-            <string notr="true">
-</string>
+            <string notr="true"/>
            </property>
            <property name="text">
             <string/>
@@ -914,8 +916,8 @@ računa</string>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(182, 227, 227);
-border-color: rgb(35, 35, 35);</string>
+          <string notr="true">background-color: #bdc6d9;
+</string>
          </property>
          <widget class="QPushButton" name="btnKupac1">
           <property name="geometry">
@@ -1078,23 +1080,23 @@ border-color: rgb(35, 35, 35);</string>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton#btnIzaberiKupca {
-    background-color: #A9C5E2;
+    background-color: #82a4e3;
     color: white; /* Bela boja teksta */
     font-size: 20px; /* Veličina fonta */
     font-weight: bold; /* Podebljani tekst */
     border-style:outset;
 	border-width:4px;
-	border-color: #93afe2;
+	border-color: #4c6084;
 	border-radius:15px;
 	padding:10px;
 }
 QPushButton#btnIzaberiKupca:hover {
-    background-color: #b5d3f1; /* Svetlija zelena kad se prelazi mišem */
+    background-color: #a2c4e0; /* Svetlija zelena kad se prelazi mišem */
 color: red; /* Crvena boja teksta */
 font-size: 22px; /* Veličina fonta */
 }
 QPushButton#btnIzaberiKupca:pressed {
-    background-color:#CEE5FD; /* Plava */
+    background-color:#5bacc2; /* Plava */
 color: white; /* Crvena boja teksta */
 font-size: 22px; /* Veličina fonta */
 }</string>
@@ -1121,7 +1123,7 @@ font-size: 22px; /* Veličina fonta */
     <item>
      <widget class="QWidget" name="desniWidget" native="true">
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(220, 242, 242);</string>
+       <string notr="true">background-color: #e3e7f1;</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -1140,7 +1142,7 @@ font-size: 22px; /* Veličina fonta */
          </property>
          <property name="styleSheet">
           <string notr="true">
-background-color: rgb(177, 197, 200);</string>
+background-color: #a2c4e0;</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
@@ -1376,7 +1378,7 @@ background-color: rgb(177, 197, 200);</string>
           </sizepolicy>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(101, 170, 194);</string>
+          <string notr="true">background-color: #bdc6d9;</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
@@ -1412,7 +1414,7 @@ background-color: rgb(177, 197, 200);</string>
                 <string>Tabela u kojoj su prikazane stavke računa.</string>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: rgb(231, 229, 215);</string>
+                <string notr="true">background-color: #FFFDF6;</string>
                </property>
                <property name="rowCount">
                 <number>0</number>
@@ -1441,9 +1443,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1468,9 +1470,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1495,9 +1497,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1522,9 +1524,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1549,9 +1551,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1576,9 +1578,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1603,9 +1605,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1630,9 +1632,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1657,9 +1659,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1695,7 +1697,7 @@ background-color: rgb(177, 197, 200);</string>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(182, 227, 227);</string>
+          <string notr="true">background-color: #bdc6d9;</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>

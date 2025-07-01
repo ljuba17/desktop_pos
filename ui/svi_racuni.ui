@@ -14,7 +14,7 @@
    <string>Pregled fiskalnih računa</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(220, 242, 242);</string>
+   <string notr="true">background-color: #e3e7f1;</string>
   </property>
   <widget class="QTabWidget" name="svirnTab">
    <property name="geometry">

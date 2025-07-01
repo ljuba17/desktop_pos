@@ -447,9 +447,9 @@ class MainWindow(QMainWindow):
         """Stilizuje meni i njegove stavke."""
         menu_style = """
             QMenu {
-                background-color: #A0B0C1; /* Pozadina menija */
+                background-color: #e3e7f1; /* Pozadina menija */
                 color: black; /* Boja teksta */
-                border: 1px solid #6b8686; /* Okvir */
+                border: 1px solid #52688f; /* Okvir */
             }
             QMenu::item {
                 background-color: transparent; /* Transparentna pozadina stavki */
@@ -457,7 +457,7 @@ class MainWindow(QMainWindow):
                 padding: 5px 20px; /* Unutrašnja margina */
             }
             QMenu::item:selected {
-                background-color: #6b8686; /* Boja pozadine na hover */
+                background-color: #52688f; /* Boja pozadine na hover */
                 color: white; /* Boja teksta na hover */
                 font-weight: bold; /* Bold tekst */
             }
@@ -477,23 +477,23 @@ class MainWindow(QMainWindow):
     def stilizuj_dugmad_kupaca(self):
         default_style = """
             QPushButton {
-                background-color: #A0B0C1;
+                background-color: #82a4e3;
                 color: white;
                 border-style: outset;
                 border-width: 4px;
-                border-radius: 15px;
-                border-color: #83909e;
+                border-radius: 10px;
+                border-color: #4c6084;
                 padding: 10px;
             }
         """
         active_style = """
             QPushButton {
-                background-color: #ffaa00;
+                background-color: #FF5733;
                 color: white;
                 border-style: outset;
                 border-width: 4px;
-                border-radius: 15px;
-                border-color: #ffc053;
+                border-radius: 10px;
+                border-color: red;
                 padding: 10px;
             }
         """
@@ -557,12 +557,12 @@ class MainWindow(QMainWindow):
     def stilizuj_dugmad_modova(self):
         default_style = """
             QPushButton {
-                background-color: #A0B0C1;
+                background-color: #82a4e3;
                 color: black;
                 border-style: outset;
                 border-width: 4px;
                 border-radius: 10px;
-                border-color: #6b8686;
+                border-color: #4c6084;
                 padding: 10px;
             }
         """

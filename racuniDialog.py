@@ -11,7 +11,7 @@ class Ui_racuniDialog(object):
     def setupUi(self, racuniDialog):
         racuniDialog.setObjectName("racuniDialog")
         racuniDialog.resize(951, 536)
-        racuniDialog.setStyleSheet("background-color: rgb(220, 242, 242);")
+        racuniDialog.setStyleSheet("background-color: #e3e7f1;")
         self.svirnTab = QtWidgets.QTabWidget(parent=racuniDialog)
         self.svirnTab.setGeometry(QtCore.QRect(0, 0, 941, 531))
         font = QtGui.QFont()
