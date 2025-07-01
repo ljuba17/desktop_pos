@@ -41,14 +41,14 @@ class NivelacijaDialog(QDialog):
 
         # Poslednja kolona id je skrivena
         # Postavljanje širine kolona u tableStavke
-        self.tableStavke.setColumnWidth(0, 60)  # Prva kolona širine 80
-        self.tableStavke.setColumnWidth(1, 70)  # Druga kolona širine 70
-        self.tableStavke.setColumnWidth(2, 220)  # Treća kolona širine 140
-        self.tableStavke.setColumnWidth(3, 80)  # Četvrta kolona širine 80
-        self.tableStavke.setColumnWidth(4, 90)  # Peta kolona širine 90
-        self.tableStavke.setColumnWidth(5, 90)  # Peta kolona širine 90
-        self.tableStavke.setColumnWidth(6, 90)  # Peta kolona širine 90
-        self.tableStavke.setColumnWidth(7, 90)  # Peta kolona širine 90
+        self.tableStavke.setColumnWidth(0, 60)  # Prva kolona širine 60 id iz karticaart
+        self.tableStavke.setColumnWidth(1, 70)  # Druga kolona širine 70 sifra
+        self.tableStavke.setColumnWidth(2, 220)  # Treća kolona širine 220 Naziv artikla
+        self.tableStavke.setColumnWidth(3, 80)  # Četvrta kolona širine 80 kolicina
+        self.tableStavke.setColumnWidth(4, 90)  # Peta kolona širine 90 stara cena
+        self.tableStavke.setColumnWidth(5, 90)  # Peta kolona širine 90 nova cena
+        self.tableStavke.setColumnWidth(6, 90)  # Peta kolona širine 90 razlika
+        self.tableStavke.setColumnWidth(7, 70)  # Peta kolona širine 70 % nivelacije
         self.tableStavke.setColumnHidden(0, True)
 
         # Povezivanje dugmeta sa funkcijom za učitavanje izveštaja
