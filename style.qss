@@ -29,7 +29,7 @@ QLineEdit:focus {
 
 /* QListWidget */
 QListWidget {
-    background-color: #ffffff;
+    background-color: #e3e7f1;
     border: 1px solid #a5a5a5;
 }
 
@@ -38,7 +38,7 @@ QListWidget::item {
 }
 
 QListWidget::item:selected {
-    background-color: #4da6ff;
+    background-color: #52688f;
     color: white;
     font-weight: bold;
 }
