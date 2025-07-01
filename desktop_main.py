@@ -23,6 +23,7 @@ from pazar import PazarDialog
 from analiticki import AnalitickaDialog
 from sinteticki import SintetickiDialog
 from neobradjeni import NeobradjeniDialog
+from nivelacija import NivelacijaDialog
 from avans import AvansDialog
 from refundirani_avansi import RefundiraniAvansDialog
 from kep import KepDialog
@@ -241,6 +242,7 @@ class MainWindow(QMainWindow):
         self.actionSintetika.triggered.connect(self.otvori_sinteticki_dialog)
         self.actionNeobradjeni.triggered.connect(self.otvori_neobradjeni_dialog)
         self.actionKEP.triggered.connect(self.otvori_kep_dialog)
+        self.actionNivelacija.triggered.connect(self.otvori_nivelacija_dialog)
         
         # 📌 Primena stilizacije menija
         self.stilizuj_meni()
@@ -433,6 +435,11 @@ class MainWindow(QMainWindow):
         """Otvara dijalog za KEP knjigu."""
         self.kep_dialog = KepDialog(self)  # Kreiraj instancu dijaloga
         self.kep_dialog.exec()  # Prikazi dijalog modalno
+
+    def otvori_nivelacija_dialog(self):
+        """Otvara dijalog za nivelaciju."""
+        self.nivelacija_dialog = NivelacijaDialog(self)  # Kreiraj instancu dijaloga
+        self.nivelacija_dialog.exec()  # Prikazi dijalog modalno
     
     #########################################################
     #########################################################

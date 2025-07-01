@@ -36,6 +36,9 @@
      <bold>true</bold>
     </font>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(170, 195, 217);</string>
+   </property>
    <property name="text">
     <string>Od datuma</string>
    </property>
@@ -54,6 +57,9 @@
      <pointsize>10</pointsize>
      <bold>true</bold>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(170, 195, 217);</string>
    </property>
    <property name="text">
     <string>Do datuma</string>
@@ -360,7 +366,12 @@ QCalendarWidget QHeaderView {
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(255, 255, 255);</string>
+    <string notr="true">background-color: rgb(255, 255, 255);
+border-style:outset;
+	border-width:2px;
+	border-radius:10px;
+	border-color:#4c6084;
+	padding:2px;</string>
    </property>
    <property name="text">
     <string>   Zatvori</string>
