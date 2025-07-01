@@ -48,7 +48,7 @@ background-color: rgb(255, 179, 0);
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: #e3e7f1;</string>
+       <string notr="true">background-color: #F5FEFF;</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -1123,7 +1123,7 @@ font-size: 22px; /* Veličina fonta */
     <item>
      <widget class="QWidget" name="desniWidget" native="true">
       <property name="styleSheet">
-       <string notr="true">background-color: #e3e7f1;</string>
+       <string notr="true">background-color: #F5FEFF;</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>

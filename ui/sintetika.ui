@@ -308,7 +308,7 @@ border:none;
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true"/>
+    <string notr="true">background-color: #FFFDF6;</string>
    </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
     <number>80</number>

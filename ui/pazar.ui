@@ -218,7 +218,7 @@ QCalendarWidget QHeaderView {
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true"/>
+    <string notr="true">background-color: #FFFDF6;</string>
    </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
     <number>120</number>
@@ -235,9 +235,9 @@ QCalendarWidget QHeaderView {
     </property>
     <property name="background">
      <color>
-      <red>185</red>
-      <green>203</green>
-      <blue>204</blue>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
      </color>
     </property>
    </column>
@@ -253,9 +253,9 @@ QCalendarWidget QHeaderView {
     </property>
     <property name="background">
      <color>
-      <red>185</red>
-      <green>203</green>
-      <blue>204</blue>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
      </color>
     </property>
    </column>
@@ -271,9 +271,9 @@ QCalendarWidget QHeaderView {
     </property>
     <property name="background">
      <color>
-      <red>185</red>
-      <green>203</green>
-      <blue>204</blue>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
      </color>
     </property>
    </column>
@@ -289,9 +289,9 @@ QCalendarWidget QHeaderView {
     </property>
     <property name="background">
      <color>
-      <red>185</red>
-      <green>203</green>
-      <blue>204</blue>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
      </color>
     </property>
    </column>
@@ -307,9 +307,9 @@ QCalendarWidget QHeaderView {
     </property>
     <property name="background">
      <color>
-      <red>185</red>
-      <green>203</green>
-      <blue>204</blue>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
      </color>
     </property>
    </column>
@@ -325,9 +325,9 @@ QCalendarWidget QHeaderView {
     </property>
     <property name="background">
      <color>
-      <red>185</red>
-      <green>203</green>
-      <blue>204</blue>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
      </color>
     </property>
    </column>
@@ -343,9 +343,9 @@ QCalendarWidget QHeaderView {
     </property>
     <property name="background">
      <color>
-      <red>185</red>
-      <green>203</green>
-      <blue>204</blue>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
      </color>
     </property>
    </column>
@@ -370,6 +370,32 @@ QCalendarWidget QHeaderView {
      <normaloff>../resources/cancel.png</normaloff>../resources/cancel.png</iconset>
    </property>
   </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>3</x>
+     <y>10</y>
+     <width>994</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(170, 195, 217);
+border-radius:10px;</string>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>label_3</zorder>
+  <zorder>label</zorder>
+  <zorder>label_2</zorder>
+  <zorder>oddatEdit</zorder>
+  <zorder>dodatEdit</zorder>
+  <zorder>btnObradi</zorder>
+  <zorder>btnStampa</zorder>
+  <zorder>tablePazar</zorder>
+  <zorder>btnCancel</zorder>
  </widget>
  <resources/>
  <connections/>

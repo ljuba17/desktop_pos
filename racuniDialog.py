@@ -37,7 +37,7 @@ class Ui_racuniDialog(object):
         self.hdrTable = QtWidgets.QTableWidget(parent=self.fiskalniTab)
         self.hdrTable.setGeometry(QtCore.QRect(10, 40, 921, 192))
         self.hdrTable.setObjectName("hdrTable")
-        self.hdrTable.horizontalHeader().setStyleSheet("QHeaderView::section { background-color: rgb(185, 203, 204); }")
+        self.hdrTable.horizontalHeader().setStyleSheet("QHeaderView::section { background-color: #a2c4e0; }")
         self.hdrTable.setColumnCount(9)  # Dodajemo skrivenu kolonu za broj
         self.hdrTable.setRowCount(0)
         self.hdrTable.setHorizontalHeaderLabels([
@@ -51,7 +51,7 @@ class Ui_racuniDialog(object):
         self.stavkeTable = QtWidgets.QTableWidget(parent=self.fiskalniTab)
         self.stavkeTable.setGeometry(QtCore.QRect(10, 240, 921, 261))
         self.stavkeTable.setObjectName("stavkeTable")
-        self.stavkeTable.horizontalHeader().setStyleSheet("QHeaderView::section { background-color: rgb(185, 203, 204); }")
+        self.stavkeTable.horizontalHeader().setStyleSheet("QHeaderView::section { background-color: #a2c4e0; }")
         self.stavkeTable.setColumnCount(5)
         self.stavkeTable.setRowCount(0)
         self.stavkeTable.setHorizontalHeaderLabels(["Šifra", "Naziv", "Kolicina","Cena", "Vrednost"])

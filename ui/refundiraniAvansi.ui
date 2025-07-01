@@ -53,6 +53,9 @@
      <pointsize>10</pointsize>
     </font>
    </property>
+   <property name="styleSheet">
+    <string notr="true"/>
+   </property>
    <property name="placeholderText">
     <string>pretraga po delu fiskalnog računa (PFR broj)</string>
    </property>
@@ -65,6 +68,9 @@
      <width>881</width>
      <height>321</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #FFFDF6;</string>
    </property>
    <attribute name="horizontalHeaderDefaultSectionSize">
     <number>153</number>
