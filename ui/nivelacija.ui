@@ -287,6 +287,18 @@ border-style:outset;
      </color>
     </property>
    </column>
+   <column>
+    <property name="text">
+     <string>broj</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
+     </color>
+    </property>
+   </column>
   </widget>
  </widget>
  <resources/>
