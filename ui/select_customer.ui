@@ -30,6 +30,12 @@
      <height>24</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(0, 0, 0);
+selection-background-color: rgb(82, 104, 143);
+selection-color: rgb(255, 255, 255);</string>
+   </property>
    <item>
     <property name="text">
      <string/>
@@ -275,6 +281,12 @@
      <width>281</width>
      <height>24</height>
     </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);
+color: rgb(0, 0, 0);
+selection-background-color: rgb(82, 104, 143);
+selection-color: rgb(255, 255, 255);</string>
    </property>
    <item>
     <property name="text">

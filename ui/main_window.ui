@@ -1073,7 +1073,7 @@ računa</string>
            </size>
           </property>
           <property name="toolTip">
-           <string>Izaberi kupca</string>
+           <string>Izaberi tip kupca</string>
           </property>
           <property name="statusTip">
            <string>Klikom na ovo dugme otvara se prozor na kome možete identifikovati kupca na način kako je to zakonodavac predvideo (PIB, JMBG, BPG,...). Identifikacija kupca je obavezna ukoliko kupac plaća robu prenosom na račun ili u slučaju zahteva kupca npr. za gotovinski račun.</string>
