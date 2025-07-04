@@ -25,6 +25,7 @@ from sinteticki import SintetickiDialog
 from neobradjeni import NeobradjeniDialog
 from nivelacija import NivelacijaDialog
 from avans import AvansDialog
+from artiklibu import ArtiklibuDialog
 from refundirani_avansi import RefundiraniAvansDialog
 from kep import KepDialog
 from fakture import FaktureDialog
@@ -243,6 +244,7 @@ class MainWindow(QMainWindow):
         self.actionNeobradjeni.triggered.connect(self.otvori_neobradjeni_dialog)
         self.actionKEP.triggered.connect(self.otvori_kep_dialog)
         self.actionNivelacija.triggered.connect(self.otvori_nivelacija_dialog)
+        self.actionArtiklibu.triggered.connect(self.otvori_artiklibu_dialog)
         
         # 📌 Primena stilizacije menija
         self.stilizuj_meni()
@@ -440,6 +442,11 @@ class MainWindow(QMainWindow):
         """Otvara dijalog za nivelaciju."""
         self.nivelacija_dialog = NivelacijaDialog(self)  # Kreiraj instancu dijaloga
         self.nivelacija_dialog.exec()  # Prikazi dijalog modalno
+
+    def otvori_artiklibu_dialog(self):
+        """Otvara dijalog za brzi unos artikala."""
+        self.artiklibu_dialog = ArtiklibuDialog(self)  # Kreiraj instancu dijaloga
+        self.artiklibu_dialog.exec()  # Prikazi dijalog modalno
     
     #########################################################
     #########################################################
