@@ -103,6 +103,17 @@ class ArtiklibuDialog(QDialog):
         except Exception as e:
             QMessageBox.critical(self, "Greška", f"Greška pri učitavanju combo box vrednosti:\n{e}")
 
+    def crveni_Info(self):
+        crveni_stil = """
+            QLabel {
+                border-style:outset;
+                border-width:2px;
+                border-radius:10px;
+                border-color:#4c6084;
+                color: red; 
+            }
+        """
+
     def proveri_sifru(self):
         sifra = self.sifraEdit.text().strip()
         if not sifra:
@@ -140,13 +151,29 @@ class ArtiklibuDialog(QDialog):
                             LIMIT 1
                         """, (GODINA, sifra))
                         if cur.fetchone():
-                            self.infolabel.setStyleSheet("color: red;")
+                            self.infolabel.setStyleSheet("""
+                            QLabel {
+                                border-style:outset;
+                                border-width:2px;
+                                border-radius:10px;
+                                border-color:#4c6084;
+                                color: red; 
+                            }
+                            """)
                             self.infolabel.setText(f"Izabrani artikal je imao promet u poslovnoj {GODINA} godini.\nDozvoljena je samo izmena cene.")
                             self.samo_izmena_cene = True
                             self.cenaEdit.setFocus()
                         else:
-                            self.infolabel.setStyleSheet("color: green;")
-                            self.infolabel.setText(f"Artikal sa izabranom šifrom nije imao promet u poslovnoj {GODINA} godini.\nMožete izmeniti sve podatke osim šifre.")
+                            self.infolabel.setStyleSheet("""
+                            QLabel {
+                                border-style:outset;
+                                border-width:2px;
+                                border-radius:10px;
+                                border-color:#4c6084;
+                                color: green; 
+                            }
+                            """)
+                            self.infolabel.setText(f"Artikal sa izabranom šifrom nije imao promet u poslovnoj {GODINA} godini. Možete izmeniti sve podatke osim šifre.")
                             self.samo_izmena_cene = False
                             self.nazivEdit.setFocus()
                     else:
