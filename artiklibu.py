@@ -158,6 +158,7 @@ class ArtiklibuDialog(QDialog):
                                 border-radius:10px;
                                 border-color:#4c6084;
                                 color: red; 
+                                font-style: italic;                         
                             }
                             """)
                             self.infolabel.setText(f"Izabrani artikal je imao promet u poslovnoj {GODINA} godini.\nDozvoljena je samo izmena cene.")
@@ -170,7 +171,8 @@ class ArtiklibuDialog(QDialog):
                                 border-width:2px;
                                 border-radius:10px;
                                 border-color:#4c6084;
-                                color: green; 
+                                color: green;
+                                font-style: italic;                         
                             }
                             """)
                             self.infolabel.setText(f"Artikal sa izabranom šifrom nije imao promet u poslovnoj {GODINA} godini. Možete izmeniti sve podatke osim šifre.")

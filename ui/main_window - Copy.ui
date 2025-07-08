@@ -24,12 +24,12 @@
     <normaloff>../resources/logo.png</normaloff>../resources/logo.png</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(220, 242, 242);</string>
+   <string notr="true">background-color: #e3e7f1;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true">
-background-color: rgb(255, 179, 0);
+background-color: rgb(255, 87, 51);
 </string>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -48,7 +48,7 @@ background-color: rgb(255, 179, 0);
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(220, 242, 242);</string>
+       <string notr="true">background-color: #F5FEFF;</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -502,22 +502,22 @@ background-color: rgb(255, 255, 255);
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton#btnKorpa {
-	background-color: #65aac2;
-	color: rgb(255, 255, 255);
+	background-color: #82a4e3;
+	color: black;
     border-style:outset;
 	border-width:4px;
 	border-radius:15px;
-	border-color:#497b8c;
+	border-color:#4c6084;
 	padding:10px;
 }
 QPushButton#btnKorpa:hover {
-   	background-color: #99b6c2; 
-	color: white;
+   	background-color: #a2c4e0; 
+	color: black;
 	font-size: 16px; /* Veličina fonta */
 }
 QPushButton#btnKorpa:pressed {
     background-color:#5bacc2; /* Plava */
-	color: white; /* Bela boja teksta */
+	color: black; /* Bela boja teksta */
 }
 QPushButton#btnKorpa:focus {
     border: 3px solid yellow;
@@ -815,16 +815,16 @@ QPushButton#btnKorpa:focus {
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton#btnStampa {
-	background-color: #65aac2;
-	color: rgb(255, 255, 255);
+	background-color: #82a4e3;
+	color: black;
     border-style:outset;
 	border-width:4px;
 	border-radius:15px;
-	border-color:#497b8c;
+	border-color:#4c6084;
 	padding:10px;
 }
 QPushButton#btnStampa:hover {
-    background-color: #99b6c2; 
+    background-color: #a2c4e0; 
 }
 QPushButton#btnStampa:pressed {
     background-color:#5bacc2; 
@@ -916,8 +916,8 @@ računa</string>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(182, 227, 227);
-border-color: rgb(35, 35, 35);</string>
+          <string notr="true">background-color: #bdc6d9;
+</string>
          </property>
          <widget class="QPushButton" name="btnKupac1">
           <property name="geometry">
@@ -1073,30 +1073,30 @@ border-color: rgb(35, 35, 35);</string>
            </size>
           </property>
           <property name="toolTip">
-           <string>Izaberi kupca</string>
+           <string>Izaberi tip kupca</string>
           </property>
           <property name="statusTip">
            <string>Klikom na ovo dugme otvara se prozor na kome možete identifikovati kupca na način kako je to zakonodavac predvideo (PIB, JMBG, BPG,...). Identifikacija kupca je obavezna ukoliko kupac plaća robu prenosom na račun ili u slučaju zahteva kupca npr. za gotovinski račun.</string>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton#btnIzaberiKupca {
-    background-color: #A9C5E2;
+    background-color: #82a4e3;
     color: white; /* Bela boja teksta */
     font-size: 20px; /* Veličina fonta */
     font-weight: bold; /* Podebljani tekst */
     border-style:outset;
 	border-width:4px;
-	border-color: #93afe2;
+	border-color: #4c6084;
 	border-radius:15px;
 	padding:10px;
 }
 QPushButton#btnIzaberiKupca:hover {
-    background-color: #b5d3f1; /* Svetlija zelena kad se prelazi mišem */
+    background-color: #a2c4e0; /* Svetlija zelena kad se prelazi mišem */
 color: red; /* Crvena boja teksta */
 font-size: 22px; /* Veličina fonta */
 }
 QPushButton#btnIzaberiKupca:pressed {
-    background-color:#CEE5FD; /* Plava */
+    background-color:#5bacc2; /* Plava */
 color: white; /* Crvena boja teksta */
 font-size: 22px; /* Veličina fonta */
 }</string>
@@ -1123,7 +1123,7 @@ font-size: 22px; /* Veličina fonta */
     <item>
      <widget class="QWidget" name="desniWidget" native="true">
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(220, 242, 242);</string>
+       <string notr="true">background-color: #F5FEFF;</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -1142,7 +1142,7 @@ font-size: 22px; /* Veličina fonta */
          </property>
          <property name="styleSheet">
           <string notr="true">
-background-color: rgb(177, 197, 200);</string>
+background-color: #a2c4e0;</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
@@ -1378,7 +1378,7 @@ background-color: rgb(177, 197, 200);</string>
           </sizepolicy>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(101, 170, 194);</string>
+          <string notr="true">background-color: #bdc6d9;</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
@@ -1414,7 +1414,7 @@ background-color: rgb(177, 197, 200);</string>
                 <string>Tabela u kojoj su prikazane stavke računa.</string>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: rgb(231, 229, 215);</string>
+                <string notr="true">background-color: #FFFDF6;</string>
                </property>
                <property name="rowCount">
                 <number>0</number>
@@ -1443,9 +1443,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1470,9 +1470,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1497,9 +1497,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1524,9 +1524,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1551,9 +1551,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1568,7 +1568,7 @@ background-color: rgb(177, 197, 200);</string>
                </column>
                <column>
                 <property name="text">
-                 <string>Popust</string>
+                 <string>Popust %</string>
                 </property>
                 <property name="font">
                  <font>
@@ -1578,9 +1578,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1605,9 +1605,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1632,9 +1632,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1659,9 +1659,9 @@ background-color: rgb(177, 197, 200);</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>185</red>
-                  <green>203</green>
-                  <blue>204</blue>
+                  <red>162</red>
+                  <green>196</green>
+                  <blue>224</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1697,7 +1697,7 @@ background-color: rgb(177, 197, 200);</string>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(182, 227, 227);</string>
+          <string notr="true">background-color: #bdc6d9;</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
@@ -2035,6 +2035,9 @@ QPushButton#btnKraj:pressed {
     <addaction name="actionNeobradjeni"/>
     <addaction name="separator"/>
     <addaction name="actionKEP"/>
+    <addaction name="actionNivelacija"/>
+    <addaction name="separator"/>
+    <addaction name="actionArtiklibu"/>
    </widget>
    <addaction name="menu_tampa"/>
    <addaction name="menuOstalo"/>
@@ -2098,6 +2101,21 @@ QPushButton#btnKraj:pressed {
   <action name="actionKEP">
    <property name="text">
     <string>KEP knjiga</string>
+   </property>
+  </action>
+  <action name="actionNivelacija">
+   <property name="text">
+    <string>Nivelacija za popuste</string>
+   </property>
+  </action>
+  <action name="actionArtiklibu">
+   <property name="text">
+    <string>Artikli brzi unos</string>
+   </property>
+  </action>
+  <action name="actionCenovnik">
+   <property name="text">
+    <string>Izmena cena</string>
    </property>
   </action>
  </widget>
