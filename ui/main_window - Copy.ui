@@ -151,6 +151,9 @@ background-color: rgb(255, 87, 51);
              <height>34</height>
             </size>
            </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="toolTip">
             <string>Pogrešan artikl, resetuj pretragu.</string>
            </property>
@@ -497,6 +500,9 @@ background-color: rgb(255, 255, 255);
              <bold>true</bold>
             </font>
            </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="statusTip">
             <string>Dodaj artikal u tabelu</string>
            </property>
@@ -810,6 +816,9 @@ QPushButton#btnKorpa:focus {
              <bold>true</bold>
             </font>
            </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="statusTip">
             <string>Kada su svi potrebni parametri za štampu fiskalnog računa ispunjeni na ovo dugme štampate fiskalni račun za kupca. Štampa je moguća samo ako je zbir svih vrsta plaćanja jednak ili veći ukupnom iznosu računa.</string>
            </property>
@@ -874,6 +883,9 @@ računa</string>
              <width>31</width>
              <height>24</height>
             </rect>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
            </property>
            <property name="toolTip">
             <string>Briši izabranog kupca</string>
@@ -940,6 +952,9 @@ računa</string>
             <height>60</height>
            </size>
           </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="toolTip">
            <string>Kupac 1</string>
           </property>
@@ -983,6 +998,9 @@ računa</string>
             <width>60</width>
             <height>60</height>
            </size>
+          </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="toolTip">
            <string>Kupac 2</string>
@@ -1028,6 +1046,9 @@ računa</string>
             <height>60</height>
            </size>
           </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="toolTip">
            <string>Kupac 3</string>
           </property>
@@ -1071,6 +1092,9 @@ računa</string>
             <width>60</width>
             <height>60</height>
            </size>
+          </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="toolTip">
            <string>Izaberi tip kupca</string>
@@ -1141,8 +1165,10 @@ font-size: 22px; /* Veličina fonta */
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">
-background-color: #a2c4e0;</string>
+          <string notr="true">background-color: #82a4e3;
+border-style:solid;
+border-width:3px;
+border-color:#4c6084;</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
@@ -1158,6 +1184,9 @@ background-color: #a2c4e0;</string>
               <pointsize>20</pointsize>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border-style:none;</string>
             </property>
             <property name="text">
              <string>Total</string>
@@ -1180,6 +1209,9 @@ background-color: #a2c4e0;</string>
               <pointsize>7</pointsize>
              </font>
             </property>
+            <property name="styleSheet">
+             <string notr="true">border-style:none;</string>
+            </property>
            </widget>
           </item>
           <item>
@@ -1197,6 +1229,9 @@ background-color: #a2c4e0;</string>
              <font>
               <pointsize>7</pointsize>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border-style:none;</string>
             </property>
            </widget>
           </item>
@@ -1232,6 +1267,10 @@ background-color: #a2c4e0;</string>
             </property>
             <property name="statusTip">
              <string>Ukupan iznos računa za plaćanje</string>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border: 2px solid rgba(0, 0, 0, 0);
+    border-bottom: 2px solid #333;</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -1720,6 +1759,9 @@ background-color: #a2c4e0;</string>
               <bold>true</bold>
              </font>
             </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
             <property name="toolTip">
              <string>Promet prodaja</string>
             </property>
@@ -1773,6 +1815,9 @@ QPushButton#btnPromet:pressed {
               <bold>true</bold>
              </font>
             </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
             <property name="toolTip">
              <string>Refundacija računa, kopiranje</string>
             </property>
@@ -1825,6 +1870,9 @@ QPushButton#btnRefundacija:pressed {
               <pointsize>12</pointsize>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="styleSheet">
              <string notr="true">QPushButton#btnAvans {
@@ -1957,6 +2005,9 @@ QPushButton#btnAvans:pressed {
               <pointsize>12</pointsize>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
             </property>
             <property name="toolTip">
              <string>Izađi iz programa</string>
