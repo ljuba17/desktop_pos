@@ -48,7 +48,7 @@ background-color: rgb(255, 87, 51);
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: #F5FEFF;</string>
+       <string notr="true">background-color: #ebebeb;</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
@@ -508,7 +508,7 @@ background-color: rgb(255, 255, 255);
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton#btnKorpa {
-	background-color: #82a4e3;
+	background-color: #e3e7f1;
 	color: black;
     border-style:outset;
 	border-width:4px;
@@ -537,7 +537,7 @@ QPushButton#btnKorpa:focus {
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>../resources/basket1.png</normaloff>../resources/basket1.png</iconset>
+             <normaloff>../resources/plavakorpa.png</normaloff>../resources/plavakorpa.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -824,7 +824,7 @@ QPushButton#btnKorpa:focus {
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton#btnStampa {
-	background-color: #82a4e3;
+	background-color: #e3e7f1;
 	color: black;
     border-style:outset;
 	border-width:4px;
@@ -928,8 +928,8 @@ računa</string>
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: #bdc6d9;
-</string>
+          <string notr="true">border: 2px solid rgba(0, 0, 0, 0);
+border-top: 2px solid #333;</string>
          </property>
          <widget class="QPushButton" name="btnKupac1">
           <property name="geometry">
@@ -962,7 +962,7 @@ računa</string>
            <string>Kupac broj 1.</string>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">border: none;</string>
           </property>
           <property name="text">
            <string/>
@@ -1009,7 +1009,7 @@ računa</string>
            <string>Kupac broj 2.</string>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">border: none;</string>
           </property>
           <property name="text">
            <string/>
@@ -1056,7 +1056,7 @@ računa</string>
            <string>Kupac broj 3.</string>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">border: none;</string>
           </property>
           <property name="text">
            <string/>
@@ -1104,7 +1104,7 @@ računa</string>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton#btnIzaberiKupca {
-    background-color: #82a4e3;
+    background-color: #e3e7f1;
     color: white; /* Bela boja teksta */
     font-size: 20px; /* Veličina fonta */
     font-weight: bold; /* Podebljani tekst */
@@ -1147,7 +1147,7 @@ font-size: 22px; /* Veličina fonta */
     <item>
      <widget class="QWidget" name="desniWidget" native="true">
       <property name="styleSheet">
-       <string notr="true">background-color: #F5FEFF;</string>
+       <string notr="true">background-color: #ebebeb;</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -1186,7 +1186,8 @@ border-color:#4c6084;</string>
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">border-style:none;</string>
+             <string notr="true">border-style:none;
+</string>
             </property>
             <property name="text">
              <string>Total</string>
@@ -1270,7 +1271,8 @@ border-color:#4c6084;</string>
             </property>
             <property name="styleSheet">
              <string notr="true">border: 2px solid rgba(0, 0, 0, 0);
-    border-bottom: 2px solid #333;</string>
+border-bottom: 2px solid #333;
+</string>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -1417,7 +1419,8 @@ border-color:#4c6084;</string>
           </sizepolicy>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: #bdc6d9;</string>
+          <string notr="true">background-color:#e5e5e5;
+</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
@@ -1453,7 +1456,7 @@ border-color:#4c6084;</string>
                 <string>Tabela u kojoj su prikazane stavke računa.</string>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-color: #FFFDF6;</string>
+                <string notr="true">background-color: #F5F5F5;</string>
                </property>
                <property name="rowCount">
                 <number>0</number>
@@ -1482,9 +1485,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1509,9 +1512,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1536,9 +1539,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1563,9 +1566,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1590,9 +1593,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1617,9 +1620,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1644,9 +1647,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1671,9 +1674,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1698,9 +1701,9 @@ border-color:#4c6084;</string>
                 </property>
                 <property name="background">
                  <color>
-                  <red>162</red>
-                  <green>196</green>
-                  <blue>224</blue>
+                  <red>239</red>
+                  <green>239</green>
+                  <blue>239</blue>
                  </color>
                 </property>
                 <property name="foreground">
@@ -1735,8 +1738,15 @@ border-color:#4c6084;</string>
            <height>70</height>
           </size>
          </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>70</height>
+          </size>
+         </property>
          <property name="styleSheet">
-          <string notr="true">background-color: #bdc6d9;</string>
+          <string notr="true">border: 2px solid rgba(0, 0, 0, 0);
+border-top: 2px solid #333;</string>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
@@ -1909,6 +1919,9 @@ QPushButton#btnAvans:pressed {
               <height>65</height>
              </size>
             </property>
+            <property name="styleSheet">
+             <string notr="true">border: none;</string>
+            </property>
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
@@ -1922,7 +1935,7 @@ QPushButton#btnAvans:pressed {
              <property name="geometry">
               <rect>
                <x>10</x>
-               <y>5</y>
+               <y>3</y>
                <width>241</width>
                <height>24</height>
               </rect>
@@ -1935,6 +1948,9 @@ QPushButton#btnAvans:pressed {
              </property>
              <property name="statusTip">
               <string>Broj računa poreske uprave</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border: none;</string>
              </property>
              <property name="readOnly">
               <bool>true</bool>
@@ -1950,7 +1966,7 @@ QPushButton#btnAvans:pressed {
              <property name="geometry">
               <rect>
                <x>10</x>
-               <y>35</y>
+               <y>32</y>
                <width>241</width>
                <height>24</height>
               </rect>
@@ -1963,6 +1979,9 @@ QPushButton#btnAvans:pressed {
              </property>
              <property name="statusTip">
               <string>Vreme transakcije (štampe fiskalnog računa)</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">border: none;</string>
              </property>
              <property name="readOnly">
               <bool>true</bool>

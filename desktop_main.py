@@ -491,7 +491,7 @@ class MainWindow(QMainWindow):
     def stilizuj_dugmad_kupaca(self):
         default_style = """
             QPushButton {
-                background-color: #82a4e3;
+                background-color: #e3e7f1;
                 color: white;
                 border-style: outset;
                 border-width: 4px;
@@ -571,7 +571,7 @@ class MainWindow(QMainWindow):
     def stilizuj_dugmad_modova(self):
         default_style = """
             QPushButton {
-                background-color: #82a4e3;
+                background-color: #e3e7f1;
                 color: black;
                 border-style: outset;
                 border-width: 4px;
