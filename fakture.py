@@ -1269,7 +1269,7 @@ class FaktureDialog(QDialog):
                 ka.sifra, a.naziv, jm.jm, ka.kolicina,
                 ROUND((ka.cenanabavna * (1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100))::numeric, 2) AS cena_bez_pdv,
                 ka.rabatproc,
-                ROUND((ka.cena * ka.kolicina)::numeric * (ka.rabatproc::numeric / 100), 2),
+                ROUND(((ka.cenanabavna * (1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100)) * ka.kolicina)::numeric * (ka.rabatproc::numeric / 100), 2),
                 ROUND(ka.kolicina::numeric * ka.cena::numeric * ROUND((1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100)::numeric, 4),2),
                 ka.porezproc, ka.porez,
                 ROUND((ka.cena * ka.kolicina)::numeric, 2),
@@ -1815,9 +1815,9 @@ class FaktureDialog(QDialog):
 
             #print(f"DEBUG: invoiceid_text = '{invoiceid_text}'")
 
-            if invoiceid_text and invoiceid_text.lower() != "none" and invoiceid_text != "0":
-                QMessageBox.information(self, "Informacija", "Ova faktura je već poslata na SEF i ne može se ponovo slati.")
-                return
+            #if invoiceid_text and invoiceid_text.lower() != "none" and invoiceid_text != "0":
+            #    QMessageBox.information(self, "Informacija", "Ova faktura je već poslata na SEF i ne može se ponovo slati.")
+            #    return
 
             id_fakture = int(self.faktureTable.item(red, 0).text())
             self.stampa_faktura_prilog(id_fakture)
