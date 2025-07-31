@@ -88,7 +88,10 @@ class AnalitickaDialog(QDialog):
                     "kasa"."kasa" k
                 JOIN "kasa"."artikli" a ON a.sifra = k.sifra
                 JOIN "kasa"."jedmere" j ON j.id = a.jedinica_mere_id
-                JOIN "kasa"."kasasum" ks ON ks.god = k.god AND ks.broj = k.broj
+                JOIN "kasa"."kasasum" ks 
+                    ON ks.god = k.god 
+                AND ks.sifobj = k.sifobj 
+                AND ks.broj = k.broj
                 WHERE 
                     k.god = '{GODINA}'
                     AND k.sifobj = '{SIFOBJEKTA}'
@@ -193,7 +196,7 @@ class AnalitickaDialog(QDialog):
             FROM kasa.kasa k
             JOIN kasa.artikli a ON a.sifra = k.sifra
             JOIN kasa.jedmere j ON j.id = a.jedinica_mere_id
-            JOIN kasa.kasasum ks ON ks.god = k.god AND ks.broj = k.broj
+            JOIN kasa.kasasum ks ON ks.god = k.god AND ks.sifobj = k.sifobj AND ks.broj = k.broj
             WHERE 
                 k.god = '{GODINA}'
                 AND k.sifobj = '{SIFOBJEKTA}'
