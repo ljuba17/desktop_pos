@@ -821,7 +821,7 @@ class MainWindow(QMainWindow):
             self.suggestions_list.hide()
 
     def ucitaj_artikal_po_sifri(self, sifra):
-        """✅ Učitavanje detalja artikla."""
+        """✅ Učitavanje detalja artikla sa podrškom za tip=1 (roba), tip=2 (usluga), tip=3 (set)."""
         try:
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
@@ -832,23 +832,50 @@ class MainWindow(QMainWindow):
             )
             cursor = conn.cursor()
 
+            # Dohvati podatke o artiklu i njegov tip
             query = """
-            SELECT a.sifra, a.naziv, jm.jm, z.cena, z.zaliha
+            SELECT a.sifra, a.naziv, jm.jm, a.tip, z.cena, z.zaliha
             FROM "kasa"."artikli" a
-            JOIN "kasa"."zaliheart" z ON a.sifra = z.sifra
+            LEFT JOIN "kasa"."zaliheart" z ON a.sifra = z.sifra AND z.god = %s AND z.sifobj = %s
             LEFT JOIN "kasa"."jedmere" jm ON a.jedinica_mere_id = jm.id
-            WHERE a.sifra = %s
-            AND z.god = %s
-            AND z.sifobj = %s;
+            WHERE a.sifra = %s;
             """
-            cursor.execute(query, (sifra, GODINA, SIFOBJEKTA))
+            cursor.execute(query, (GODINA, SIFOBJEKTA, sifra))
             result = cursor.fetchone()
 
             if result:
-                self.popuni_polja(result)
-                self.kolicinaEdit.setText("1")
-                self.kolicinaEdit.setFocus()
-                self.kolicinaEdit.selectAll()
+                sifra_artikla, naziv, jm, tip, cena, zaliha = result
+                self.trenutni_tip = tip  # čuvamo tip za keyPressEvent
+
+                # tip 2 (usluge) nemaju zalihe
+                if tip == 2:
+                    zaliha = 0.0
+                    self.cenaEdit.setEnabled(True)     # uključi polje ako je bilo onemogućeno u Qt Designeru
+                    self.cenaEdit.setReadOnly(False)   # omogući unos cene
+                    cena = 0.0                         # prazna cena, unosi korisnik
+                else:
+                    self.cenaEdit.setEnabled(True)
+                    self.cenaEdit.setReadOnly(True)
+
+                # tip 3 (set) → cena artikala iz tabele setsastav
+                if tip == 3:
+                    cursor.execute("""
+                        SELECT SUM(cena * kolicina)
+                        FROM "kasa"."setsastav"
+                        WHERE sifra = %s
+                    """, (sifra,))
+                    set_cena = cursor.fetchone()[0]
+                    cena = set_cena if set_cena else 0.0
+
+                self.popuni_polja((sifra_artikla, naziv, jm, cena, zaliha), tip)
+
+                # fokus nakon učitavanja
+                if tip == 2:
+                    self.cenaEdit.setFocus()
+                    self.cenaEdit.selectAll()
+                else:
+                    self.kolicinaEdit.setFocus()
+                    self.kolicinaEdit.selectAll()
             else:
                 self.clear_fields()
                 self.nazivEdit.setText("Nema rezultata")
@@ -859,18 +886,32 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"❌ Greška pri učitavanju artikla: {e}")
 
-    def popuni_polja(self, result):
+    def popuni_polja(self, result, tip_artikla=None):
         """✅ Popunjavanje polja sa podacima artikla."""
         sifra, naziv, jm, cena, zaliha = result
         self.sifraEdit.setText(sifra)
         self.nazivEdit.setText(naziv)
         self.jmEdit.setText(jm or "N/A")
         self.kolicinaEdit.setText("1")
-        self.zalihaEdit.setText(str(zaliha))
-        self.cenaEdit.setText(f"{cena:.2f}")
+
+        if tip_artikla == 2:
+            # usluga → polje za cenu je editabilno i prazno
+            self.cenaEdit.setEnabled(True)
+            self.cenaEdit.setReadOnly(False)
+            self.cenaEdit.setText("")
+            self.cenaEdit.setFocus()
+        else:
+            # roba i set → cena zaključana
+            self.cenaEdit.setEnabled(True)
+            self.cenaEdit.setReadOnly(True)
+            self.cenaEdit.setText(f"{(cena or 0):.2f}")
+            self.kolicinaEdit.setFocus()
+            self.kolicinaEdit.selectAll()
+
+        self.zalihaEdit.setText(str(zaliha or 0))
 
     def keyPressEvent(self, event):
-        """✅ Navigacija po listi i potvrda unosa."""
+        """✅ Navigacija po listi i potvrda unosa + podrška za tip=2 (usluge)."""
         if self.suggestions_list.isVisible():
             if event.key() == Qt.Key.Key_Down:
                 current_row = self.suggestions_list.currentRow()
@@ -883,12 +924,20 @@ class MainWindow(QMainWindow):
                 if item:
                     self.artikal_izabran(item)
         else:
-            # 🎯 Ako je fokus na btnKorpa i korisnik pritisne Enter
+            # Enter dok je fokus na dugmetu → klikni na njega
             if self.btnKorpa.hasFocus() and event.key() in [Qt.Key.Key_Return, Qt.Key.Key_Enter]:
                 self.btnKorpa.click()
-            # 🎯 Ako korisnik pritisne +
+            # + znak dodaje artikal u korpu
             elif event.key() == Qt.Key.Key_Plus:
                 self.dodaj_u_kasa1()
+            # Ako je artikal tip = 2 → nakon unosa količine fokus ide na cenu
+            elif hasattr(self, "trenutni_tip") and self.trenutni_tip == 2:
+                if self.kolicinaEdit.hasFocus() and event.key() in [Qt.Key.Key_Return, Qt.Key.Key_Enter]:
+                    self.cenaEdit.setEnabled(True)
+                    self.cenaEdit.setReadOnly(False)
+                    self.cenaEdit.setFocus()
+                    self.cenaEdit.selectAll()
+                    return
             else:
                 super().keyPressEvent(event)
     
@@ -921,52 +970,6 @@ class MainWindow(QMainWindow):
                 return
 
             # Preuzimanje artiklid i tip iz baze
-            artiklid = None
-            tip = None
-            try:
-                conn = psycopg2.connect(
-                    dbname=os.getenv("DB_NAME"),
-                    user=os.getenv("DB_USER"),
-                    password=os.getenv("DB_PASSWORD"),
-                    host=os.getenv("DB_HOST"),
-                    port=os.getenv("DB_PORT")
-                )
-                cursor = conn.cursor()
-                cursor.execute(
-                    """
-                    SELECT id, tip
-                    FROM "kasa"."artikli"
-                    WHERE sifra = %s
-                    """,
-                    (sifra,)
-                )
-                result = cursor.fetchone()
-                if result:
-                    artiklid, tip = result
-                else:
-                    print(f"❌ Greška: Artikal sa šifrom {sifra} nije pronađen.")
-                    return
-            except Exception as e:
-                print(f"❌ Greška pri dohvatanju artikla: {e}")
-                return
-            finally:
-                cursor.close()
-                conn.close()
-
-            # Izračunavanje vrednosti i popusta
-            proc_popust = float(self.procPopEdit.text() or 0)
-            popust_iznos = round(cena_bez_popusta * proc_popust / 100,2)
-            cena_sa_popustom = round(cena_bez_popusta - popust_iznos,2)
-            vrednost = round(cena_sa_popustom * kolicina,2)
-
-            sifobj = SIFOBJEKTA
-            datum = datetime.now().date()
-            kasa = int(KASA)
-            god = int(GODINA)
-            ststatus = "A"
-            sto = self.aktivan_kupac
-
-            # Unos u bazu
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
                 user=os.getenv("DB_USER"),
@@ -975,25 +978,84 @@ class MainWindow(QMainWindow):
                 port=os.getenv("DB_PORT")
             )
             cursor = conn.cursor()
+            cursor.execute("""SELECT id, tip FROM "kasa"."artikli" WHERE sifra = %s""", (sifra,))
+            result = cursor.fetchone()
+            if not result:
+                print(f"❌ Greška: Artikal sa šifrom {sifra} nije pronađen.")
+                return
 
-            cursor.execute(
-                """
-                INSERT INTO "kasa"."kasa1" 
-                (sifra, sifobj, cena, datum, kolic, broj, kasa, smena, cena2, popproc1, popdin1, popsum, god, kar, ststatus, kreirao, sto, artikliid, tip) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'sistem', %s, %s, %s) 
-                RETURNING id
-                """,
-                (sifra, sifobj, cena_sa_popustom, datum, kolicina, self.trenutni_broj_racuna, kasa, 1,
-                cena_bez_popusta, proc_popust, popust_iznos, popust_iznos*kolicina, god, 1, ststatus, sto, artiklid, tip)
-            )
+            artiklid, tip = result
 
-            inserted_id = cursor.fetchone()[0]
+            # Popust
+            proc_popust = float(self.procPopEdit.text() or 0)
+            popust_iznos = round(cena_bez_popusta * proc_popust / 100, 2)
+            cena_sa_popustom = round(cena_bez_popusta - popust_iznos, 2)
+
+            sifobj = SIFOBJEKTA
+            datum = datetime.now().date()
+            kasa = int(KASA)
+            god = int(GODINA)
+            ststatus = "A"
+            sto = self.aktivan_kupac
+
+            # Ako je artikal SET (tip=3) → učitaj komponente
+            if tip == 3:
+                cursor.execute("""
+                    SELECT s.sifraart, s.kolicina, s.cena, a.naziv
+                    FROM "kasa"."setsastav" s
+                    JOIN "kasa"."artikli" a ON s.sifraart = a.sifra
+                    WHERE s.sifra = %s
+                """, (sifra,))
+                komponente = cursor.fetchall()
+
+                for sifra_komp, kol_komp, cena_komp, naziv_komp in komponente:
+                    ukupna_kolicina = kolicina * kol_komp
+                    vrednost = round(ukupna_kolicina * cena_komp, 2)
+
+                    cursor.execute("""
+                        INSERT INTO "kasa"."kasa1"
+                        (sifra, sifobj, cena, datum, kolic, broj, kasa, smena, 
+                        cena2, popproc1, popdin1, popsum, god, kar, ststatus, 
+                        kreirao, sto, artikliid, tip)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,
+                                %s,%s,%s,%s,%s,%s,%s,
+                                'sistem',%s,
+                                (SELECT id FROM "kasa"."artikli" WHERE sifra = %s), 1)
+                        RETURNING id
+                    """, (sifra_komp, sifobj, cena_komp, datum, ukupna_kolicina,
+                        self.trenutni_broj_racuna, kasa, 1, cena_komp, 0, 0, 0,
+                        god, 1, ststatus, sto, sifra_komp))
+
+                    inserted_id = cursor.fetchone()[0]
+                    self.dodaj_u_korpu(inserted_id, sifra_komp, f"{naziv_komp} (SET)",
+                                    ukupna_kolicina, cena_komp, 0,
+                                    cena_komp, vrednost)
+            else:
+                # Standardan unos artikla (tip 1 ili 2)
+                vrednost = round(cena_sa_popustom * kolicina, 2)
+                cursor.execute("""
+                    INSERT INTO "kasa"."kasa1"
+                    (sifra, sifobj, cena, datum, kolic, broj, kasa, smena, 
+                    cena2, popproc1, popdin1, popsum, god, kar, ststatus, 
+                    kreirao, sto, artikliid, tip)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,
+                            %s,%s,%s,%s,%s,%s,%s,
+                            'sistem',%s,%s,%s)
+                    RETURNING id
+                """, (sifra, sifobj, cena_sa_popustom, datum, kolicina,
+                    self.trenutni_broj_racuna, kasa, 1,
+                    cena_bez_popusta, proc_popust, popust_iznos,
+                    popust_iznos * kolicina, god, 1, ststatus,
+                    sto, artiklid, tip))
+
+                inserted_id = cursor.fetchone()[0]
+                self.dodaj_u_korpu(inserted_id, sifra, self.nazivEdit.text(),
+                                kolicina, cena_bez_popusta, proc_popust,
+                                cena_sa_popustom, vrednost)
+
             conn.commit()
             cursor.close()
             conn.close()
-
-            # Dodavanje u tabelu
-            self.dodaj_u_korpu(inserted_id, sifra, self.nazivEdit.text(), kolicina, cena_bez_popusta, proc_popust, cena_sa_popustom, vrednost)
 
         except Exception as e:
             print(f"❌ Greška pri upisu u bazu `kasa1`: {e}")
