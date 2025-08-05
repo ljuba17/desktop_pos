@@ -2109,7 +2109,6 @@ QPushButton#btnKraj:pressed {
      <string>Ostalo</string>
     </property>
     <addaction name="actionFaktura"/>
-    <addaction name="actionPredracun"/>
     <addaction name="separator"/>
     <addaction name="actionAvans"/>
     <addaction name="separator"/>
