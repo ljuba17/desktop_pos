@@ -225,7 +225,7 @@ class ZaliheDialog(QDialog):
             Paragraph(f"<b>{objekat_podaci}</b>", ParagraphStyle("Objekat", fontName=font_name, fontSize=10)),
             Paragraph(f"{adresa}", ParagraphStyle("Adresa", fontName=font_name, fontSize=10)),
             Paragraph(f"{mesto}", ParagraphStyle("Mesto", fontName=font_name, fontSize=10)),
-            Paragraph("Stanje artikala - skraćeni izveštaj", ParagraphStyle("Naslov", fontName=font_name, fontSize=14, alignment=1)),
+            Paragraph("Stanje artikala", ParagraphStyle("Naslov", fontName=font_name, fontSize=14, alignment=1)),
             Spacer(1, 14),
             Paragraph(f"Na dan: {datum_fmt}", ParagraphStyle("Datum", fontName=font_name, fontSize=10, alignment=1)),
             Spacer(1, 12),
