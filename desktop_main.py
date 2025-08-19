@@ -30,6 +30,7 @@ from refundirani_avansi import RefundiraniAvansDialog
 from kep import KepDialog
 from fakture import FaktureDialog
 from partneri import PartneriDialog
+from zalihe import ZaliheDialog
 import json
 from PyQt6.QtGui import QAction
 from functools import partial
@@ -245,6 +246,7 @@ class MainWindow(QMainWindow):
         self.actionKEP.triggered.connect(self.otvori_kep_dialog)
         self.actionNivelacija.triggered.connect(self.otvori_nivelacija_dialog)
         self.actionArtiklibu.triggered.connect(self.otvori_artiklibu_dialog)
+        self.actionZalihe.triggered.connect(self.otvori_zalihe_dialog)
         
         # 📌 Primena stilizacije menija
         self.stilizuj_meni()
@@ -447,6 +449,11 @@ class MainWindow(QMainWindow):
         """Otvara dijalog za brzi unos artikala."""
         self.artiklibu_dialog = ArtiklibuDialog(self)  # Kreiraj instancu dijaloga
         self.artiklibu_dialog.exec()  # Prikazi dijalog modalno
+
+    def otvori_zalihe_dialog(self):
+        """Otvara dijalog za stanje zaiha."""
+        self.zalihe_dialog = ZaliheDialog(self)  # Kreiraj instancu dijaloga
+        self.zalihe_dialog.exec()  # Prikazi dijalog modalno
     
     #########################################################
     #########################################################
