@@ -33,17 +33,30 @@ class CeneDialog(QDialog):
         today = QDate.currentDate()
         # Pokretanje funkcije za primenu nivelacije
         self.primeni_nivelacije()
+        # Izmena broja dana za prikaz
+        # Povezivanje combo boxa sa funkcijom
+        self.comboDana.currentIndexChanged.connect(self.on_combo_changed)
+        # Pokretanje funkcije za popunjavanje tabele
         self.ucitaj_cene(dana=10)
 
         # Tabela u zalihe dijalog
         self.tableCene.setColumnWidth(0, 100)  # Prva kolona širine 100 - datum
-        self.tableCene.setColumnWidth(1, 80)  # Druga kolona širine 80 - sifra
-        self.tableCene.setColumnWidth(2, 290)  # Treca kolona širine 290 - naziv
-        self.tableCene.setColumnWidth(3, 80)  # Cetvrta kolona širine 80 - stara cena
-        self.tableCene.setColumnWidth(4, 80)  # Peta kolona širine 80 - nova cena
+        self.tableCene.setColumnWidth(1, 105)  # Druga kolona širine 105 - Dokument
+        self.tableCene.setColumnWidth(2, 80)  # Treca kolona širine 80 - sifra
+        self.tableCene.setColumnWidth(3, 290)  # Cetvrta kolona širine 290 - naziv
+        self.tableCene.setColumnWidth(4, 80)  # Peta kolona širine 80 - stara cena
+        self.tableCene.setColumnWidth(5, 80)  # Sesta kolona širine 80 - nova cena
 
         # Povezivanje dugmeta sa funkcijom za učitavanje izveštaja
         self.btnCancel.clicked.connect(self.reject)
+
+    # Funkcija za obradu promene combo boxa
+    def on_combo_changed(self, index):
+        try:
+            dana = int(self.comboDana.currentText())
+        except ValueError:
+            dana = 10  # fallback
+        self.ucitaj_cene(dana)
 
     def primeni_nivelacije(self):
         """
@@ -128,7 +141,7 @@ class CeneDialog(QDialog):
             cursor = conn.cursor()
 
             query = """
-                SELECT k.datum, a.sifra, a.naziv, k.staracena AS stara_cena, k.cena AS nova_cena
+                SELECT k.datum, k.opis, a.sifra, a.naziv, k.staracena AS stara_cena, k.cena AS nova_cena
                 FROM kasa.karticaart k
                 JOIN kasa.artikli a ON k.artikliid = a.id
                 JOIN kasa.zaliheart z ON z.artikliid = k.artikliid 
@@ -148,20 +161,23 @@ class CeneDialog(QDialog):
 
             self.tableCene.setRowCount(len(rezultati))
 
-            for row_idx, (datum, sifra, naziv, stara_cena, nova_cena) in enumerate(rezultati):
+            for row_idx, (datum, opis, sifra, naziv, stara_cena, nova_cena) in enumerate(rezultati):
                 # Datum
                 self.tableCene.setItem(row_idx, 0, QTableWidgetItem(datum.strftime("%d.%m.%Y")))
 
                 # Šifra
-                self.tableCene.setItem(row_idx, 1, QTableWidgetItem(str(sifra)))
+                self.tableCene.setItem(row_idx, 1, QTableWidgetItem(opis))
+
+                # Šifra
+                self.tableCene.setItem(row_idx, 2, QTableWidgetItem(str(sifra)))
 
                 # Naziv artikla
-                self.tableCene.setItem(row_idx, 2, QTableWidgetItem(naziv))
+                self.tableCene.setItem(row_idx, 3, QTableWidgetItem(naziv))
 
                 # Stara cena (crvena)
                 item_stara = QTableWidgetItem(f"{stara_cena:.2f}")
                 item_stara.setForeground(QBrush(QColor("red")))
-                self.tableCene.setItem(row_idx, 3, item_stara)
+                self.tableCene.setItem(row_idx, 4, item_stara)
 
                 # Nova cena (zelena)
                 item_nova = QTableWidgetItem(f"{nova_cena:.2f}")
@@ -169,7 +185,7 @@ class CeneDialog(QDialog):
                 font = item_nova.font()
                 font.setBold(True)
                 item_nova.setFont(font)
-                self.tableCene.setItem(row_idx, 4, item_nova)
+                self.tableCene.setItem(row_idx, 5, item_nova)
 
             cursor.close()
             conn.close()

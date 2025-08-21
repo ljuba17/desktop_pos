@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>675</width>
+    <width>779</width>
     <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Izmenjene cene u poslednjih 10 dana</string>
+   <string>Izmenjene cene</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color:#e5e5e5;</string>
@@ -19,7 +19,7 @@
   <widget class="QPushButton" name="btnCancel">
    <property name="geometry">
     <rect>
-     <x>550</x>
+     <x>670</x>
      <y>20</y>
      <width>91</width>
      <height>31</height>
@@ -49,13 +49,25 @@ border-style:outset;
     <rect>
      <x>10</x>
      <y>60</y>
-     <width>651</width>
+     <width>761</width>
      <height>541</height>
     </rect>
    </property>
    <column>
     <property name="text">
      <string>Datum izmene</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Dokument</string>
     </property>
     <property name="background">
      <color>
@@ -113,6 +125,92 @@ border-style:outset;
      </color>
     </property>
    </column>
+  </widget>
+  <widget class="QComboBox" name="comboDana">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>20</y>
+     <width>68</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <bold>true</bold>
+    </font>
+   </property>
+   <item>
+    <property name="text">
+     <string>10</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>5</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>15</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>30</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>60</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>90</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>120</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>20</y>
+     <width>181</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>Cene izmenjene u poslednjih</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>20</y>
+     <width>49</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <bold>true</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>dana</string>
+   </property>
   </widget>
  </widget>
  <resources/>
