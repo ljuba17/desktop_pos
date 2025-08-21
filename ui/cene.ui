@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ceneDialog</class>
+ <widget class="QDialog" name="ceneDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>675</width>
+    <height>608</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Izmenjene cene u poslednjih 10 dana</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color:#e5e5e5;</string>
+  </property>
+  <widget class="QPushButton" name="btnCancel">
+   <property name="geometry">
+    <rect>
+     <x>550</x>
+     <y>20</y>
+     <width>91</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: rgb(255, 255, 255);
+border-style:outset;
+	border-width:2px;
+	border-radius:10px;
+	border-color:#4c6084;
+	padding:2px;</string>
+   </property>
+   <property name="text">
+    <string>   Zatvori</string>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>../resources/cancel.png</normaloff>../resources/cancel.png</iconset>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="tableCene">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>651</width>
+     <height>541</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>Datum izmene</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Šifra</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Naziv</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Stara cena</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
+     </color>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Nova cena</string>
+    </property>
+    <property name="background">
+     <color>
+      <red>162</red>
+      <green>196</green>
+      <blue>224</blue>
+     </color>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

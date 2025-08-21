@@ -2120,6 +2120,7 @@ QPushButton#btnKraj:pressed {
     <addaction name="separator"/>
     <addaction name="actionKEP"/>
     <addaction name="actionNivelacija"/>
+    <addaction name="actionCene"/>
     <addaction name="actionZalihe"/>
     <addaction name="separator"/>
     <addaction name="actionArtiklibu"/>
@@ -2206,6 +2207,11 @@ QPushButton#btnKraj:pressed {
   <action name="actionZalihe">
    <property name="text">
     <string>Zalihe</string>
+   </property>
+  </action>
+  <action name="actionCene">
+   <property name="text">
+    <string>Izmenjene cene</string>
    </property>
   </action>
  </widget>

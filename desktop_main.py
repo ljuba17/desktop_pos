@@ -31,6 +31,7 @@ from kep import KepDialog
 from fakture import FaktureDialog
 from partneri import PartneriDialog
 from zalihe import ZaliheDialog
+from cene import CeneDialog
 import json
 from PyQt6.QtGui import QAction
 from functools import partial
@@ -247,6 +248,7 @@ class MainWindow(QMainWindow):
         self.actionNivelacija.triggered.connect(self.otvori_nivelacija_dialog)
         self.actionArtiklibu.triggered.connect(self.otvori_artiklibu_dialog)
         self.actionZalihe.triggered.connect(self.otvori_zalihe_dialog)
+        self.actionCene.triggered.connect(self.otvori_cene_dialog)
         
         # 📌 Primena stilizacije menija
         self.stilizuj_meni()
@@ -454,6 +456,11 @@ class MainWindow(QMainWindow):
         """Otvara dijalog za stanje zaiha."""
         self.zalihe_dialog = ZaliheDialog(self)  # Kreiraj instancu dijaloga
         self.zalihe_dialog.exec()  # Prikazi dijalog modalno
+
+    def otvori_cene_dialog(self):
+        """Otvara dijalog za izmenu cena."""
+        self.cene_dialog = CeneDialog(self)  # Kreiraj instancu dijaloga
+        self.cene_dialog.exec()  # Prikazi dijalog modalno
     
     #########################################################
     #########################################################
