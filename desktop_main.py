@@ -728,16 +728,16 @@ class MainWindow(QMainWindow):
 
             iznos = kolicina * cena
             if iznos_unet == iznos:
-                self.procPopEdit.setText("0.00")
+                self.procPopEdit.setText("0.0000")
                 self.popustEdit.setText("0.00")
             else:
                 popust_iznos = iznos - iznos_unet
                 proc_popust = (popust_iznos / iznos) * 100
 
-                self.procPopEdit.setText(f"{proc_popust:.2f}")
+                self.procPopEdit.setText(f"{proc_popust:.4f}")
                 self.popustEdit.setText(f"{popust_iznos:.2f}")
         except ValueError:
-            self.procPopEdit.setText("0.00")
+            self.procPopEdit.setText("0.0000")
             self.popustEdit.setText("0.00")
             self.popCeoRnEdit.setText("0.00")
 

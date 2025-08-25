@@ -223,12 +223,22 @@ class FaktureDialog(QDialog):
             for red_index, red in enumerate(rezultati):
                 self.neobradjeniTable.insertRow(red_index)
 
-                # Unos podataka u ćelije
-                self.neobradjeniTable.setItem(red_index, 0, QTableWidgetItem(str(red[0])))  # broj
-                self.neobradjeniTable.setItem(red_index, 1, QTableWidgetItem(str(red[1])))  # kasa
-                self.neobradjeniTable.setItem(red_index, 2, QTableWidgetItem(str(red[2])))  # datum
-                self.neobradjeniTable.setItem(red_index, 3, QTableWidgetItem(f"{red[3]:.2f}"))  # ukiznos
-                self.neobradjeniTable.setItem(red_index, 4, QTableWidgetItem(str(red[4])))  # brracpu (skriven)
+                # Polja koja se upisuju u tabelu
+                vrednosti = [
+                    str(red[0]),                # broj
+                    str(red[1]),                # kasa
+                    str(red[2]),                # datum
+                    f"{red[3]:.2f}",            # ukiznos
+                    str(red[4])                 # brracpu (skriveno polje)
+                ]
+
+                for col_index, vrednost in enumerate(vrednosti):
+                    item = QTableWidgetItem(vrednost)
+                    # onemogućimo editovanje odmah
+                    flags = item.flags()
+                    flags &= ~Qt.ItemFlag.ItemIsEditable
+                    item.setFlags(flags)
+                    self.neobradjeniTable.setItem(red_index, col_index, item)
 
                 # Dodavanje dugmeta "Izaberi"
                 dugme = QPushButton("Izaberi")
@@ -250,11 +260,6 @@ class FaktureDialog(QDialog):
                 """)
                 dugme.clicked.connect(lambda _, r=red_index: self.izaberi_racun(r))
                 self.neobradjeniTable.setCellWidget(red_index, 5, dugme)
-                for row in range(self.neobradjeniTable.rowCount()):
-                    for col in range(self.neobradjeniTable.columnCount()):
-                        item = self.neobradjeniTable.item(row, col)
-                        if item is not None:
-                            item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
 
             cursor.close()
             conn.close()

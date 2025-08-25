@@ -2,6 +2,7 @@ import requests
 import xml.etree.ElementTree as ET
 from html import unescape
 import json
+import certifi
 
 # Funkcija za dobijanje osnovnih podataka o firmi na osnovu PIB-a
 def vrati_proveri_pib_nbs(pib):
@@ -32,7 +33,7 @@ def vrati_proveri_pib_nbs(pib):
             "https://webservices.nbs.rs/CommunicationOfficeService1_0/CoreXmlService.asmx",
             data=xml_poruka,
             headers=headers,
-            verify=False
+            verify=certifi.where() #verify=False
         )
         response.raise_for_status()
         #print("API Response: ", response.content)  # Dodato za proveru odgovora
@@ -103,7 +104,7 @@ def vrati_pib_tekrac_nbs(ip_pib):
             "https://webservices.nbs.rs/CommunicationOfficeService1_0/CompanyAccountXmlService.asmx",
             data=xml_poruka,
             headers=headers,
-            verify=False
+            verify=certifi.where() #verify=False
         )
         response.raise_for_status()
     except requests.exceptions.RequestException as e:

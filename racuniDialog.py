@@ -277,8 +277,8 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
 
         # 📌 **Podešavanje širine kolona**
         self.hdrTable.setColumnWidth(0, 210)  # Broj računa PU
-        self.hdrTable.setColumnWidth(1, 170)  # Vreme transakcije
-        self.hdrTable.setColumnWidth(2, 120)  # Vrednost
+        self.hdrTable.setColumnWidth(1, 155)  # Vreme transakcije
+        self.hdrTable.setColumnWidth(2, 110)  # Vrednost
         self.hdrTable.setColumnWidth(3, 95)  # Prikaži sliku
         self.hdrTable.setColumnWidth(4, 99)  # Prikaži stavke
         self.hdrTable.setColumnWidth(6, 92)  # Izaberi
