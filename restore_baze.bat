@@ -1,46 +1,51 @@
 @echo off
 set PGPASSWORD=postgres
+
 set PG_RESTORE="C:\Program Files\PostgreSQL\15\bin\pg_restore.exe"
 set HOST=localhost
 set PORT=5433
 set USER=postgres
 set DB=mrkdb
-
-set BACKUPDIR=D:\backup
+set BACKUP_DIR=D:\backup
 
 echo ========================================
-echo   RESTORE POSTGRESQL BEKAPA
+echo    RESTORE POSTGRESQL BEKAPA
 echo ========================================
-echo Dostupni datumi bekapa:
+echo Dostupni bekapi:
 echo ----------------------------------------
 
-for /d %%G in ("%BACKUPDIR%\*") do (
-    for /d %%M in ("%%G\*") do (
-        for /d %%D in ("%%M\*") do (
-            echo   %%~nD%%~nM%%~nG
-        )
-    )
+:: Prikaz svih dostupnih fajlova sa putanjom YYYY\MM\DD
+for /f "tokens=* delims=" %%F in ('dir /b /s "%BACKUP_DIR%\mrkdb.backup"') do (
+    set FILEPATH=%%F
+    call echo %%FILEPATH:%BACKUP_DIR%\=%%
 )
 
 echo ----------------------------------------
-set /p DATUM=Unesite datum (ddmmyyyy): 
+set /p DATUM=Unesite datum (yyyy-mm-dd) [Enter za poslednji bekap]: 
 
-set GODINA=%DATUM:6,4%
-set MESEC=%DATUM:2,2%
-set DAN=%DATUM:0,2%
+if "%DATUM%"=="" (
+    :: Ako je prazno, uzmi poslednji bekap po datumu
+    for /f "delims=" %%L in ('dir /b /s /o:-d "%BACKUP_DIR%\*\*\mrkdb.backup"') do (
+        set FILE=%%L
+        goto :found
+    )
+) else (
+    set YYYY=%DATUM:~0,4%
+    set MM=%DATUM:~5,2%
+    set DD=%DATUM:~8,2%
+    set FILE=%BACKUP_DIR%\%YYYY%\%MM%\%DD%\mrkdb.backup
+)
 
-set FILE=%BACKUPDIR%\%GODINA%\%MESEC%\%DAN%\mrkdb.backup
-
+:found
 if exist "%FILE%" (
-    echo Pokrecem restore sa fajla:
-    echo %FILE%
+    echo Pokrecem restore sa fajla: %FILE%
     %PG_RESTORE% --host=%HOST% --port=%PORT% --username=%USER% ^
-      --dbname=%DB% --verbose ^
-      "%FILE%"
+      --dbname=%DB% --verbose "%FILE%"
     echo ----------------------------------------
     echo Restore zavrsen uspesno.
 ) else (
     echo Greska: Fajl ne postoji!
     echo Ocekivana putanja: %FILE%
 )
+
 pause

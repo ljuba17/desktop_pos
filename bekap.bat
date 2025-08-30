@@ -1,12 +1,12 @@
 @echo off
 set PGPASSWORD=postgres
 
-:: Preuzimamo datum
-for /f "tokens=2-4 delims=/. " %%a in ('date /t') do (
-    set DD=%%a
-    set MM=%%b
-    set YYYY=%%c
-)
+:: Preuzimamo datum u formatu YYYYMMDD
+for /f %%a in ('wmic os get localdatetime ^| find "."') do set ldt=%%a
+
+set YYYY=%ldt:~0,4%
+set MM=%ldt:~4,2%
+set DD=%ldt:~6,2%
 
 :: Putanja za bekap
 set BACKUP_DIR=D:\backup\%YYYY%\%MM%\%DD%
