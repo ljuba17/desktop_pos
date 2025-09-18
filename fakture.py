@@ -25,6 +25,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.styles import ParagraphStyle
+from textwrap import wrap
 import webbrowser
 
 # Učitavanje konfiguracije iz kasa.ini
@@ -999,12 +1000,6 @@ class FaktureDialog(QDialog):
         font_path = os.path.join(BASE_DIR, "fonts", "EncodeSans-Medium.ttf")
         pdfmetrics.registerFont(TTFont("EncodeSans-Medium", font_path))
 
-        # ==== Stari deo koda za folder izvestaja i font koji se koristi ===#
-        #folder_izvestaja = r"D:\\pos_desktop\\desktop_pos\\izvestaji"
-        #os.makedirs(folder_izvestaja, exist_ok=True)
-        #font_path = r"D:\\pos_desktop\\desktop_pos\\fonts\\EncodeSans-Medium.ttf"
-        #pdfmetrics.registerFont(TTFont("EncodeSans-Medium", font_path))
-        # ==== Kraj Starog dela koda za folder izvestaja i font koji se koristi ===#
         try:
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
@@ -1018,7 +1013,6 @@ class FaktureDialog(QDialog):
             cursor.execute("SELECT naziv, adresa, pobro, mesto, pib, banka, primarni_racun, tel, email, matbr, sifdel FROM kasa.fvr LIMIT 1")
             fvr_naziv, fvr_adresa, fvr_pobro, fvr_mesto, fvr_pib, fvr_banka, fvr_primarni_racun, fvr_tel, fvr_email, fvr_matbr, fvr_sifdel = cursor.fetchone()
 
-            # === RAZREŠAVANJE JSON POLJA ZA BANKU ===
             if isinstance(fvr_banka, str):
                 fvr_banka = json.loads(fvr_banka)
             fvr_banka_naziv = fvr_banka.get("naziv", "")
@@ -1075,10 +1069,14 @@ class FaktureDialog(QDialog):
             id='normal'
         )
 
+        # === Stilovi za Paragraph ===
+        style_kupac = ParagraphStyle(name='CustomNormal', fontName='EncodeSans-Medium', fontSize=10, leading=11)
+        style_normal = ParagraphStyle(name='CustomNormal', fontName='EncodeSans-Medium', fontSize=8, leading=11)
+        style_artikal = ParagraphStyle(name='ArtikalStyle', fontName='EncodeSans-Medium', fontSize=8, leading=9)
+
         def draw_page_decorator(canvas, doc):
             canvas.setFont("EncodeSans-Medium", 10)
 
-            # === HEADER samo na prvoj stranici ===
             if doc.page == 1:
                 y_top = A4[1] - 20 * mm
                 x1 = 10 * mm
@@ -1103,52 +1101,49 @@ class FaktureDialog(QDialog):
                     canvas.drawString(x1 + 5, t_y1, linija)
                     t_y1 -= 12
 
-                # Kupac
+                # Kupac (prelom teksta)
                 x2 = A4[0] - 10 * mm - 90 * mm
                 y2 = y_top
-                canvas.roundRect(x2, y2 - height1, 90 * mm, height1, radius=4, stroke=1, fill=0)
-                text2 = [
-                    f"Kupac: {p_sifra}",
-                    p_naziv,
-                    p_adresa,
-                    f"{p_pobro} {p_mesto}",
-                    f"PIB: {p_pib}  Mat. br: {p_matbr}"
-                ]
-                t_y2 = y2 - 10
-                for linija in text2:
-                    canvas.drawString(x2 + 5, t_y2, linija)
-                    t_y2 -= 12
+                width2 = 90 * mm
+                height2 = 35 * mm
+                canvas.roundRect(x2, y2 - height2, width2, height2, radius=4, stroke=1, fill=0)
 
+                kupac_text = f"""
+                <b>Kupac: {p_sifra}</b><br/>
+                {p_naziv}<br/>
+                {p_adresa}<br/>
+                {p_pobro} {p_mesto}<br/>
+                PIB: {p_pib} &nbsp;&nbsp; Mat. br: {p_matbr}
+                """
+                p_kupac = Paragraph(kupac_text, style_kupac)
+                kupac_frame = Frame(x2 + 5, y2 - height2 + 5, width2 - 10, height2 - 10, showBoundary=0)
+                kupac_frame.addFromList([p_kupac], canvas)
+
+                # Naslov fakture
                 canvas.setFont("EncodeSans-Medium", 12)
                 canvas.drawString(x1, (y1 - height1) - 25, f"Račun br: {brojfakture}")
 
                 canvas.setFont("EncodeSans-Medium", 10)
-                dodatni_y = y2 - height1 - 10
+                dodatni_y = y2 - height2 - 10
                 canvas.drawString(x2, dodatni_y, f"Datum računa:  {datumpred.strftime('%d.%m.%Y')}")
                 canvas.drawString(x2, dodatni_y - 12, f"Datum prometa:   {datumdpd.strftime('%d.%m.%Y')}")
                 canvas.drawString(x2, dodatni_y - 24, f"Valuta plaćanja: {datumvazenja.strftime('%d.%m.%Y')}")
                 canvas.drawString(x2, dodatni_y - 36, f"Mesto izdavanja: {objekat_mesto}")
 
-            # === FOOTER na SVAKOJ stranici ===
+            # Footer
             canvas.setFont("EncodeSans-Medium", 8)
             y = 18 * mm
             center_x = A4[0] / 2
-
             banka_tekst = f"{fvr_banka_naziv} Tekući račun: {fvr_primarni_racun}"
             canvas.drawCentredString(center_x, y + 6, banka_tekst)
-
             canvas.line(margin_left, y + 4, A4[0] - margin_right, y + 4)
-
             kontakt = f"Tel: {fvr_tel}    eMail: {fvr_email}    Matični broj: {fvr_matbr}    Šifra delatnosti: {fvr_sifdel}"
             canvas.drawCentredString(center_x, y - 6, kontakt)
-
             canvas.drawRightString(A4[0] - 10 * mm, 10 * mm, f"Strana {doc.page}")
 
         doc.addPageTemplates([PageTemplate(id='Invoice', frames=frame, onPage=draw_page_decorator)])
 
-        styles = getSampleStyleSheet()
-        style_normal = ParagraphStyle(name='CustomNormal', fontName='EncodeSans-Medium', fontSize=9, leading=12)
-
+        # === Tabela artikala ===
         data = [["R.br.", "Šifra", "Naziv artikla", "JM", "Količina", "Cena", "Popust", "Vrednost"]]
         ukupna_vrednost = 0
         ukupni_popust = 0
@@ -1157,10 +1152,14 @@ class FaktureDialog(QDialog):
             vrednost = cena * kolicina - rabat
             ukupna_vrednost += cena * kolicina
             ukupni_popust += rabat
+
+            # Naziv artikla kao Paragraph (automatski prelom)
+            naziv_para = Paragraph(naziv, style_artikal)
+
             data.append([
                 str(idx),
                 sifra,
-                naziv,
+                naziv_para,  # koristi Paragraph
                 jm,
                 f"{kolicina:.3f}".replace(".", ","),
                 f"{cena:.2f}".replace(".", ","),
@@ -1176,11 +1175,13 @@ class FaktureDialog(QDialog):
             ("ALIGN", (0,0), (-1,0), "CENTER"),
             ("FONTNAME", (0,0), (-1,-1), "EncodeSans-Medium"),
             ("FONTSIZE", (0,0), (-1,-1), 8),
-            ("BOTTOMPADDING", (0,0), (-1,-1), 1),  # Smanjena visina reda
-            ("TOPPADDING", (0,0), (-1,-1), 1),     # Smanjena visina reda
+            ("VALIGN", (0,0), (-1,-1), "TOP"),  # VAŽNO: da se paragraf drži gore
+            ("BOTTOMPADDING", (0,0), (-1,-1), 2),
+            ("TOPPADDING", (0,0), (-1,-1), 2),
             ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
         ]))
 
+        # Sumiranje
         za_uplatu = ukupna_vrednost - ukupni_popust
         iznos_tekst = self.broj_u_tekst(za_uplatu)
 
@@ -1201,8 +1202,8 @@ class FaktureDialog(QDialog):
             ("ALIGN", (1,0), (1,-1), "RIGHT"),
             ("FONTNAME", (0,0), (-1,-1), "EncodeSans-Medium"),
             ("FONTSIZE", (0,0), (-1,-1), 9),
-            ("BOTTOMPADDING", (0,0), (-1,-1), 1),  # Smanjena visina reda
-            ("TOPPADDING", (0,0), (-1,-1), 1),     # Smanjena visina reda
+            ("BOTTOMPADDING", (0,0), (-1,-1), 1),
+            ("TOPPADDING", (0,0), (-1,-1), 1),
             ("BOX", (0,0), (-1,-1), 0.25, colors.black),
             ("INNERGRID", (0,0), (-1,-1), 0.25, colors.black),
         ]))
@@ -1345,9 +1346,11 @@ class FaktureDialog(QDialog):
                     t_y1 -= 12
 
                 # Kupac
+                # Kupac
                 x2 = A4[0] - 10 * mm - 90 * mm
                 y2 = y_top
                 canvas.roundRect(x2, y2 - height1, 90 * mm, height1, radius=4, stroke=1, fill=0)
+
                 text2 = [
                     f"Kupac: {p_sifra}",
                     p_naziv,
@@ -1355,10 +1358,13 @@ class FaktureDialog(QDialog):
                     f"{p_pobro} {p_mesto}",
                     f"PIB: {p_pib}  Mat. br: {p_matbr}"
                 ]
+
                 t_y2 = y2 - 10
                 for linija in text2:
-                    canvas.drawString(x2 + 5, t_y2, linija)
-                    t_y2 -= 12
+                    # Ako linija može biti preduga (npr. naziv kupca), prelomimo je
+                    for podlinija in wrap(linija, 40):  # 40 karaktera = gruba širina
+                        canvas.drawString(x2 + 5, t_y2, podlinija)
+                        t_y2 -= 12
 
                 if vrsta != 3:
                     canvas.setFont("EncodeSans-Medium", 12)
@@ -1400,6 +1406,13 @@ class FaktureDialog(QDialog):
         suma_osnovica = suma_popust = suma_pdv = suma_vrednost = suma_za_uplatu = suma_bez_popusta = 0
         visoka_osn = visoka_pdv = niza_osn = niza_pdv = 0
 
+        style_naziv = ParagraphStyle(
+            name='NazivArtikla',
+            fontName='EncodeSans-Medium',
+            fontSize=6,
+            leading=7,
+        )
+
         for idx, stavka in enumerate(stavke, start=1):
             sifra, naziv, jm, kolicina, cena_bez_pdv, rabatproc, popust, osnovica, stopa_pdv, pdv_iznos, ukupno, tarifa, _ = stavka
 
@@ -1426,7 +1439,9 @@ class FaktureDialog(QDialog):
                 niza_pdv += pdv_iznos
 
             data.append([
-                str(idx), sifra, naziv, jm,
+                str(idx), sifra, 
+                Paragraph(naziv, style_naziv), 
+                jm,
                 f"{kolicina:.3f}".replace(".", ","),
                 f"{cena_bez_pdv:.2f}".replace(".", ","),
                 f"{rabatproc:.2f}".replace(".", ","),
@@ -1448,6 +1463,7 @@ class FaktureDialog(QDialog):
             ("TOPPADDING", (0,0), (-1,-1), 1),     # Smanjena visina reda
             ("ALIGN", (4,1), (-1,-1), "RIGHT"),
             ("ALIGN", (0,0), (-1,0), "CENTER"),
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
             ("BACKGROUND", (0,0), (-1,0), colors.lightgrey),
         ]))
 
