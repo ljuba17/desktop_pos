@@ -18,6 +18,38 @@ config = configparser.ConfigParser()
 config.read(config_path)
 GODINA = config.get('POS_Settings', 'god')
 SIFOBJEKTA = config.get('POS_Settings', 'sifobj')
+GLAVNA_LOKACIJA_ID = None
+
+
+def ucitaj_glavnu_lokaciju():
+    conn = psycopg2.connect(
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
+    )
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id
+        FROM kasa.lokacija
+        WHERE sifobj = %s
+          AND glavna = TRUE
+          AND aktivna = TRUE
+        LIMIT 1
+    """, (SIFOBJEKTA,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise Exception(f"Nije pronađena glavna lokacija za objekat {SIFOBJEKTA}")
+
+    return row[0]
 
 class NivelacijaDialog(QDialog):
     def __init__(self, parent=None):
@@ -26,6 +58,9 @@ class NivelacijaDialog(QDialog):
         # Učitavanje UI fajla
         ui_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui", "nivelacija.ui")
         uic.loadUi(ui_path, self)
+
+        self.glavna_lokacija_id = ucitaj_glavnu_lokaciju()
+        #print(f"✅ Nivelacija koristi glavnu lokaciju: {self.glavna_lokacija_id}")
         
         # Postavljanje današnjeg datuma
         today = QDate.currentDate()
@@ -70,9 +105,11 @@ class NivelacijaDialog(QDialog):
                   AND sifobj = %s
                   AND vrsta = 4
                   AND datdok = %s
+                  AND lokacija_id = %s
+                  AND status = 'KNJIZEN'
                   AND opis LIKE 'Auto niv. br%%'
             """
-            cur.execute(sql, (GODINA, SIFOBJEKTA, datum_str))
+            cur.execute(sql, (GODINA, SIFOBJEKTA, datum_str, self.glavna_lokacija_id))
             rezultat = cur.fetchone()
 
             cur.close()
@@ -103,13 +140,14 @@ class NivelacijaDialog(QDialog):
                 JOIN kasa.artikli a ON a.id = ka.artikliid
                 WHERE ka.god = %s
                   AND ka.sifobj = %s
+                  AND ka.lokacija_id = %s
                   AND ka.datum = %s
                   AND ka.vrsta IN (3, 8, 9)
                   AND ka.cena <> ka.cenanabavna
                   AND a.tip = 1
                 LIMIT 1
             """
-            cur.execute(sql, (GODINA, SIFOBJEKTA, datum_str))
+            cur.execute(sql, (GODINA, SIFOBJEKTA, self.glavna_lokacija_id, datum_str))
             postoji = cur.fetchone() is not None
 
             cur.close()
@@ -164,9 +202,10 @@ class NivelacijaDialog(QDialog):
             sql = """
                 INSERT INTO kasa.robnadok (
                     god, kar, vrsta, sifobj,
+                    lokacija_id,
                     datdok, datdospeca, kreirao,
-                    broj, opis, vrednost
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    broj, opis, vrednost, status
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
 
             cur.execute(sql, (
@@ -174,12 +213,14 @@ class NivelacijaDialog(QDialog):
                 1,                      # kar = 1
                 4,                      # vrsta = 4 (nivelacija)
                 SIFOBJEKTA,
+                self.glavna_lokacija_id,
                 datum_str,
                 datum_str,
                 os.getenv("APP_USER") or "auto_nivelacija",
                 novi_broj,
                 f"Auto niv. br: {novi_broj}",
-                0                      # vrednost se kasnije ažurira
+                0,
+                "KNJIZEN"                                            # vrednost se kasnije ažurira
             ))
 
             conn.commit()
@@ -209,30 +250,36 @@ class NivelacijaDialog(QDialog):
                     k.grupa,
                     k.porezid,
                     k.cena AS nova_cena,
-                    k.cenanabavna,
+                    z.cena AS staracena,
                     SUM(k.kolicina) AS ukupna_kolicina
-                FROM
-                    kasa.karticaart k
-                    JOIN kasa.artikli a ON k.sifra = a.sifra
-                WHERE
-                    k.datum = %s
-                    AND k.sifobj = %s
-                    AND k.vrsta IN (8, 9, 3)
-                    AND k.cena <> k.cenanabavna
-                    AND a.tip = 1
+                FROM kasa.karticaart k
+                JOIN kasa.artikli a ON k.sifra = a.sifra
+                JOIN kasa.zaliheart z
+                    ON z.god = k.god
+                AND z.sifobj = k.sifobj
+                AND z.lokacija_id = k.lokacija_id
+                AND z.sifra = k.sifra
+                WHERE k.god = %s
+                AND k.datum = %s
+                AND k.sifobj = %s
+                AND k.lokacija_id = %s
+                AND k.vrsta IN (8, 9, 3)
+                AND k.dokstatus IN ('PP', 'PR')
+                AND k.cena <> z.cena
+                AND a.tip = 1
                 GROUP BY
                     a.sifra, a.id, k.tarifa, k.porezproc,
-                    k.grupa, k.porezid, k.cena, k.cenanabavna
+                    k.grupa, k.porezid, k.cena, z.cena
                 ORDER BY
                     a.sifra, k.cena
             """
 
-            cur.execute(sql, (datum, sifobj))
+            cur.execute(sql, (GODINA, datum, sifobj, self.glavna_lokacija_id))
             result = cur.fetchall()
 
             stavke = []
             for row in result:
-                sifra, artikliid, tarifa, porezproc, grupa, porezid, nova_cena, cenanabavna, ukupna_kolicina = row
+                sifra, artikliid, tarifa, porezproc, grupa, porezid, nova_cena, staracena, ukupna_kolicina = row
                 stavke.append({
                     "sifra": sifra,
                     "artikliid": artikliid,
@@ -241,11 +288,11 @@ class NivelacijaDialog(QDialog):
                     "grupa": grupa,
                     "porezid": porezid,
                     "nova_cena": float(nova_cena),
-                    "cenanabavna": float(cenanabavna),
+                    "staracena": float(staracena),
                     "kolicina": float(ukupna_kolicina)
                 })
 
-                print(f"➡ Šifra: {sifra}, Nova cena: {nova_cena}, Nabavna: {cenanabavna}, Količina: {ukupna_kolicina}")
+                print(f"➡ Šifra: {sifra}, Nova cena: {nova_cena}, Stara cena: {staracena}, Količina: {ukupna_kolicina}")
 
             cur.close()
             conn.close()
@@ -267,7 +314,7 @@ class NivelacijaDialog(QDialog):
         grupa = stavka["grupa"]
         porezid = stavka["porezid"]
         nova_cena = stavka["nova_cena"]
-        staracena = stavka["cenanabavna"]
+        staracena = stavka["staracena"]
         kolicina = stavka["kolicina"]
 
         if not sifra or artikliid is None or nova_cena is None or kolicina is None:
@@ -302,12 +349,12 @@ class NivelacijaDialog(QDialog):
 
             cur.execute("""
                 INSERT INTO kasa.karticaart (
-                    god, kar, broj, sifobj, vrsta,
+                    god, kar, broj, sifobj, lokacija_id, vrsta,
                     artikliid, sifra, kolicina, cena, staracena,
                     porez, porezproc, tarifa, porezid, grupa,
                     opis, datum, kreirao, idpartneri
                 ) VALUES (
-                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s,
                     %s, %s, %s, %s
@@ -317,6 +364,7 @@ class NivelacijaDialog(QDialog):
                 1,  # kar
                 broj_dokumenta,
                 sifobj,
+                self.glavna_lokacija_id,
                 4,  # vrsta = 4 (nivelacija)
                 artikliid,
                 sifra,
@@ -356,16 +404,16 @@ class NivelacijaDialog(QDialog):
             cur.execute("""
                 SELECT SUM((cena - staracena) * kolicina)
                 FROM kasa.karticaart
-                WHERE god = %s AND sifobj = %s AND vrsta = 4 AND broj = %s
-            """, (GODINA, sifobj, broj))
+                WHERE god = %s AND sifobj = %s AND lokacija_id = %s AND vrsta = 4 AND broj = %s
+            """, (GODINA, sifobj, self.glavna_lokacija_id, broj))
             ukupna_vrednost = cur.fetchone()[0] or 0
 
             # Ažuriramo vrednost u zaglavlju
             cur.execute("""
                 UPDATE kasa.robnadok
                 SET vrednost = %s
-                WHERE god = %s AND sifobj = %s AND vrsta = 4 AND broj = %s
-            """, (ukupna_vrednost, GODINA, sifobj, broj))
+                WHERE god = %s AND sifobj = %s AND lokacija_id = %s AND vrsta = 4 AND broj = %s
+            """, (ukupna_vrednost, GODINA, sifobj, self.glavna_lokacija_id, broj))
 
             conn.commit()
             cur.close()
@@ -496,9 +544,9 @@ class NivelacijaDialog(QDialog):
                     ka.broj           -- 8 (skriveno)
                 FROM kasa.karticaart ka
                 JOIN kasa.artikli a ON a.sifra = ka.sifra
-                WHERE ka.god = %s AND ka.sifobj = %s AND ka.vrsta = 4 AND ka.broj = %s
+                WHERE ka.god = %s AND ka.sifobj = %s AND ka.lokacija_id = %s AND ka.vrsta = 4 AND ka.broj = %s
                 ORDER BY ka.id
-            """, (GODINA, sifobj, broj_nivelacije))
+            """, (GODINA, sifobj, self.glavna_lokacija_id, broj_nivelacije))
 
             rezultati = cur.fetchall()
             self.tableStavke.setRowCount(len(rezultati))
@@ -529,5 +577,3 @@ class NivelacijaDialog(QDialog):
 
         except Exception as e:
             QMessageBox.critical(self, "Greška", f"Greška prilikom prikaza stavki:\n{e}")
-
-

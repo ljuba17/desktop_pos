@@ -26,6 +26,39 @@ config = configparser.ConfigParser()
 config.read(config_path)
 GODINA = config.get('POS_Settings', 'god')
 SIFOBJEKTA = config.get('POS_Settings', 'sifobj')
+GLAVNA_LOKACIJA_ID = None
+
+
+def ucitaj_glavnu_lokaciju():
+    conn = psycopg2.connect(
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
+    )
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id
+        FROM kasa.lokacija
+        WHERE sifobj = %s
+          AND glavna = TRUE
+          AND aktivna = TRUE
+        LIMIT 1
+    """, (SIFOBJEKTA,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise Exception(f"Nije pronađena glavna lokacija za objekat {SIFOBJEKTA}")
+
+    return row[0]
+
 
 class ZaliheDialog(QDialog):
     def __init__(self, parent=None):
@@ -34,6 +67,9 @@ class ZaliheDialog(QDialog):
         # Učitavanje UI fajla
         ui_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui", "zalihe.ui")
         uic.loadUi(ui_path, self)
+
+        self.glavna_lokacija_id = ucitaj_glavnu_lokaciju()
+        #print(f"✅ Zalihe koriste glavnu lokaciju: {self.glavna_lokacija_id}")
         
         # Postavljanje današnjeg datuma
         today = QDate.currentDate()
@@ -66,9 +102,34 @@ class ZaliheDialog(QDialog):
             )
             cursor = conn.cursor()
 
+            #cursor.execute("""
+            #    SELECT * FROM kasa.obradi(%s, %s, %s, CURRENT_DATE)
+            #""", [GODINA, 1, SIFOBJEKTA])
             cursor.execute("""
-                SELECT * FROM kasa.obradi(%s, %s, %s, CURRENT_DATE)
-            """, [GODINA, 1, SIFOBJEKTA])
+                SELECT
+                    z.sifra,
+                    a.naziv,
+                    jm.jm AS jedinica_mere,
+                    p.stopa AS pdv_stopa,
+                    z.netofcena,
+                    z.cena AS maloprodajna_cena,
+                    z.zaliha AS kolicina,
+                    0 AS ulaz_kolicina,
+                    0 AS izlaz_kolicina,
+                    z.zaliha,
+                    0 AS fin_ulaz,
+                    0 AS fin_izlaz,
+                    (z.zaliha * z.cena) AS vrednost
+                FROM kasa.zaliheart z
+                LEFT JOIN kasa.artikli a ON a.id = z.artikliid
+                LEFT JOIN kasa.jedmere jm ON jm.id = a.jedinica_mere_id
+                LEFT JOIN kasa.porezi p ON p.id = a.porez_id
+                WHERE z.god = %s
+                AND z.kar = %s
+                AND z.sifobj = %s
+                AND z.lokacija_id = %s
+                ORDER BY z.sifra::numeric
+            """, [GODINA, 1, SIFOBJEKTA, self.glavna_lokacija_id])
 
             rezultati = cursor.fetchall()
             kolone = [desc[0] for desc in cursor.description]
@@ -87,26 +148,26 @@ class ZaliheDialog(QDialog):
 
             # Popuni tabelu svim podacima
             self.popuni_tabelu(rezultati)
-
+            # Kod za automatsko azuriranje zaliha
             # 🔄 Ažuriranje zaliheart
-            for red in rezultati:
-                sifra = red[self.kolone["sifra"]]
-                zaliha = red[self.kolone["kol"]]
+            #for red in rezultati:
+            #    sifra = red[self.kolone["sifra"]]
+            #    zaliha = red[self.kolone["kol"]]
 
-                cursor.execute("""
-                    SELECT 1 FROM kasa.zaliheart 
-                    WHERE god = %s AND sifobj = %s AND sifra = %s
-                """, [GODINA, SIFOBJEKTA, sifra])
-                exists = cursor.fetchone()
+            #    cursor.execute("""
+            #        SELECT 1 FROM kasa.zaliheart 
+            #        WHERE god = %s AND sifobj = %s AND sifra = %s
+            #    """, [GODINA, SIFOBJEKTA, sifra])
+            #    exists = cursor.fetchone()
 
-                if exists:
-                    cursor.execute("""
-                        UPDATE kasa.zaliheart
-                        SET zaliha = %s
-                        WHERE god = %s AND sifobj = %s AND sifra = %s
-                    """, [zaliha, GODINA, SIFOBJEKTA, sifra])
+            #    if exists:
+            #        cursor.execute("""
+            #            UPDATE kasa.zaliheart
+            #            SET zaliha = %s
+            #            WHERE god = %s AND sifobj = %s AND sifra = %s
+            #        """, [zaliha, GODINA, SIFOBJEKTA, sifra])
 
-            conn.commit()
+            #conn.commit()
             cursor.close()
             conn.close()
 

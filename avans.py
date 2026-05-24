@@ -22,6 +22,38 @@ config.read(config_path)
 GODINA = config.get('POS_Settings', 'god')
 SIFOBJEKTA = config.get('POS_Settings', 'sifobj')
 KASA = config.get('POS_Settings', 'kasa')
+GLAVNA_LOKACIJA_ID = None
+
+
+def ucitaj_glavnu_lokaciju():
+    conn = psycopg2.connect(
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
+    )
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id
+        FROM kasa.lokacija
+        WHERE sifobj = %s
+          AND glavna = TRUE
+          AND aktivna = TRUE
+        LIMIT 1
+    """, (SIFOBJEKTA,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise Exception(f"Nije pronađena glavna lokacija za objekat {SIFOBJEKTA}")
+
+    return row[0]
 
 LATIN_TO_CYRILLIC_MAP = {
         "A": "А", #"\u0410",  # А - Nije u PDV
@@ -38,6 +70,9 @@ class AvansDialog(QDialog):
         # Učitavanje UI fajla
         ui_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui", "avans.ui")
         uic.loadUi(ui_path, self)
+
+        self.glavna_lokacija_id = ucitaj_glavnu_lokaciju()
+        print(f"✅ Avansi koriste glavnu lokaciju: {self.glavna_lokacija_id}")
 
         # Postavljamo da se otvara prvi page (indeks 0)
         self.stackedWidget.setCurrentIndex(0)
@@ -869,13 +904,13 @@ class AvansDialog(QDialog):
 
                 cursor.execute("""
                 INSERT INTO "kasa"."karticaart"
-                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, porezid, ui, kasa, idpartneri, kreirao, kreirano)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
+                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, lokacija_id, porezid, ui, kasa, idpartneri, kreirao, kreirano)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
                 """, (
                     GODINA, 1, novi_broj_racuna, sifra, round(prodajna_cena, 2), round(nabavna_cena, 2), round(ukupna_kolicina, 3),
                     round(rabat_proc, 2), round(ukupna_vrednost, 2), porez, stopa, tarifa, grupa,
                     8 if tiptransakcije == 0 else 9, dokstatus,
-                    f"Fiskalni račun {dokstatus}", artikli_id, SIFOBJEKTA, porezid, ui, int(KASA)
+                    f"Fiskalni račun {dokstatus}", artikli_id, SIFOBJEKTA, self.glavna_lokacija_id, porezid, ui, int(KASA)
                 ))
                 
                 sifra, prodajna_cena, ukupna_kolicina, *_ = artikal
@@ -1824,13 +1859,13 @@ class AvansDialog(QDialog):
 
                 cursor.execute("""
                 INSERT INTO "kasa"."karticaart"
-                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, porezid, ui, kasa, idpartneri, kreirao, kreirano)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
+                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, lokacija_id, porezid, ui, kasa, idpartneri, kreirao, kreirano)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
                 """, (
                     GODINA, 1, novi_broj_racuna, sifra, round(prodajna_cena, 2), round(nabavna_cena, 2), -round(ukupna_kolicina, 3),
                     round(rabat_proc, 2), round(ukupna_vrednost, 2), porez, stopa, tarifa, grupa,
                     9, dokstatus,
-                    "Fiskalni račun AR", artikli_id, SIFOBJEKTA, porezid, ui, int(KASA)
+                    "Fiskalni račun AR", artikli_id, SIFOBJEKTA, self.glavna_lokacija_id, porezid, ui, int(KASA)
                 ))
                 
                 sifra, prodajna_cena, ukupna_kolicina, *_ = artikal

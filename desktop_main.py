@@ -54,6 +54,53 @@ SIFOBJEKTA = config.get('POS_Settings', 'sifobj')
 KASA = config.get('POS_Settings', 'kasa')
 PIN = config.get('POS_Settings', 'PIN')
 
+GLAVNA_LOKACIJA_ID = None
+
+
+def get_db_connection():
+    return psycopg2.connect(
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
+    )
+
+
+def ucitaj_glavnu_lokaciju(conn, sifobj):
+    """
+    Vraća ID glavne aktivne lokacije za dati objekat.
+    POS uvek radi sa glavnom lokacijom objekta.
+    """
+    with conn.cursor() as cursor:
+        cursor.execute("""
+            SELECT id
+            FROM kasa.lokacija
+            WHERE sifobj = %s
+              AND glavna = TRUE
+              AND aktivna = TRUE
+            LIMIT 1
+        """, (sifobj,))
+        row = cursor.fetchone()
+
+    if not row:
+        raise Exception(f"Nije pronađena glavna aktivna lokacija za objekat {sifobj}.")
+
+    return row[0]
+
+
+def inicijalizuj_glavnu_lokaciju():
+    global GLAVNA_LOKACIJA_ID
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        GLAVNA_LOKACIJA_ID = ucitaj_glavnu_lokaciju(conn, SIFOBJEKTA)
+        #print(f"✅ Glavna lokacija za objekat {SIFOBJEKTA}: {GLAVNA_LOKACIJA_ID}")
+    finally:
+        if conn:
+            conn.close()
+
 ################################################################
 
 LATIN_TO_CYRILLIC_MAP = {
@@ -192,6 +239,8 @@ class MainWindow(QMainWindow):
     
     def __init__(self):
         super().__init__()
+
+        inicijalizuj_glavnu_lokaciju()
 
         # 📌 Učitavanje UI fajla
         ui_path = os.path.join(BASE_DIR, "ui", "main_window.ui")
@@ -850,11 +899,11 @@ class MainWindow(QMainWindow):
             query = """
             SELECT a.sifra, a.naziv, jm.jm, a.tip, z.cena, z.zaliha
             FROM "kasa"."artikli" a
-            LEFT JOIN "kasa"."zaliheart" z ON a.sifra = z.sifra AND z.god = %s AND z.sifobj = %s
+            LEFT JOIN "kasa"."zaliheart" z ON a.sifra = z.sifra AND z.god = %s AND z.sifobj = %s AND z.lokacija_id = %s
             LEFT JOIN "kasa"."jedmere" jm ON a.jedinica_mere_id = jm.id
             WHERE a.sifra = %s;
             """
-            cursor.execute(query, (GODINA, SIFOBJEKTA, sifra))
+            cursor.execute(query, (GODINA, SIFOBJEKTA, GLAVNA_LOKACIJA_ID, sifra))
             result = cursor.fetchone()
 
             if result:
@@ -1417,13 +1466,13 @@ class MainWindow(QMainWindow):
 
                 cursor.execute("""
                 INSERT INTO "kasa"."karticaart"
-                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, porezid, ui, kasa, idpartneri, kreirao, kreirano)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
+                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, lokacija_id, porezid, ui, kasa, idpartneri, kreirao, kreirano)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
                 """, (
                     GODINA, 1, novi_broj_racuna, sifra, round(prodajna_cena, 2), round(nabavna_cena, 2), round(ukupna_kolicina, 3),
                     round(rabat_proc, 2), round(ukupna_vrednost, 2), porez, stopa, tarifa, grupa,
                     8 if tiptransakcije == 0 else 9, dokstatus,
-                    f"Fiskalni račun {dokstatus}", artikli_id, SIFOBJEKTA, porezid, ui, int(KASA)
+                    f"Fiskalni račun {dokstatus}", artikli_id, SIFOBJEKTA, GLAVNA_LOKACIJA_ID, porezid, ui, int(KASA)
                 ))
                 
                 sifra, prodajna_cena, ukupna_kolicina, *_ = artikal
@@ -1818,13 +1867,13 @@ class MainWindow(QMainWindow):
                 cursor.execute("""
                     SELECT zaliha
                     FROM "kasa"."zaliheart"
-                    WHERE god = %s AND sifobj = %s AND sifra = %s
+                    WHERE god = %s AND sifobj = %s AND lokacija_id = %s AND sifra = %s 
                     FOR UPDATE
-                """, (god, sifobj, sifra))
+                """, (god, sifobj, GLAVNA_LOKACIJA_ID, sifra))
                 zaliha_row = cursor.fetchone()
 
                 if not zaliha_row:
-                    #print(f"Zaliha ne postoji za šifru {sifra}")
+                    #print(f"Zaliha ne postoji za šifru {sifra} na lokaciji {GLAVNA_LOKACIJA_ID}")
                     continue
 
                 trenutna_zaliha = zaliha_row[0]
@@ -1834,8 +1883,16 @@ class MainWindow(QMainWindow):
                 cursor.execute("""
                     UPDATE "kasa"."zaliheart"
                     SET zaliha = %s
-                    WHERE god = %s AND sifobj = %s AND sifra = %s
-                """, (nova_zaliha, god, sifobj, sifra))
+                    WHERE god = %s AND sifobj = %s AND lokacija_id = %s AND sifra = %s
+                """, (nova_zaliha, god, sifobj, GLAVNA_LOKACIJA_ID, sifra))
+
+                print(
+                    f"✅ Artikal: {sifra} | "
+                    f"Lokacija: {GLAVNA_LOKACIJA_ID} | "
+                    f"Staro: {trenutna_zaliha} | "
+                    f"Promena: {-suma_kolicina} | "
+                    f"Novo: {nova_zaliha}"
+                )
 
             conn.commit()
             print(f"Zalihe uspešno ažurirane. {god, sifobj, sifra, nova_zaliha}")
@@ -2005,13 +2062,13 @@ class MainWindow(QMainWindow):
 
                 cursor.execute("""
                 INSERT INTO "kasa"."karticaart"
-                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, porezid, ui, kasa, idpartneri, kreirao, kreirano)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
+                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, lokacija_id, porezid, ui, kasa, idpartneri, kreirao, kreirano)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
                 """, (
                     GODINA, 1, novi_broj_racuna, sifra, round(prodajna_cena, 2), round(nabavna_cena, 2), round(ukupna_kolicina, 3),
                     round(rabat_proc, 2), round(ukupna_vrednost, 2), porez, stopa, tarifa, grupa,
                     8, dokstatus,
-                    "Fiskalni račun PP", artikli_id, SIFOBJEKTA, porezid, ui, int(KASA)
+                    "Fiskalni račun PP", artikli_id, SIFOBJEKTA, GLAVNA_LOKACIJA_ID, porezid, ui, int(KASA)
                 ))
                 
                 sifra, prodajna_cena, ukupna_kolicina, *_ = artikal
@@ -2677,13 +2734,13 @@ class MainWindow(QMainWindow):
 
                 cursor.execute("""
                 INSERT INTO "kasa"."karticaart"
-                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, porezid, ui, kasa, idpartneri, kreirao, kreirano)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
+                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, lokacija_id, porezid, ui, kasa, idpartneri, kreirao, kreirano)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
                 """, (
                     GODINA, 1, novi_broj_racuna, sifra, round(prodajna_cena, 2), round(nabavna_cena, 2), -round(ukupna_kolicina, 3),
                     round(rabat_proc, 2), round(ukupna_vrednost, 2), porez, stopa, tarifa, grupa,
                     9, dokstatus,
-                    "Fiskalni račun PR", artikli_id, SIFOBJEKTA, porezid, ui, int(KASA)
+                    "Fiskalni račun PR", artikli_id, SIFOBJEKTA, GLAVNA_LOKACIJA_ID, porezid, ui, int(KASA)
                 ))
                 
                 sifra, prodajna_cena, ukupna_kolicina, *_ = artikal

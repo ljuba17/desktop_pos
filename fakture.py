@@ -642,7 +642,7 @@ class FaktureDialog(QDialog):
                 SELECT sifra, sifobj, broj, datum, kolicina, cena, cenanabavna, tarifa,
                     opis, ui, porez, porezproc, grupa, valuta, rabatproc, rabatdinarski,
                     god, kar, kreirao, kreirano, izmenio, izmenjen, porezid, vm,
-                    artikliid, netofcena, kasa, staracena
+                    artikliid, netofcena, kasa, staracena, lokacija_id
                 FROM kasa.karticaart
                 WHERE god = %s AND sifobj = %s AND vrsta = 8 AND broj = %s
             """, (god_racuna, sifobj_racuna, broj_racuna))
@@ -660,7 +660,7 @@ class FaktureDialog(QDialog):
                 (sifra, sifobj, broj, datum, kolicina, cena, cenanabavna, tarifa,
                 opis, ui, porez, porezproc, grupa, valuta, rabatproc, rabatdinarski,
                 god, kar, kreirao, kreirano, izmenio, izmenjen, porezid, vm,
-                artikliid, netofcena, kasa, staracena) = s
+                artikliid, netofcena, kasa, staracena, lokacija_id) = s
 
                 nova_vrsta = 2
                 novi_opis = 'Faktura'
@@ -672,20 +672,20 @@ class FaktureDialog(QDialog):
                 # Insert nove stavke u karticaart (kao faktura)
                 cursor.execute("""
                     INSERT INTO kasa.karticaart (
-                        sifra, sifobj, broj, datum, kolicina, cena, cenanabavna, tarifa,
+                        sifra, sifobj, lokacija_id, broj, datum, kolicina, cena, cenanabavna, tarifa,
                         vrsta, opis, ui, porez, porezproc, grupa, valuta, rabatproc,
                         rabatdinarski, god, kar, kreirao, kreirano, izmenio, izmenjen,
                         porezid, vm, idpartneri, marza, dobit, prenetpdv, zavtroskovi,
                         koltren, kolpop, dokstatus, brfakt, artikliid, netofcena, kasa, staracena
                     ) VALUES (
-                        %s, %s, %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, now(), %s, %s, %s,
                         %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s, %s, %s, %s
                     )
                 """, (
-                    sifra, SIFOBJEKTA, broj_racuna, datum, kolicina, cena, cenanabavna, tarifa,
+                    sifra, SIFOBJEKTA, lokacija_id, broj_racuna, datum, kolicina, cena, cenanabavna, tarifa,
                     nova_vrsta, novi_opis, ui, porez, porezproc, grupa, valuta, rabatproc,
                     rabatdinarski, GODINA, kar, kreirao, izmenio, izmenjen,
                     porezid, vm, idkupcaEdit, None, None, None, None,

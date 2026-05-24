@@ -1,0 +1,517 @@
+﻿
+Path                                             LineNumber Line                                                                                        
+----                                             ---------- ----                                                                                        
+D:\pos_desktop\desktop_pos\analiticki.py                 30 class AnalitickaDialog(QDialog):                                                            
+D:\pos_desktop\desktop_pos\analiticki.py                 69                 SELECT                                                                      
+D:\pos_desktop\desktop_pos\analiticki.py                 91                 JOIN "kasa"."kasasum" ks                                                    
+D:\pos_desktop\desktop_pos\analiticki.py                183         cur.execute("SELECT naziv, adresa, mesto FROM kasa.fvr LIMIT 1")                    
+D:\pos_desktop\desktop_pos\analiticki.py                186         cur.execute("SELECT objekat, adresa FROM kasa.objekti WHERE sifobj = %s", (SIFOBJ...
+D:\pos_desktop\desktop_pos\analiticki.py                190             SELECT                                                                          
+D:\pos_desktop\desktop_pos\analiticki.py                199             JOIN kasa.kasasum ks ON ks.god = k.god AND ks.sifobj = k.sifobj AND ks.broj =...
+D:\pos_desktop\desktop_pos\analiticki.py                268         class BrojanjeStranaDoc(BaseDocTemplate):                                           
+D:\pos_desktop\desktop_pos\artiklibu.py                  19 class ArtiklibuDialog(QDialog):                                                             
+D:\pos_desktop\desktop_pos\artiklibu.py                  66                     cur.execute("SELECT use_counter_artikli FROM kasa.core_appconfig LIMI...
+D:\pos_desktop\desktop_pos\artiklibu.py                  74                 cur.execute("SELECT MAX(sifra) FROM kasa.artikli")                          
+D:\pos_desktop\desktop_pos\artiklibu.py                  90                     cur.execute("SELECT id, jm FROM kasa.jedmere ORDER BY jm")              
+D:\pos_desktop\desktop_pos\artiklibu.py                  95                     cur.execute("SELECT id, stopa FROM kasa.porezi ORDER BY stopa")         
+D:\pos_desktop\desktop_pos\artiklibu.py                 100                     cur.execute("SELECT id, naziv FROM kasa.robnegrupe ORDER BY naziv")     
+D:\pos_desktop\desktop_pos\artiklibu.py                 125                     cur.execute("SELECT id, naziv, tip, jedinica_mere_id, porez_id, robna...
+D:\pos_desktop\desktop_pos\artiklibu.py                 138                         # Dohvati cenu iz zaliheart                                         
+D:\pos_desktop\desktop_pos\artiklibu.py                 140                             SELECT cena FROM kasa.zaliheart                                 
+D:\pos_desktop\desktop_pos\artiklibu.py                 149                             SELECT 1 FROM kasa.karticaart                                   
+D:\pos_desktop\desktop_pos\artiklibu.py                 220                                 UPDATE kasa.zaliheart                                       
+D:\pos_desktop\desktop_pos\artiklibu.py                 226                                 UPDATE kasa.artikli                                         
+D:\pos_desktop\desktop_pos\artiklibu.py                 232                                 UPDATE kasa.zaliheart                                       
+D:\pos_desktop\desktop_pos\artiklibu.py                 238                             INSERT INTO kasa.artikli (                                      
+D:\pos_desktop\desktop_pos\artiklibu.py                 248                                 INSERT INTO kasa.zaliheart (                                
+D:\pos_desktop\desktop_pos\avans.py                      33 class AvansDialog(QDialog):                                                                 
+D:\pos_desktop\desktop_pos\avans.py                     101         self.dodajBtn.clicked.connect(self.dodaj_u_kasa1)  # Povezivanje sa bazom podataka  
+D:\pos_desktop\desktop_pos\avans.py                     135         self.dodajBtn_2.clicked.connect(self.dodaj_u_kasa1)  # Povezivanje sa bazom podataka
+D:\pos_desktop\desktop_pos\avans.py                     387     def dodaj_u_kasa1(self):                                                                
+D:\pos_desktop\desktop_pos\avans.py                     449                     SELECT id, tip                                                          
+D:\pos_desktop\desktop_pos\avans.py                     494                     INSERT INTO "kasa"."kasa1"                                              
+D:\pos_desktop\desktop_pos\avans.py                     506                 print(f"❌ Greška pri upisu u bazu `kasa1`: {e}")                            
+D:\pos_desktop\desktop_pos\avans.py                     516             print(f"❌ Greška pri izvršavanju `dodaj_u_kasa1`: {e}")                         
+D:\pos_desktop\desktop_pos\avans.py                     560         """✅ Brisanje artikla iz baze `kasa1` i tabele `stavkeTable` ili `stavkeTable_2`."""
+D:\pos_desktop\desktop_pos\avans.py                     571             cursor.execute("""DELETE FROM "kasa"."kasa1" WHERE id = %s;""", (id_stavke,))   
+D:\pos_desktop\desktop_pos\avans.py                     638                 "SELECT id, sifra, (SELECT naziv FROM \"kasa\".\"artikli\" WHERE sifra = ...
+D:\pos_desktop\desktop_pos\avans.py                     741                 SELECT COALESCE(MAX(broj), 0) + 1                                           
+D:\pos_desktop\desktop_pos\avans.py                     742                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\avans.py                     810             # Snimanje podataka iz `kasa1` u `kasa`                                         
+D:\pos_desktop\desktop_pos\avans.py                     812             INSERT INTO "kasa"."kasa"                                                       
+D:\pos_desktop\desktop_pos\avans.py                     814             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, kolic, cena, popproc1, po...
+D:\pos_desktop\desktop_pos\avans.py                     815             FROM "kasa"."kasa1"                                                             
+D:\pos_desktop\desktop_pos\avans.py                     819             # Ažuriranje podataka u `kasa1` kao zatvorenih                                  
+D:\pos_desktop\desktop_pos\avans.py                     821             UPDATE "kasa"."kasa1"                                                           
+D:\pos_desktop\desktop_pos\avans.py                     826             # Snimanje podataka u `kasasum`                                                 
+D:\pos_desktop\desktop_pos\avans.py                     828             INSERT INTO "kasa"."kasasum"                                                    
+D:\pos_desktop\desktop_pos\avans.py                     840             # Snimanje podataka u `karticaart`                                              
+D:\pos_desktop\desktop_pos\avans.py                     842             SELECT                                                                          
+D:\pos_desktop\desktop_pos\avans.py                     854             FROM "kasa"."kasa1" k                                                           
+D:\pos_desktop\desktop_pos\avans.py                     871                 INSERT INTO "kasa"."karticaart"                                             
+D:\pos_desktop\desktop_pos\avans.py                    1001                     SELECT jm.jm                                                            
+D:\pos_desktop\desktop_pos\avans.py                    1020             SELECT p.slovo                                                                  
+D:\pos_desktop\desktop_pos\avans.py                    1110                 # Ažuriranje kasasum                                                        
+D:\pos_desktop\desktop_pos\avans.py                    1111                 self.main_window.azuriraj_kasasum(broj_racuna, ip_stampe)                   
+D:\pos_desktop\desktop_pos\avans.py                    1180             SELECT brracpu, vremetransakcije, datum, ukiznos, refbrracpu, kodkupca, oznak...
+D:\pos_desktop\desktop_pos\avans.py                    1181             FROM "kasa"."kasasum"                                                           
+D:\pos_desktop\desktop_pos\avans.py                    1199                 SELECT 1                                                                    
+D:\pos_desktop\desktop_pos\avans.py                    1200                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1217             SELECT brracpu, vremetransakcije, datum, ukiznos, refbrracpu, kodkupca, oznak...
+D:\pos_desktop\desktop_pos\avans.py                    1218             FROM "kasa"."kasasum"                                                           
+D:\pos_desktop\desktop_pos\avans.py                    1236                 SELECT brracpu, vremetransakcije, datum, ukiznos, refbrracpu, kodkupca, o...
+D:\pos_desktop\desktop_pos\avans.py                    1237                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1259         """Punjenje TreeWidget-a podacima iz kasasum tabele."""                             
+D:\pos_desktop\desktop_pos\avans.py                    1273                 SELECT brracpu, vremetransakcije, datum, ukiznos, refbrracpu, kodkupca, o...
+D:\pos_desktop\desktop_pos\avans.py                    1274                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1334             # Dohvati podatke o računu iz kasasum                                           
+D:\pos_desktop\desktop_pos\avans.py                    1337                 SELECT god, sifobj, broj, tiptransakcije                                    
+D:\pos_desktop\desktop_pos\avans.py                    1338                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1343             kasasum_podaci = cursor.fetchone()                                              
+D:\pos_desktop\desktop_pos\avans.py                    1345             if not kasasum_podaci:                                                          
+D:\pos_desktop\desktop_pos\avans.py                    1346                 print("❌ Nema podataka u kasasum za ovaj račun!")                           
+D:\pos_desktop\desktop_pos\avans.py                    1349             god, sifobj, broj, tiptransakcije = kasasum_podaci                              
+D:\pos_desktop\desktop_pos\avans.py                    1356             # Dohvati stavke računa iz karticaart i pridruži artikle                        
+D:\pos_desktop\desktop_pos\avans.py                    1359                 SELECT k.sifra, a.naziv, k.kolicina, k.cena, (k.kolicina * k.cena) AS uku...
+D:\pos_desktop\desktop_pos\avans.py                    1361                 FROM "kasa"."karticaart" k                                                  
+D:\pos_desktop\desktop_pos\avans.py                    1391     # kopiranje stavki iz kasa u kasa1 pri formiranju racuna za refundaciju                 
+D:\pos_desktop\desktop_pos\avans.py                    1392     def kopiraj_stavke_u_kasa1(self):                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1393         """Kopira stavke selektovanog računa iz kasa u kasa1 sa novim brojem računa (refu...
+D:\pos_desktop\desktop_pos\avans.py                    1420             # Dohvati podatke o računu iz kasasum                                           
+D:\pos_desktop\desktop_pos\avans.py                    1423                 SELECT god, sifobj, broj                                                    
+D:\pos_desktop\desktop_pos\avans.py                    1424                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1429             kasasum_podaci = cursor.fetchone()                                              
+D:\pos_desktop\desktop_pos\avans.py                    1431             if not kasasum_podaci:                                                          
+D:\pos_desktop\desktop_pos\avans.py                    1432                 print("❌ Nema podataka u kasasum za ovaj račun!")                           
+D:\pos_desktop\desktop_pos\avans.py                    1435             god, sifobj, stari_broj = kasasum_podaci                                        
+D:\pos_desktop\desktop_pos\avans.py                    1438             # Kopiraj stavke iz kasa u kasa1 sa novim brojem računa                         
+D:\pos_desktop\desktop_pos\avans.py                    1441                 INSERT INTO "kasa"."kasa1" (sifra, sifobj, cena, datum, kolic, broj, kasa...
+D:\pos_desktop\desktop_pos\avans.py                    1444                 SELECT sifra, sifobj, cena, datum, kolic, %s, kasa, smena,                  
+D:\pos_desktop\desktop_pos\avans.py                    1462             print(f"❌ Greška pri kopiranju stavki u kasa1: {e}")                            
+D:\pos_desktop\desktop_pos\avans.py                    1487             # Dohvati podatke o računu iz kasasum                                           
+D:\pos_desktop\desktop_pos\avans.py                    1490                 SELECT tipracuna, tiptransakcije, refbrracpu                                
+D:\pos_desktop\desktop_pos\avans.py                    1491                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1496             kasasum_podaci = cursor.fetchone()                                              
+D:\pos_desktop\desktop_pos\avans.py                    1498             if not kasasum_podaci:                                                          
+D:\pos_desktop\desktop_pos\avans.py                    1499                 print("❌ Nema podataka u kasasum za ovaj račun!")                           
+D:\pos_desktop\desktop_pos\avans.py                    1502             tipracuna, tiptransakcije, refbrracpu = kasasum_podaci                          
+D:\pos_desktop\desktop_pos\avans.py                    1517             cursor.execute("SELECT pib FROM \"kasa\".\"fvr\" LIMIT 1")                      
+D:\pos_desktop\desktop_pos\avans.py                    1527             # Kopiranje stavki u kasa1                                                      
+D:\pos_desktop\desktop_pos\avans.py                    1528             self.kopiraj_stavke_u_kasa1()                                                   
+D:\pos_desktop\desktop_pos\avans.py                    1558                 SELECT id, sifra,                                                           
+D:\pos_desktop\desktop_pos\avans.py                    1559                     (SELECT naziv FROM "kasa"."artikli" WHERE sifra = k.sifra) AS naziv,    
+D:\pos_desktop\desktop_pos\avans.py                    1561                 FROM "kasa"."kasa1" k                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1611                     SELECT god, broj, brracpu, refbrracpu, datum, tiptransakcije            
+D:\pos_desktop\desktop_pos\avans.py                    1612                     FROM kasa.kasasum                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1617                     SELECT ks.god, ks.broj, ks.brracpu, ks.refbrracpu, ks.datum, ks.tiptr...
+D:\pos_desktop\desktop_pos\avans.py                    1618                     FROM kasa.kasasum ks                                                    
+D:\pos_desktop\desktop_pos\avans.py                    1622                 SELECT god, broj, brracpu, refbrracpu, datum, tiptransakcije                
+D:\pos_desktop\desktop_pos\avans.py                    1652                     SELECT sifra, cena                                                      
+D:\pos_desktop\desktop_pos\avans.py                    1664             # 5. Priprema za upis u kasa1                                                   
+D:\pos_desktop\desktop_pos\avans.py                    1679                     INSERT INTO kasa.kasa1 (                                                
+D:\pos_desktop\desktop_pos\avans.py                    1697             print("\n✅ Uspešno snimljene zbirne stavke u kasa1.")                           
+D:\pos_desktop\desktop_pos\avans.py                    1733         ✅ Snima refundaciju računa u baze: kasa, kasasum i karticaart.                      
+D:\pos_desktop\desktop_pos\avans.py                    1763             # Snimanje podataka iz `kasa1` u `kasa` (pozitivna količina)                    
+D:\pos_desktop\desktop_pos\avans.py                    1765             INSERT INTO "kasa"."kasa"                                                       
+D:\pos_desktop\desktop_pos\avans.py                    1767             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, ABS(kolic), cena, popproc...
+D:\pos_desktop\desktop_pos\avans.py                    1768             FROM "kasa"."kasa1"                                                             
+D:\pos_desktop\desktop_pos\avans.py                    1772             # Ažuriranje podataka u `kasa1` kao zatvorenih                                  
+D:\pos_desktop\desktop_pos\avans.py                    1774             UPDATE "kasa"."kasa1"                                                           
+D:\pos_desktop\desktop_pos\avans.py                    1779             # Snimanje podataka u `kasasum`                                                 
+D:\pos_desktop\desktop_pos\avans.py                    1781             INSERT INTO "kasa"."kasasum"                                                    
+D:\pos_desktop\desktop_pos\avans.py                    1795             # Snimanje podataka u `karticaart` (negativna količina)                         
+D:\pos_desktop\desktop_pos\avans.py                    1797             SELECT                                                                          
+D:\pos_desktop\desktop_pos\avans.py                    1809             FROM "kasa"."kasa1" k                                                           
+D:\pos_desktop\desktop_pos\avans.py                    1826                 INSERT INTO "kasa"."karticaart"                                             
+D:\pos_desktop\desktop_pos\avans.py                    1872                         SELECT jm.jm                                                        
+D:\pos_desktop\desktop_pos\avans.py                    1889                         SELECT p.slovo                                                      
+D:\pos_desktop\desktop_pos\avans.py                    1974                 self.main_window.azuriraj_kasasum(broj_racuna, ip_stampe)                   
+D:\pos_desktop\desktop_pos\cene.py                       24 class CeneDialog(QDialog):                                                                  
+D:\pos_desktop\desktop_pos\cene.py                       79             SELECT broj, god, sifobj, datdospeca                                            
+D:\pos_desktop\desktop_pos\cene.py                       80             FROM kasa.robnadok                                                              
+D:\pos_desktop\desktop_pos\cene.py                       93                 SELECT artikliid, cena                                                      
+D:\pos_desktop\desktop_pos\cene.py                       94                 FROM kasa.karticaart                                                        
+D:\pos_desktop\desktop_pos\cene.py                      106                     SELECT 1                                                                
+D:\pos_desktop\desktop_pos\cene.py                      107                     FROM kasa.karticaart                                                    
+D:\pos_desktop\desktop_pos\cene.py                      121                     UPDATE kasa.zaliheart                                                   
+D:\pos_desktop\desktop_pos\cene.py                      144                 SELECT k.datum, k.opis, a.sifra, a.naziv, k.staracena AS stara_cena, k.ce...
+D:\pos_desktop\desktop_pos\cene.py                      145                 FROM kasa.karticaart k                                                      
+D:\pos_desktop\desktop_pos\cene.py                      147                 JOIN kasa.zaliheart z ON z.artikliid = k.artikliid                          
+D:\pos_desktop\desktop_pos\desktop_main.py               82         cursor.execute("SELECT ipstampe FROM \"kasa\".\"confkasa\" WHERE kasa = %s AND si...
+D:\pos_desktop\desktop_pos\desktop_main.py              179 class EditableDelegate(QStyledItemDelegate):                                                
+D:\pos_desktop\desktop_pos\desktop_main.py              191 class MainWindow(QMainWindow):                                                              
+D:\pos_desktop\desktop_pos\desktop_main.py              355         self.btnKorpa.clicked.connect(self.dodaj_u_kasa1)  # Povezivanje sa bazom podataka  
+D:\pos_desktop\desktop_pos\desktop_main.py              635             SELECT popdane FROM "kasa"."confkasa"                                           
+D:\pos_desktop\desktop_pos\desktop_main.py              796             SELECT a.sifra, a.naziv, COALESCE(b.barkod, '')                                 
+D:\pos_desktop\desktop_pos\desktop_main.py              851             SELECT a.sifra, a.naziv, jm.jm, a.tip, z.cena, z.zaliha                         
+D:\pos_desktop\desktop_pos\desktop_main.py              853             LEFT JOIN "kasa"."zaliheart" z ON a.sifra = z.sifra AND z.god = %s AND z.sifo...
+D:\pos_desktop\desktop_pos\desktop_main.py              877                         SELECT SUM(cena * kolicina)                                         
+D:\pos_desktop\desktop_pos\desktop_main.py              946                 self.dodaj_u_kasa1()                                                        
+D:\pos_desktop\desktop_pos\desktop_main.py              960     def dodaj_u_kasa1(self):                                                                
+D:\pos_desktop\desktop_pos\desktop_main.py              995             cursor.execute("""SELECT id, tip FROM "kasa"."artikli" WHERE sifra = %s""", (...
+D:\pos_desktop\desktop_pos\desktop_main.py             1018                     SELECT s.sifraart, s.kolicina, s.cena, a.naziv                          
+D:\pos_desktop\desktop_pos\desktop_main.py             1030                         INSERT INTO "kasa"."kasa1"                                          
+D:\pos_desktop\desktop_pos\desktop_main.py             1037                                 (SELECT id FROM "kasa"."artikli" WHERE sifra = %s), 1)      
+D:\pos_desktop\desktop_pos\desktop_main.py             1051                     INSERT INTO "kasa"."kasa1"                                              
+D:\pos_desktop\desktop_pos\desktop_main.py             1075             print(f"❌ Greška pri upisu u bazu `kasa1`: {e}")                                
+D:\pos_desktop\desktop_pos\desktop_main.py             1118         """✅ Brisanje artikla iz baze `kasa1` i tabele `stavkeTable`."""                    
+D:\pos_desktop\desktop_pos\desktop_main.py             1129             cursor.execute("""DELETE FROM "kasa"."kasa1" WHERE id = %s;""", (id_stavke,))   
+D:\pos_desktop\desktop_pos\desktop_main.py             1173                 "SELECT id, sifra, (SELECT naziv FROM \"kasa\".\"artikli\" WHERE sifra = ...
+D:\pos_desktop\desktop_pos\desktop_main.py             1303                 SELECT COALESCE(MAX(broj), 0) + 1                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             1304                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\desktop_main.py             1355             # Snimanje podataka iz `kasa1` u `kasa`                                         
+D:\pos_desktop\desktop_pos\desktop_main.py             1357             INSERT INTO "kasa"."kasa"                                                       
+D:\pos_desktop\desktop_pos\desktop_main.py             1359             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, kolic, cena, popproc1, po...
+D:\pos_desktop\desktop_pos\desktop_main.py             1360             FROM "kasa"."kasa1"                                                             
+D:\pos_desktop\desktop_pos\desktop_main.py             1364             # Ažuriranje podataka u `kasa1` kao zatvorenih                                  
+D:\pos_desktop\desktop_pos\desktop_main.py             1366             UPDATE "kasa"."kasa1"                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             1371             # Snimanje podataka u `kasasum`                                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             1373             INSERT INTO "kasa"."kasasum"                                                    
+D:\pos_desktop\desktop_pos\desktop_main.py             1388             # Snimanje podataka u `karticaart`                                              
+D:\pos_desktop\desktop_pos\desktop_main.py             1390             SELECT                                                                          
+D:\pos_desktop\desktop_pos\desktop_main.py             1402             FROM "kasa"."kasa1" k                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             1419                 INSERT INTO "kasa"."karticaart"                                             
+D:\pos_desktop\desktop_pos\desktop_main.py             1459             SELECT ipstampe, lservis                                                        
+D:\pos_desktop\desktop_pos\desktop_main.py             1576                 # Ažuriranje kasasum                                                        
+D:\pos_desktop\desktop_pos\desktop_main.py             1577                 self.azuriraj_kasasum(broj_racuna, ip_stampe)                               
+D:\pos_desktop\desktop_pos\desktop_main.py             1612                         SELECT jm.jm                                                        
+D:\pos_desktop\desktop_pos\desktop_main.py             1631                 SELECT p.slovo                                                              
+D:\pos_desktop\desktop_pos\desktop_main.py             1771             # 1. Pronađi zaglavlje iz kasasum                                               
+D:\pos_desktop\desktop_pos\desktop_main.py             1773                 SELECT god, sifobj, broj, dokstatus                                         
+D:\pos_desktop\desktop_pos\desktop_main.py             1774                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\desktop_main.py             1777             kasasum = cursor.fetchone()                                                     
+D:\pos_desktop\desktop_pos\desktop_main.py             1779             if not kasasum:                                                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             1783             god, sifobj, broj, dokstatus = kasasum                                          
+D:\pos_desktop\desktop_pos\desktop_main.py             1789             # 2. Izvuci stavke iz karticaart                                                
+D:\pos_desktop\desktop_pos\desktop_main.py             1791                 SELECT sifra, SUM(kolicina)                                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             1792                 FROM "kasa"."karticaart"                                                    
+D:\pos_desktop\desktop_pos\desktop_main.py             1805                 SELECT sifra, tip                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             1819                     SELECT zaliha                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             1820                     FROM "kasa"."zaliheart"                                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             1835                     UPDATE "kasa"."zaliheart"                                               
+D:\pos_desktop\desktop_pos\desktop_main.py             1851     def azuriraj_kasasum(self, broj_racuna, ip_stampe):                                     
+D:\pos_desktop\desktop_pos\desktop_main.py             1853         Ažurira polja 'brracpu', 'vremetransakcije' i 'verificationurl' u modelu 'kasasum'  
+D:\pos_desktop\desktop_pos\desktop_main.py             1877             # Ažuriranje modela kasasum                                                     
+D:\pos_desktop\desktop_pos\desktop_main.py             1888                 UPDATE "kasa"."kasasum"                                                     
+D:\pos_desktop\desktop_pos\desktop_main.py             1906             print(f"❌ Greška pri ažuriranju kasasum: {e}")                                  
+D:\pos_desktop\desktop_pos\desktop_main.py             1912         ✅ Snima refundaciju računa u baze: kasa, kasasum i karticaart.                      
+D:\pos_desktop\desktop_pos\desktop_main.py             1942             # Snimanje podataka iz `kasa1` u `kasa` (pozitivna količina)                    
+D:\pos_desktop\desktop_pos\desktop_main.py             1944             INSERT INTO "kasa"."kasa"                                                       
+D:\pos_desktop\desktop_pos\desktop_main.py             1946             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, ABS(kolic), cena, popproc...
+D:\pos_desktop\desktop_pos\desktop_main.py             1947             FROM "kasa"."kasa1"                                                             
+D:\pos_desktop\desktop_pos\desktop_main.py             1951             # Ažuriranje podataka u `kasa1` kao zatvorenih                                  
+D:\pos_desktop\desktop_pos\desktop_main.py             1953             UPDATE "kasa"."kasa1"                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             1958             # Snimanje podataka u `kasasum`                                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             1960             INSERT INTO "kasa"."kasasum"                                                    
+D:\pos_desktop\desktop_pos\desktop_main.py             1976             # Snimanje podataka u `karticaart` (pozitivna količina)                         
+D:\pos_desktop\desktop_pos\desktop_main.py             1978             SELECT                                                                          
+D:\pos_desktop\desktop_pos\desktop_main.py             1990             FROM "kasa"."kasa1" k                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2007                 INSERT INTO "kasa"."karticaart"                                             
+D:\pos_desktop\desktop_pos\desktop_main.py             2054                 SELECT brracpu, datum                                                       
+D:\pos_desktop\desktop_pos\desktop_main.py             2055                 FROM kasa.kasasum                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2068                 SELECT god, sifobj, broj                                                    
+D:\pos_desktop\desktop_pos\desktop_main.py             2069                 FROM kasa.kasasum                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2082                     SELECT cena, porez                                                      
+D:\pos_desktop\desktop_pos\desktop_main.py             2083                     FROM kasa.karticaart                                                    
+D:\pos_desktop\desktop_pos\desktop_main.py             2157                 self.azuriraj_kasasum(broj_racuna, ip_stampe)                               
+D:\pos_desktop\desktop_pos\desktop_main.py             2175             # ✅ Dohvatanje podataka iz baze za kasasum i kasa                               
+D:\pos_desktop\desktop_pos\desktop_main.py             2185             # ✅ Dohvatanje podataka iz kasasum (zaglavlja računa) - dodajemo kodkupca i o...
+D:\pos_desktop\desktop_pos\desktop_main.py             2187             SELECT brracpu, vremetransakcije, ukiznos, broj, kasa, god, sifobj, tiptransa...
+D:\pos_desktop\desktop_pos\desktop_main.py             2189             FROM "kasa"."kasasum"                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2193             self.kasasum = [                                                                
+D:\pos_desktop\desktop_pos\desktop_main.py             2215             SELECT k.broj, k.sifra, a.naziv, k.kolic, k.cena, (k.kolic * k.cena) AS vredn...
+D:\pos_desktop\desktop_pos\desktop_main.py             2239             SELECT id, sifra, naziv, tip                                                    
+D:\pos_desktop\desktop_pos\desktop_main.py             2258             dialog = RacuniDialog(self.kasasum, self.kasa, self.artikli, ip_stampe, lserv...
+D:\pos_desktop\desktop_pos\desktop_main.py             2293             SELECT ipstampe FROM "kasa"."confkasa"                                          
+D:\pos_desktop\desktop_pos\desktop_main.py             2310         Prebacuje stavke iz izabranog računa u stavkeTable glavnog prozora i model kasa1.   
+D:\pos_desktop\desktop_pos\desktop_main.py             2311         Takođe snima stavke u bazu u model kasa1.                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2314             # Pronalazimo zapis u kasasum koristeći brracpu                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             2315             zapis_kasasum = next((record for record in self.kasasum if record["brracpu"] ...
+D:\pos_desktop\desktop_pos\desktop_main.py             2316             if not zapis_kasasum:                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2317                 raise ValueError(f"❌ Nema zapisa u kasasum za brracpu: {brracpu}")          
+D:\pos_desktop\desktop_pos\desktop_main.py             2320             god = zapis_kasasum.get("god")                                                  
+D:\pos_desktop\desktop_pos\desktop_main.py             2321             sifobj = zapis_kasasum.get("sifobj")                                            
+D:\pos_desktop\desktop_pos\desktop_main.py             2322             kasa = zapis_kasasum.get("kasa")                                                
+D:\pos_desktop\desktop_pos\desktop_main.py             2323             broj = zapis_kasasum.get("broj")                                                
+D:\pos_desktop\desktop_pos\desktop_main.py             2325             #print(f"✅ Pronađeni podaci u kasasum: god={god}, sifobj={sifobj}, kasa={kasa...
+D:\pos_desktop\desktop_pos\desktop_main.py             2328                 raise ValueError(f"❌ Nedostaju podaci u zapisu kasasum za brracpu: {brrac...
+D:\pos_desktop\desktop_pos\desktop_main.py             2348             # Dodavanje stavki u model kasa1 sa ažuriranim privremenim brojem računa        
+D:\pos_desktop\desktop_pos\desktop_main.py             2349             self.kasa1 = []                                                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             2380                 self.kasa1.append(nova_stavka)                                              
+D:\pos_desktop\desktop_pos\desktop_main.py             2382             # Snimanje stavki iz kasa1 u bazu (tabela kasa1) sa ID dohvatom                 
+D:\pos_desktop\desktop_pos\desktop_main.py             2393                 for stavka in self.kasa1:                                                   
+D:\pos_desktop\desktop_pos\desktop_main.py             2395                     INSERT INTO "kasa"."kasa1"                                              
+D:\pos_desktop\desktop_pos\desktop_main.py             2425                 #print(f"✅ Stavke su uspešno snimljene u bazu (kasa1) za privremeni broj ...
+D:\pos_desktop\desktop_pos\desktop_main.py             2431             # Popunjavanje stavkeTable sa stavkama iz kasa1                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             2440         Popunjava stavkeTable podacima iz modela kasa1.                                     
+D:\pos_desktop\desktop_pos\desktop_main.py             2442         self.stavkeTable.setRowCount(len(self.kasa1))                                       
+D:\pos_desktop\desktop_pos\desktop_main.py             2443         for row, stavka in enumerate(self.kasa1):                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2498             stavka = next((s for s in self.kasa1 if s["id"] == id_stavke), None)            
+D:\pos_desktop\desktop_pos\desktop_main.py             2500                 raise ValueError(f"❌ Stavka sa ID-jem {id_stavke} nije pronađena u modelu...
+D:\pos_desktop\desktop_pos\desktop_main.py             2539             UPDATE "kasa"."kasa1"                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2583         ✅ Snima refundaciju računa u baze: kasa, kasasum i karticaart.                      
+D:\pos_desktop\desktop_pos\desktop_main.py             2613             # Snimanje podataka iz `kasa1` u `kasa` (pozitivna količina)                    
+D:\pos_desktop\desktop_pos\desktop_main.py             2615             INSERT INTO "kasa"."kasa"                                                       
+D:\pos_desktop\desktop_pos\desktop_main.py             2617             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, ABS(kolic), cena, popproc...
+D:\pos_desktop\desktop_pos\desktop_main.py             2618             FROM "kasa"."kasa1"                                                             
+D:\pos_desktop\desktop_pos\desktop_main.py             2622             # Ažuriranje podataka u `kasa1` kao zatvorenih                                  
+D:\pos_desktop\desktop_pos\desktop_main.py             2624             UPDATE "kasa"."kasa1"                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2629             # Snimanje podataka u `kasasum`                                                 
+D:\pos_desktop\desktop_pos\desktop_main.py             2631             INSERT INTO "kasa"."kasasum"                                                    
+D:\pos_desktop\desktop_pos\desktop_main.py             2648             # Snimanje podataka u `karticaart` (negativna količina)                         
+D:\pos_desktop\desktop_pos\desktop_main.py             2650             SELECT                                                                          
+D:\pos_desktop\desktop_pos\desktop_main.py             2662             FROM "kasa"."kasa1" k                                                           
+D:\pos_desktop\desktop_pos\desktop_main.py             2679                 INSERT INTO "kasa"."karticaart"                                             
+D:\pos_desktop\desktop_pos\desktop_main.py             2756                 self.azuriraj_kasasum(broj_racuna, ip_stampe)                               
+D:\pos_desktop\desktop_pos\efakture.py                   31 class eFaktureDialog(QDialog):                                                              
+D:\pos_desktop\desktop_pos\efakture.py                   82             cursor.execute("SELECT demoef, kljuc_api, kljuc_demo_api, pib, jbkjs, matbr F...
+D:\pos_desktop\desktop_pos\efakture.py                  155             cursor.execute("SELECT demoef FROM kasa.fvr LIMIT 1")                           
+D:\pos_desktop\desktop_pos\efakture.py                  160                 SELECT brojfakture, idpartneri FROM kasa.fakture WHERE id = %s              
+D:\pos_desktop\desktop_pos\efakture.py                  172                 SELECT naziv, pib, jbkjs, matbr FROM kasa.partneri WHERE id = %s            
+D:\pos_desktop\desktop_pos\efakture.py                  192             cursor.execute("SELECT kljuc_api FROM kasa.fvr LIMIT 1")                        
+D:\pos_desktop\desktop_pos\efakture.py                  324             cursor.execute("SELECT naziv, adresa, pobro, mesto, pib, banka, primarni_racu...
+D:\pos_desktop\desktop_pos\efakture.py                  339             cursor.execute("SELECT brojfakture, datumpred, datumdpd, datumvazenja, idpart...
+D:\pos_desktop\desktop_pos\efakture.py                  343             cursor.execute("SELECT naziv, adresa, pobro, mesto, pib, matbr FROM kasa.part...
+D:\pos_desktop\desktop_pos\efakture.py                  364                 FROM kasa.karticaart ka                                                     
+D:\pos_desktop\desktop_pos\efakture.py                  704             cursor.execute("SELECT brracpu FROM kasa.fakture WHERE id = %s", (faktura_id,)) 
+D:\pos_desktop\desktop_pos\efakture.py                  711             cursor.execute("SELECT refbrracpu FROM kasa.kasasum WHERE brracpu = %s", (brr...
+D:\pos_desktop\desktop_pos\efakture.py                  723                     SELECT refbrracpu, tipracuna, tiptransakcije, datum, broj               
+D:\pos_desktop\desktop_pos\efakture.py                  724                     FROM kasa.kasasum                                                       
+D:\pos_desktop\desktop_pos\efakture.py                  735                         SELECT brojfakture, datumpred                                       
+D:\pos_desktop\desktop_pos\efakture.py                  851                                 UPDATE kasa.fakture                                         
+D:\pos_desktop\desktop_pos\efakture.py                  869                                 SELECT brojfakture                                          
+D:\pos_desktop\desktop_pos\efakture.py                  880                                     UPDATE kasa.karticaart                                  
+D:\pos_desktop\desktop_pos\efakture.py                  921             cursor.execute("SELECT kljuc_api, pib, matbr, jbkjs FROM kasa.fvr LIMIT 1")     
+D:\pos_desktop\desktop_pos\fakture.py                    47 class FaktureDialog(QDialog):                                                               
+D:\pos_desktop\desktop_pos\fakture.py                   102         self.neobradjeniTable.setColumnHidden(4, True)  # sakrivam kolonu u kojoj je brra...
+D:\pos_desktop\desktop_pos\fakture.py                   110         self.izabraniTable.setColumnHidden(4, True)  # sakrivam kolonu u kojoj je brracpu...
+D:\pos_desktop\desktop_pos\fakture.py                   151         self.stavkefaktTable.setColumnWidth(0, 80)  # Prva kolona širine 80  sifra iz kar...
+D:\pos_desktop\desktop_pos\fakture.py                   154         self.stavkefaktTable.setColumnWidth(3, 100)  # Četvrta kolona širine 100 kolicina...
+D:\pos_desktop\desktop_pos\fakture.py                   155         self.stavkefaktTable.setColumnWidth(4, 90)  # Peta kolona širine 90 iz karticaart...
+D:\pos_desktop\desktop_pos\fakture.py                   156         self.stavkefaktTable.setColumnWidth(5, 90)  # Šesta kolona širine 90 rabatproc iz...
+D:\pos_desktop\desktop_pos\fakture.py                   157         self.stavkefaktTable.setColumnWidth(6, 100)  # Sedma kolona širine 100 rabatdinar...
+D:\pos_desktop\desktop_pos\fakture.py                   159         self.stavkefaktTable.setColumnWidth(8, 90)  # deveta kolona širine 90 porezproc i...
+D:\pos_desktop\desktop_pos\fakture.py                   160         self.stavkefaktTable.setColumnWidth(9, 100)  # deseta kolona širine 100 porez iz ...
+D:\pos_desktop\desktop_pos\fakture.py                   161         self.stavkefaktTable.setColumnWidth(10, 100)  # jedanaesta kolona širine 100 cena...
+D:\pos_desktop\desktop_pos\fakture.py                   162         self.stavkefaktTable.setColumnWidth(11, 60)  # dvanaesta kolona širine 60 tarifa ...
+D:\pos_desktop\desktop_pos\fakture.py                   163         self.stavkefaktTable.setColumnWidth(12, 60)  # trinaesta kolona širine 60 id iz k...
+D:\pos_desktop\desktop_pos\fakture.py                   164         self.stavkefaktTable.setColumnHidden(11, True)  # sakrivam kolonu u kojoj je tari...
+D:\pos_desktop\desktop_pos\fakture.py                   165         self.stavkefaktTable.setColumnHidden(12, True)  # sakrivam kolonu u kojoj je id k...
+D:\pos_desktop\desktop_pos\fakture.py                   181                     cursor.execute("SELECT obv FROM kasa.fvr LIMIT 1")                      
+D:\pos_desktop\desktop_pos\fakture.py                   209                 SELECT broj, kasa, datum, ukiznos, brracpu                                  
+D:\pos_desktop\desktop_pos\fakture.py                   210                 FROM kasa.kasasum                                                           
+D:\pos_desktop\desktop_pos\fakture.py                   292                 SELECT k.sifra, a.naziv, k.kolic, k.cena, (k.kolic * k.cena) AS vrednost    
+D:\pos_desktop\desktop_pos\fakture.py                   359                 SELECT k.sifra, a.naziv, k.kolic, k.cena, (k.kolic * k.cena) AS vrednost    
+D:\pos_desktop\desktop_pos\fakture.py                   488                     SELECT COUNT(*) FROM kasa.fakture                                       
+D:\pos_desktop\desktop_pos\fakture.py                   498                     SELECT COUNT(*) FROM kasa.fakture                                       
+D:\pos_desktop\desktop_pos\fakture.py                   588             cursor.execute("SELECT demoef FROM kasa.fvr LIMIT 1")                           
+D:\pos_desktop\desktop_pos\fakture.py                   594                 SELECT 1 FROM kasa.fakture                                                  
+D:\pos_desktop\desktop_pos\fakture.py                   600                     INSERT INTO kasa.fakture (                                              
+D:\pos_desktop\desktop_pos\fakture.py                   619                 SELECT god, sifobj, broj                                                    
+D:\pos_desktop\desktop_pos\fakture.py                   620                 FROM kasa.kasasum                                                           
+D:\pos_desktop\desktop_pos\fakture.py                   633                 SELECT sifra, kolic, cena                                                   
+D:\pos_desktop\desktop_pos\fakture.py                   640             # 1. Preuzmi stavke iz karticaart za fiskalni račun                             
+D:\pos_desktop\desktop_pos\fakture.py                   642                 SELECT sifra, sifobj, broj, datum, kolicina, cena, cenanabavna, tarifa,     
+D:\pos_desktop\desktop_pos\fakture.py                   646                 FROM kasa.karticaart                                                        
+D:\pos_desktop\desktop_pos\fakture.py                   672                 # Insert nove stavke u karticaart (kao faktura)                             
+D:\pos_desktop\desktop_pos\fakture.py                   674                     INSERT INTO kasa.karticaart (                                           
+D:\pos_desktop\desktop_pos\fakture.py                   700                 UPDATE kasa.fakture                                                         
+D:\pos_desktop\desktop_pos\fakture.py                   710             # ==== KORAK 9: Azuriranje kasasum ====                                         
+D:\pos_desktop\desktop_pos\fakture.py                   712                 UPDATE kasa.kasasum                                                         
+D:\pos_desktop\desktop_pos\fakture.py                   716             print(f"Kasasum ažurirana: broj fakture={brojrnEdit}, id kupca={idkupcaEdit}")  
+D:\pos_desktop\desktop_pos\fakture.py                   764                 SELECT                                                                      
+D:\pos_desktop\desktop_pos\fakture.py                   862                     FROM kasa.karticaart ka                                                 
+D:\pos_desktop\desktop_pos\fakture.py                  1013             cursor.execute("SELECT naziv, adresa, pobro, mesto, pib, banka, primarni_racu...
+D:\pos_desktop\desktop_pos\fakture.py                  1020             cursor.execute("SELECT sifobj, objekat, adresa, mesto, telefon, racunopolagac...
+D:\pos_desktop\desktop_pos\fakture.py                  1023             cursor.execute("SELECT brojfakture, datumpred, datumdpd, datumvazenja, idpart...
+D:\pos_desktop\desktop_pos\fakture.py                  1026             cursor.execute("SELECT sifra, naziv, adresa, pobro, mesto, pib, matbr FROM ka...
+D:\pos_desktop\desktop_pos\fakture.py                  1037                 FROM kasa.karticaart k                                                      
+D:\pos_desktop\desktop_pos\fakture.py                  1256             cursor.execute("SELECT naziv, adresa, pobro, mesto, pib, banka, primarni_racu...
+D:\pos_desktop\desktop_pos\fakture.py                  1264             cursor.execute("SELECT sifobj, objekat, adresa, mesto, telefon, racunopolagac...
+D:\pos_desktop\desktop_pos\fakture.py                  1267             cursor.execute("SELECT brojfakture, datumpred, datumdpd, datumvazenja, idpart...
+D:\pos_desktop\desktop_pos\fakture.py                  1270             cursor.execute("SELECT sifra, naziv, adresa, pobro, mesto, pib, matbr FROM ka...
+D:\pos_desktop\desktop_pos\fakture.py                  1283             FROM kasa.karticaart ka                                                         
+D:\pos_desktop\desktop_pos\fakture.py                  1646                         SELECT refbrracpu, tipracuna, tiptransakcije, datum                 
+D:\pos_desktop\desktop_pos\fakture.py                  1647                         FROM kasa.kasasum                                                   
+D:\pos_desktop\desktop_pos\fakture.py                  1665                 SELECT refbrracpu                                                           
+D:\pos_desktop\desktop_pos\fakture.py                  1666                 FROM kasa.kasasum                                                           
+D:\pos_desktop\desktop_pos\fakture.py                  1679                     SELECT god, sifobj, broj, brfakt, datum                                 
+D:\pos_desktop\desktop_pos\fakture.py                  1680                     FROM kasa.kasasum                                                       
+D:\pos_desktop\desktop_pos\fakture.py                  1689                     SELECT tarifa,                                                          
+D:\pos_desktop\desktop_pos\fakture.py                  1692                     FROM kasa.karticaart                                                    
+D:\pos_desktop\desktop_pos\fakture.py                  1741                     cursor.execute("SELECT demoef, kljuc_api, kljuc_demo_api FROM kasa.fv...
+D:\pos_desktop\desktop_pos\fakture.py                  1803                             UPDATE kasa.fakture                                             
+D:\pos_desktop\desktop_pos\kep.py                        41 class KepDialog(QDialog):                                                                   
+D:\pos_desktop\desktop_pos\kep.py                        86                         SELECT id, datum, zaduzenje, razduzenje, opis                       
+D:\pos_desktop\desktop_pos\kep.py                       145                         SELECT COUNT(*) FROM kasa.tk                                        
+D:\pos_desktop\desktop_pos\kep.py                       199                         SELECT COUNT(*) FROM kasa.tk                                        
+D:\pos_desktop\desktop_pos\kep.py                       214                         FROM kasa.kasasum                                                   
+D:\pos_desktop\desktop_pos\kep.py                       227                             INSERT INTO kasa.tk                                             
+D:\pos_desktop\desktop_pos\kep.py                       253                         SELECT brracpu, ukiznos FROM kasa.kasasum                           
+D:\pos_desktop\desktop_pos\kep.py                       289                         SELECT COUNT(*) FROM kasa.tk                                        
+D:\pos_desktop\desktop_pos\kep.py                       297                     # Suma vrednosti iz karticaart za vrstu 5 (početno stanje)              
+D:\pos_desktop\desktop_pos\kep.py                       299                         SELECT COALESCE(SUM(kolicina * cena), 0)                            
+D:\pos_desktop\desktop_pos\kep.py                       300                         FROM kasa.karticaart                                                
+D:\pos_desktop\desktop_pos\kep.py                       314                         INSERT INTO kasa.tk                                                 
+D:\pos_desktop\desktop_pos\kep.py                       349                     query_robnadok = """                                                    
+D:\pos_desktop\desktop_pos\kep.py                       350                         SELECT d.broj, d.brojuidok, d.idpartneri, p.naziv                   
+D:\pos_desktop\desktop_pos\kep.py                       351                         FROM kasa.robnadok d                                                
+D:\pos_desktop\desktop_pos\kep.py                       355                     cursor.execute(query_robnadok, (self.GODINA, self.SIFOBJEKTA, datum_s...
+D:\pos_desktop\desktop_pos\kep.py                       365                             SELECT kolicina, cena                                           
+D:\pos_desktop\desktop_pos\kep.py                       366                             FROM kasa.karticaart                                            
+D:\pos_desktop\desktop_pos\kep.py                       380                                 INSERT INTO kasa.tk                                         
+D:\pos_desktop\desktop_pos\kep.py                       427                     query_robnadok = """                                                    
+D:\pos_desktop\desktop_pos\kep.py                       428                         SELECT broj                                                         
+D:\pos_desktop\desktop_pos\kep.py                       429                         FROM kasa.robnadok                                                  
+D:\pos_desktop\desktop_pos\kep.py                       432                     cursor.execute(query_robnadok, (self.GODINA, self.SIFOBJEKTA, datum_s...
+D:\pos_desktop\desktop_pos\kep.py                       439                             SELECT kolicina, cena, staracena                                
+D:\pos_desktop\desktop_pos\kep.py                       440                             FROM kasa.karticaart                                            
+D:\pos_desktop\desktop_pos\kep.py                       453                             INSERT INTO kasa.tk (datum, opis, razduzenje, zaduzenje, vrst...
+D:\pos_desktop\desktop_pos\kep.py                       492                     query_robnadok = """                                                    
+D:\pos_desktop\desktop_pos\kep.py                       493                         SELECT d.broj, d.brojuidok, d.idpartneri, p.naziv                   
+D:\pos_desktop\desktop_pos\kep.py                       494                         FROM kasa.robnadok d                                                
+D:\pos_desktop\desktop_pos\kep.py                       498                     cursor.execute(query_robnadok, (self.GODINA, self.SIFOBJEKTA, datum_s...
+D:\pos_desktop\desktop_pos\kep.py                       508                             SELECT kolicina, cena                                           
+D:\pos_desktop\desktop_pos\kep.py                       509                             FROM kasa.karticaart                                            
+D:\pos_desktop\desktop_pos\kep.py                       523                                 INSERT INTO kasa.tk                                         
+D:\pos_desktop\desktop_pos\kep.py                       571                     query_robnadok = """                                                    
+D:\pos_desktop\desktop_pos\kep.py                       572                         SELECT d.broj, d.brojuidok, d.opis, d.idpartneri, p.naziv           
+D:\pos_desktop\desktop_pos\kep.py                       573                         FROM kasa.robnadok d                                                
+D:\pos_desktop\desktop_pos\kep.py                       577                     cursor.execute(query_robnadok, (self.GODINA, self.SIFOBJEKTA, datum_s...
+D:\pos_desktop\desktop_pos\kep.py                       587                             SELECT kolicina, cena                                           
+D:\pos_desktop\desktop_pos\kep.py                       588                             FROM kasa.karticaart                                            
+D:\pos_desktop\desktop_pos\kep.py                       602                                 INSERT INTO kasa.tk                                         
+D:\pos_desktop\desktop_pos\kep.py                       650                     query_robnadok = """                                                    
+D:\pos_desktop\desktop_pos\kep.py                       651                         SELECT d.broj, d.brojuidok, d.opis, d.idpartneri, p.naziv           
+D:\pos_desktop\desktop_pos\kep.py                       652                         FROM kasa.robnadok d                                                
+D:\pos_desktop\desktop_pos\kep.py                       656                     cursor.execute(query_robnadok, (self.GODINA, self.SIFOBJEKTA, datum_s...
+D:\pos_desktop\desktop_pos\kep.py                       666                             SELECT kolicina, cena                                           
+D:\pos_desktop\desktop_pos\kep.py                       667                             FROM kasa.karticaart                                            
+D:\pos_desktop\desktop_pos\kep.py                       681                                 INSERT INTO kasa.tk                                         
+D:\pos_desktop\desktop_pos\kep.py                       732                     query_robnadok = """                                                    
+D:\pos_desktop\desktop_pos\kep.py                       733                         SELECT d.broj, d.brojuidok, d.opis, d.idpartneri, p.naziv           
+D:\pos_desktop\desktop_pos\kep.py                       734                         FROM kasa.robnadok d                                                
+D:\pos_desktop\desktop_pos\kep.py                       738                     cursor.execute(query_robnadok, (self.GODINA, self.SIFOBJEKTA, datum_s...
+D:\pos_desktop\desktop_pos\kep.py                       748                             SELECT kolicina, cena                                           
+D:\pos_desktop\desktop_pos\kep.py                       749                             FROM kasa.karticaart                                            
+D:\pos_desktop\desktop_pos\kep.py                       763                                 INSERT INTO kasa.tk                                         
+D:\pos_desktop\desktop_pos\kep.py                       811                     query_robnadok = """                                                    
+D:\pos_desktop\desktop_pos\kep.py                       812                         SELECT d.broj, d.brojuidok, d.opis, d.idpartneri, p.naziv           
+D:\pos_desktop\desktop_pos\kep.py                       813                         FROM kasa.robnadok d                                                
+D:\pos_desktop\desktop_pos\kep.py                       817                     cursor.execute(query_robnadok, (self.GODINA, self.SIFOBJEKTA, datum_s...
+D:\pos_desktop\desktop_pos\kep.py                       827                             SELECT kolicina, cena                                           
+D:\pos_desktop\desktop_pos\kep.py                       828                             FROM kasa.karticaart                                            
+D:\pos_desktop\desktop_pos\kep.py                       842                                 INSERT INTO kasa.tk                                         
+D:\pos_desktop\desktop_pos\kep.py                       951         cur.execute("SELECT naziv FROM kasa.fvr LIMIT 1")                                   
+D:\pos_desktop\desktop_pos\kep.py                       954         cur.execute("SELECT objekat, adresa, mesto FROM kasa.objekti WHERE sifobj = %s", ...
+D:\pos_desktop\desktop_pos\kep.py                       959             SELECT datum, opis, zaduzenje, razduzenje                                       
+D:\pos_desktop\desktop_pos\kep.py                       967             SELECT COUNT(*) FROM kasa.tk                                                    
+D:\pos_desktop\desktop_pos\kep_stampa_dijalog.py          7 class KepStampaDijalog(QDialog):                                                            
+D:\pos_desktop\desktop_pos\login.py                      24 class LoginDialog(QDialog):                                                                 
+D:\pos_desktop\desktop_pos\login.py                      59             cursor.execute("SELECT password, is_active FROM kasa.auth_user WHERE username...
+D:\pos_desktop\desktop_pos\login_dijalog.py              12 class Ui_login(object):                                                                     
+D:\pos_desktop\desktop_pos\neobradjeni.py                28 class NeobradjeniDialog(QDialog):                                                           
+D:\pos_desktop\desktop_pos\neobradjeni.py                74                 SELECT ks.broj, ks.kasa, ks.kreirano, ks.ukiznos, ks.tiptransakcije,        
+D:\pos_desktop\desktop_pos\neobradjeni.py                77                 FROM "kasa"."kasasum" ks                                                    
+D:\pos_desktop\desktop_pos\neobradjeni.py               203                 SELECT                                                                      
+D:\pos_desktop\desktop_pos\neobradjeni.py               416                 self.main_window.azuriraj_kasasum(broj_racuna, ip_stampe)                   
+D:\pos_desktop\desktop_pos\neobradjeni.py               455             # Brisanje stavki iz kasa1                                                      
+D:\pos_desktop\desktop_pos\neobradjeni.py               457                 DELETE FROM "kasa"."kasa1"                                                  
+D:\pos_desktop\desktop_pos\neobradjeni.py               460             #print("Obrisano iz kasa1:", cursor.rowcount)                                   
+D:\pos_desktop\desktop_pos\neobradjeni.py               469             # Brisanje stavki iz karticaart                                                 
+D:\pos_desktop\desktop_pos\neobradjeni.py               471                 DELETE FROM "kasa"."karticaart"                                             
+D:\pos_desktop\desktop_pos\neobradjeni.py               474             #print("Obrisano iz karticaart:", cursor.rowcount)                              
+D:\pos_desktop\desktop_pos\neobradjeni.py               476             # Brisanje zaglavlja računa iz kasasum (dodao god i sifobj)                     
+D:\pos_desktop\desktop_pos\neobradjeni.py               478                 DELETE FROM "kasa"."kasasum"                                                
+D:\pos_desktop\desktop_pos\neobradjeni.py               481             #print("Obrisano iz kasasum:", cursor.rowcount)                                 
+D:\pos_desktop\desktop_pos\nivelacija.py                 22 class NivelacijaDialog(QDialog):                                                            
+D:\pos_desktop\desktop_pos\nivelacija.py                 36         self.tableStavke.setColumnWidth(0, 60)  # Prva kolona širine 60 id iz karticaart    
+D:\pos_desktop\desktop_pos\nivelacija.py                 68                 SELECT broj FROM kasa.robnadok                                              
+D:\pos_desktop\desktop_pos\nivelacija.py                102                 SELECT 1 FROM kasa.karticaart ka                                            
+D:\pos_desktop\desktop_pos\nivelacija.py                136                 SELECT broj FROM kasa.robnadok                                              
+D:\pos_desktop\desktop_pos\nivelacija.py                165                 INSERT INTO kasa.robnadok (                                                 
+D:\pos_desktop\desktop_pos\nivelacija.py                215                     kasa.karticaart k                                                       
+D:\pos_desktop\desktop_pos\nivelacija.py                261         Dodaje jednu stavku nivelacije u karticaart koristeći podatke iz agregatne funkcije.
+D:\pos_desktop\desktop_pos\nivelacija.py                304                 INSERT INTO kasa.karticaart (                                               
+D:\pos_desktop\desktop_pos\nivelacija.py                357                 SELECT SUM((cena - staracena) * kolicina)                                   
+D:\pos_desktop\desktop_pos\nivelacija.py                358                 FROM kasa.karticaart                                                        
+D:\pos_desktop\desktop_pos\nivelacija.py                365                 UPDATE kasa.robnadok                                                        
+D:\pos_desktop\desktop_pos\nivelacija.py                387                 SELECT broj FROM kasa.robnadok                                              
+D:\pos_desktop\desktop_pos\nivelacija.py                487                 SELECT                                                                      
+D:\pos_desktop\desktop_pos\nivelacija.py                497                 FROM kasa.karticaart ka                                                     
+D:\pos_desktop\desktop_pos\partneri.py                   31 class PartneriDialog(QDialog):                                                              
+D:\pos_desktop\desktop_pos\partneri.py                   55                     cursor.execute("SELECT MAX(sifra) FROM kasa.partneri")                  
+D:\pos_desktop\desktop_pos\partneri.py                  135                     cursor.execute("SELECT 1 FROM kasa.partneri WHERE pib = %s", (self.pi...
+D:\pos_desktop\desktop_pos\partneri.py                  140                         INSERT INTO kasa.partneri (                                         
+D:\pos_desktop\desktop_pos\pazar.py                      29 class PazarDialog(QDialog):                                                                 
+D:\pos_desktop\desktop_pos\pazar.py                      77             SELECT kreirao,                                                                 
+D:\pos_desktop\desktop_pos\pazar.py                      84             FROM kasa.kasasum                                                               
+D:\pos_desktop\desktop_pos\pazar.py                     123             SELECT                                                                          
+D:\pos_desktop\desktop_pos\pazar.py                     130             FROM kasa.kasasum                                                               
+D:\pos_desktop\desktop_pos\pazar.py                     215         cur.execute("SELECT naziv, adresa, mesto FROM kasa.fvr LIMIT 1")                    
+D:\pos_desktop\desktop_pos\pazar.py                     218         cur.execute("SELECT objekat, adresa, mesto FROM kasa.objekti WHERE sifobj = %s", ...
+D:\pos_desktop\desktop_pos\pazar.py                     223             SELECT kreirao,                                                                 
+D:\pos_desktop\desktop_pos\pazar.py                     226             FROM kasa.kasasum                                                               
+D:\pos_desktop\desktop_pos\pazar.py                     237             SELECT                                                                          
+D:\pos_desktop\desktop_pos\pazar.py                     240             FROM kasa.kasasum                                                               
+D:\pos_desktop\desktop_pos\periodicni.py                  7 class PeriodicniDialog(QDialog):                                                            
+D:\pos_desktop\desktop_pos\porkat.py                     23 class PorkatDialog(QDialog):                                                                
+D:\pos_desktop\desktop_pos\porkat.py                     60                 SELECT reasonid, keykat, category, text, law                                
+D:\pos_desktop\desktop_pos\racuniDialog.py               10 class Ui_racuniDialog(object):                                                              
+D:\pos_desktop\desktop_pos\racuniDialog.py               85 class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):                                     
+D:\pos_desktop\desktop_pos\racuniDialog.py               89     def __init__(self, kasasum, kasa, artikli, ip_stampe, lservis, parent=None):            
+D:\pos_desktop\desktop_pos\racuniDialog.py               94         self.kasasum = kasasum  # Model za zaglavlja računa                                 
+D:\pos_desktop\desktop_pos\racuniDialog.py              146         ✅ Popunjava hdrTable podacima iz modela kasasum, a refundirane račune ističe vizu...
+D:\pos_desktop\desktop_pos\racuniDialog.py              156         self.hdrTable.setRowCount(len(self.kasasum))                                        
+D:\pos_desktop\desktop_pos\racuniDialog.py              158         for row, record in enumerate(self.kasasum):                                         
+D:\pos_desktop\desktop_pos\racuniDialog.py              389             # Pronalazimo zapis u kasasum koristeći brracpu                                 
+D:\pos_desktop\desktop_pos\racuniDialog.py              390             zapis_kasasum = next((record for record in self.kasasum if record["brracpu"] ...
+D:\pos_desktop\desktop_pos\racuniDialog.py              391             if not zapis_kasasum:                                                           
+D:\pos_desktop\desktop_pos\racuniDialog.py              392                 raise ValueError(f"❌ Nema zapisa u kasasum za brracpu: {brracpu}")          
+D:\pos_desktop\desktop_pos\racuniDialog.py              395             god = zapis_kasasum.get("god")                                                  
+D:\pos_desktop\desktop_pos\racuniDialog.py              396             sifobj = zapis_kasasum.get("sifobj")                                            
+D:\pos_desktop\desktop_pos\racuniDialog.py              397             kasa = zapis_kasasum.get("kasa")                                                
+D:\pos_desktop\desktop_pos\racuniDialog.py              398             broj = zapis_kasasum.get("broj")                                                
+D:\pos_desktop\desktop_pos\racuniDialog.py              440             # ✅ Pronalazimo odgovarajući zapis u kasasum                                    
+D:\pos_desktop\desktop_pos\racuniDialog.py              441             zapis_kasasum = next((r for r in self.kasasum if str(r["broj"]) == broj_skriv...
+D:\pos_desktop\desktop_pos\racuniDialog.py              442             if not zapis_kasasum:                                                           
+D:\pos_desktop\desktop_pos\racuniDialog.py              443                 print("❌ Greška: Nije pronađen zapis u kasasum!")                           
+D:\pos_desktop\desktop_pos\racuniDialog.py              446             #print(f"✅ Pronađen zapis u kasasum: {zapis_kasasum}")                          
+D:\pos_desktop\desktop_pos\racuniDialog.py              449             god = zapis_kasasum.get("god")                                                  
+D:\pos_desktop\desktop_pos\racuniDialog.py              450             sifobj = zapis_kasasum.get("sifobj")                                            
+D:\pos_desktop\desktop_pos\racuniDialog.py              451             kasa = zapis_kasasum.get("kasa")                                                
+D:\pos_desktop\desktop_pos\racuniDialog.py              452             broj = zapis_kasasum.get("broj")                                                
+D:\pos_desktop\desktop_pos\racuniDialog.py              453             tip_transakcije = int(zapis_kasasum.get("tiptransakcije", 0))  # 0 = Prodaja,...
+D:\pos_desktop\desktop_pos\racuniDialog.py              500                         SELECT jm.jm, p.slovo                                               
+D:\pos_desktop\desktop_pos\racuniDialog.py              532                 ("1", zapis_kasasum.get("vrgotovina", 0)),                                  
+D:\pos_desktop\desktop_pos\racuniDialog.py              533                 ("2", zapis_kasasum.get("vrkartica", 0)),                                   
+D:\pos_desktop\desktop_pos\racuniDialog.py              534                 ("3", zapis_kasasum.get("vrcek", 0)),                                       
+D:\pos_desktop\desktop_pos\racuniDialog.py              535                 ("4", zapis_kasasum.get("vrfaktura", 0)),                                   
+D:\pos_desktop\desktop_pos\refundirani_avansi.py         34 class RefundiraniAvansDialog(QDialog):                                                      
+D:\pos_desktop\desktop_pos\refundirani_avansi.py         78             cursor.execute("SELECT pib FROM kasa.fvr LIMIT 1")                              
+D:\pos_desktop\desktop_pos\refundirani_avansi.py         87                 SELECT refbrracpu, brracpu                                                  
+D:\pos_desktop\desktop_pos\refundirani_avansi.py         88                 FROM kasa.kasasum                                                           
+D:\pos_desktop\desktop_pos\refundirani_avansi.py         96                 SELECT brracpu, vremetransakcije, ukiznos, kodkupca, oznakakupca, broj, g...
+D:\pos_desktop\desktop_pos\refundirani_avansi.py         97                 FROM kasa.kasasum                                                           
+D:\pos_desktop\desktop_pos\select_customer.py             5 class SelectCustomerDialog(QDialog):                                                        
+D:\pos_desktop\desktop_pos\sinteticki.py                 29 class SintetickiDialog(QDialog):                                                            
+D:\pos_desktop\desktop_pos\sinteticki.py                 76                 SELECT                                                                      
+D:\pos_desktop\desktop_pos\sinteticki.py                198         cur.execute("SELECT naziv, adresa, mesto FROM kasa.fvr LIMIT 1")                    
+D:\pos_desktop\desktop_pos\sinteticki.py                201         cur.execute("SELECT objekat, adresa FROM kasa.objekti WHERE sifobj = %s", (SIFOBJ...
+D:\pos_desktop\desktop_pos\sinteticki.py                207             SELECT                                                                          
+D:\pos_desktop\desktop_pos\sinteticki.py                247         class BrojanjeStranaDoc(BaseDocTemplate):                                           
+D:\pos_desktop\desktop_pos\trazi_avans.py                22 class TraziAvansDialog(QDialog):                                                            
+D:\pos_desktop\desktop_pos\trazi_avans.py                49         """Punjenje tabele racuniTable podacima iz kasasum."""                              
+D:\pos_desktop\desktop_pos\trazi_avans.py                61                 SELECT datum, ukiznos, brracpu, vremetransakcije, refbrracpu,               
+D:\pos_desktop\desktop_pos\trazi_avans.py                63                 FROM "kasa"."kasasum"                                                       
+D:\pos_desktop\desktop_pos\trazi_partnera.py             23 class TraziPartneraDialog(QDialog):                                                         
+D:\pos_desktop\desktop_pos\trazi_partnera.py             61                 SELECT id, naziv, pib, jbkjs                                                
+D:\pos_desktop\desktop_pos\zalihe.py                     30 class ZaliheDialog(QDialog):                                                                
+D:\pos_desktop\desktop_pos\zalihe.py                     70                 SELECT * FROM kasa.obradi(%s, %s, %s, CURRENT_DATE)                         
+D:\pos_desktop\desktop_pos\zalihe.py                     91             # 🔄 Ažuriranje zaliheart                                                       
+D:\pos_desktop\desktop_pos\zalihe.py                     97                     SELECT 1 FROM kasa.zaliheart                                            
+D:\pos_desktop\desktop_pos\zalihe.py                    104                         UPDATE kasa.zaliheart                                               
+D:\pos_desktop\desktop_pos\zalihe.py                    211         cur.execute("SELECT sifobj, objekat, adresa, mesto FROM kasa.objekti WHERE sifobj...
+D:\pos_desktop\desktop_pos\zalihe.py                    236         cur.execute("""SELECT * FROM kasa.obradi(%s, %s, %s, %s)""", [GODINA, 1, SIFOBJEK...
+
+
