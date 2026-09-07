@@ -136,14 +136,18 @@ class NivelacijaDialog(QDialog):
             cur = conn.cursor()
 
             sql = """
-                SELECT 1 FROM kasa.karticaart ka
-                JOIN kasa.artikli a ON a.id = ka.artikliid
+                SELECT 1
+                FROM kasa.karticaart ka
+                JOIN kasa.artikli a
+                  ON a.id = ka.artikliid
                 WHERE ka.god = %s
                   AND ka.sifobj = %s
                   AND ka.lokacija_id = %s
                   AND ka.datum = %s
                   AND ka.vrsta IN (3, 8, 9)
-                  AND ka.cena <> ka.cenanabavna
+                  AND ka.dokstatus IN ('PP', 'PR')
+                  AND ka.staracena IS NOT NULL
+                  AND ABS(ka.cena - ka.staracena) > 0.005
                   AND a.tip = 1
                 LIMIT 1
             """
@@ -250,28 +254,33 @@ class NivelacijaDialog(QDialog):
                     k.grupa,
                     k.porezid,
                     k.cena AS nova_cena,
-                    z.cena AS staracena,
+                    k.staracena,
                     SUM(k.kolicina) AS ukupna_kolicina
                 FROM kasa.karticaart k
-                JOIN kasa.artikli a ON k.sifra = a.sifra
-                JOIN kasa.zaliheart z
-                    ON z.god = k.god
-                AND z.sifobj = k.sifobj
-                AND z.lokacija_id = k.lokacija_id
-                AND z.sifra = k.sifra
+                JOIN kasa.artikli a
+                  ON a.id = k.artikliid
                 WHERE k.god = %s
-                AND k.datum = %s
-                AND k.sifobj = %s
-                AND k.lokacija_id = %s
-                AND k.vrsta IN (8, 9, 3)
-                AND k.dokstatus IN ('PP', 'PR')
-                AND k.cena <> z.cena
-                AND a.tip = 1
+                  AND k.datum = %s
+                  AND k.sifobj = %s
+                  AND k.lokacija_id = %s
+                  AND k.vrsta IN (3, 8, 9)
+                  AND k.dokstatus IN ('PP', 'PR')
+                  AND k.staracena IS NOT NULL
+                  AND ABS(k.cena - k.staracena) > 0.005
+                  AND a.tip = 1
                 GROUP BY
-                    a.sifra, a.id, k.tarifa, k.porezproc,
-                    k.grupa, k.porezid, k.cena, z.cena
+                    a.sifra,
+                    a.id,
+                    k.tarifa,
+                    k.porezproc,
+                    k.grupa,
+                    k.porezid,
+                    k.cena,
+                    k.staracena
                 ORDER BY
-                    a.sifra, k.cena
+                    a.sifra,
+                    k.cena,
+                    k.staracena
             """
 
             cur.execute(sql, (GODINA, datum, sifobj, self.glavna_lokacija_id))
@@ -352,12 +361,14 @@ class NivelacijaDialog(QDialog):
                     god, kar, broj, sifobj, lokacija_id, vrsta,
                     artikliid, sifra, kolicina, cena, staracena,
                     porez, porezproc, tarifa, porezid, grupa,
-                    opis, datum, kreirao, idpartneri
+                    opis, datum, kreirao, idpartneri,
+                    dokstatus, ne_menja_zalihe
                 ) VALUES (
                     %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s,
-                    %s, %s, %s, %s
+                    %s, %s, %s, %s,
+                    'KNJIZEN', TRUE
                 )
             """, (
                 GODINA,
@@ -470,52 +481,314 @@ class NivelacijaDialog(QDialog):
         if self.proveri_i_prikazi_nivelaciju():
             return
 
-        if not self.postoji_popust_za_datum():
-            QMessageBox.information(None, "Informacija", "Za izabrani datum nema prodaje sa popustom. Nivelacija neće biti kreirana.")
-            return
-
-        try:
-            broj = self.generisi_broj_dokumenta()
-        except Exception as e:
-            QMessageBox.critical(None, "Greška", f"Nije moguće generisati broj dokumenta:\n{e}")
-            return
-
         datum_qdate = self.datumEdit.date()
-        self.kreiraj_zaglavlje_nivelacije(datum_qdate, broj)
-
         datum_str = datum_qdate.toString("yyyy-MM-dd")
+
+        if not self.postoji_popust_za_datum():
+            QMessageBox.information(
+                None,
+                "Informacija",
+                "Za izabrani datum nema prodaje sa popustom. "
+                "Nivelacija neće biti kreirana."
+            )
+            return
+
         try:
-            stavke = self.dohvati_agregirane_stavke_nivelacije(datum_str, SIFOBJEKTA)
+            stavke = self.dohvati_agregirane_stavke_nivelacije(
+                datum_str,
+                SIFOBJEKTA
+            )
         except Exception as e:
-            QMessageBox.critical(None, "Greška", f"Greška prilikom dohvata stavki za nivelaciju:\n{e}")
+            QMessageBox.critical(
+                None,
+                "Greška",
+                f"Greška prilikom dohvata stavki za nivelaciju:\n{e}"
+            )
             return
 
         if not stavke:
-            QMessageBox.information(None, "Informacija", "Nema stavki koje ispunjavaju uslove za nivelaciju.")
+            QMessageBox.information(
+                None,
+                "Informacija",
+                "Nema stavki koje ispunjavaju uslove za nivelaciju."
+            )
             return
 
-        korisnik = os.getenv("APP_USER") or "auto_nivelacija"
+        conn = None
+        cur = None
 
-        broj_uspesnih = 0
-        for stavka in stavke:
-            try:
-                self.dodaj_stavku_nivelacije(
-                    broj_dokumenta=broj,
-                    datum_qdate=datum_qdate,
-                    sifobj=SIFOBJEKTA,
-                    korisnik=korisnik,
-                    stavka=stavka
+        try:
+            conn = psycopg2.connect(
+                dbname=os.getenv("DB_NAME"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT")
+            )
+            conn.autocommit = False
+            cur = conn.cursor()
+
+            # Sprečava istovremeno generisanje istog broja
+            # automatske nivelacije za godinu i objekat.
+            cur.execute(
+                """
+                SELECT pg_advisory_xact_lock(
+                    hashtext(%s),
+                    %s
                 )
-                broj_uspesnih += 1
-            except Exception as e:
-                print(f"Greška za šifru {stavka['sifra']}: {e}")
+                """,
+                (
+                    f"AUTO_NIV:{GODINA}:{SIFOBJEKTA}",
+                    4
+                )
+            )
 
-        self.azuriraj_vrednost_nivelacije(broj, SIFOBJEKTA)
-        self.prikazi_stavke_nivelacije(broj, SIFOBJEKTA)
+            # Ponovna provera unutar transakcije.
+            cur.execute(
+                """
+                SELECT broj
+                FROM kasa.robnadok
+                WHERE god = %s
+                  AND sifobj = %s
+                  AND vrsta = 4
+                  AND datdok = %s
+                  AND lokacija_id = %s
+                  AND status = 'KNJIZEN'
+                  AND opis LIKE 'Auto niv. br%%'
+                LIMIT 1
+                """,
+                (
+                    GODINA,
+                    SIFOBJEKTA,
+                    datum_str,
+                    self.glavna_lokacija_id
+                )
+            )
+
+            postojeca = cur.fetchone()
+            if postojeca:
+                conn.rollback()
+                QMessageBox.information(
+                    None,
+                    "Informacija",
+                    "Nivelacija za izabrani datum već postoji."
+                )
+                self.prikazi_stavke_nivelacije(
+                    postojeca[0],
+                    SIFOBJEKTA
+                )
+                return
+
+            # Broj se određuje pod transakcionim zaključavanjem.
+            cur.execute(
+                """
+                SELECT COALESCE(MAX(broj), 0) + 1
+                FROM kasa.robnadok
+                WHERE god = %s
+                  AND sifobj = %s
+                  AND vrsta = 4
+                """,
+                (
+                    GODINA,
+                    SIFOBJEKTA
+                )
+            )
+            broj = cur.fetchone()[0]
+
+            korisnik = os.getenv("APP_USER") or "auto_nivelacija"
+
+            # Najpre zaglavlje u statusu NACRT.
+            cur.execute(
+                """
+                INSERT INTO kasa.robnadok (
+                    god,
+                    kar,
+                    vrsta,
+                    sifobj,
+                    lokacija_id,
+                    datdok,
+                    datdospeca,
+                    kreirao,
+                    broj,
+                    opis,
+                    vrednost,
+                    status
+                )
+                VALUES (
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s
+                )
+                """,
+                (
+                    GODINA,
+                    1,
+                    4,
+                    SIFOBJEKTA,
+                    self.glavna_lokacija_id,
+                    datum_str,
+                    datum_str,
+                    korisnik,
+                    broj,
+                    f"Auto niv. br: {broj}",
+                    0,
+                    "NACRT"
+                )
+            )
+
+            ukupna_vrednost = 0
+
+            for stavka in stavke:
+                sifra = stavka["sifra"]
+                artikliid = stavka["artikliid"]
+                tarifa = stavka["tarifa"]
+                porezproc = stavka["porezproc"] or 0
+                grupa = stavka["grupa"]
+                porezid = stavka["porezid"]
+                nova_cena = stavka["nova_cena"]
+                staracena = stavka["staracena"]
+                kolicina = stavka["kolicina"]
+
+                if not sifra or artikliid is None:
+                    raise ValueError(
+                        "Stavka nivelacije nema šifru ili ID artikla."
+                    )
+
+                if kolicina <= 0:
+                    raise ValueError(
+                        f"Količina za artikal {sifra} mora biti veća od nule."
+                    )
+
+                if porezproc > 0:
+                    preracunata_stopa = (
+                        porezproc * 100
+                    ) / (
+                        porezproc + 100
+                    )
+                else:
+                    preracunata_stopa = 0
+
+                razlika_cene = nova_cena - staracena
+                vrednost_stavke = razlika_cene * kolicina
+                porez = round(
+                    razlika_cene
+                    * (preracunata_stopa / 100)
+                    * kolicina,
+                    2
+                )
+
+                ukupna_vrednost += vrednost_stavke
+
+                cur.execute(
+                    """
+                    INSERT INTO kasa.karticaart (
+                        god,
+                        kar,
+                        broj,
+                        sifobj,
+                        lokacija_id,
+                        vrsta,
+                        artikliid,
+                        sifra,
+                        kolicina,
+                        cena,
+                        staracena,
+                        porez,
+                        porezproc,
+                        tarifa,
+                        porezid,
+                        grupa,
+                        opis,
+                        datum,
+                        kreirao,
+                        idpartneri,
+                        dokstatus,
+                        ne_menja_zalihe
+                    )
+                    VALUES (
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        'KNJIZEN', TRUE
+                    )
+                    """,
+                    (
+                        GODINA,
+                        1,
+                        broj,
+                        SIFOBJEKTA,
+                        self.glavna_lokacija_id,
+                        4,
+                        artikliid,
+                        sifra,
+                        kolicina,
+                        nova_cena,
+                        staracena,
+                        porez,
+                        porezproc,
+                        tarifa or "",
+                        porezid,
+                        grupa,
+                        f"Auto niv. br: {broj}",
+                        datum_str,
+                        korisnik,
+                        None
+                    )
+                )
+
+            # Dokument postaje knjižen tek po uspešnom upisu svih stavki.
+            cur.execute(
+                """
+                UPDATE kasa.robnadok
+                SET vrednost = %s,
+                    status = 'KNJIZEN'
+                WHERE god = %s
+                  AND sifobj = %s
+                  AND lokacija_id = %s
+                  AND vrsta = 4
+                  AND broj = %s
+                """,
+                (
+                    round(ukupna_vrednost, 2),
+                    GODINA,
+                    SIFOBJEKTA,
+                    self.glavna_lokacija_id,
+                    broj
+                )
+            )
+
+            conn.commit()
+
+        except Exception as e:
+            if conn is not None:
+                conn.rollback()
+
+            QMessageBox.critical(
+                None,
+                "Greška",
+                "Nivelacija nije kreirana. "
+                "Sve promene su poništene.\n\n"
+                f"{e}"
+            )
+            return
+
+        finally:
+            if cur is not None:
+                cur.close()
+            if conn is not None:
+                conn.close()
+
+        self.prikazi_stavke_nivelacije(
+            broj,
+            SIFOBJEKTA
+        )
+
         QMessageBox.information(
             None,
             "Uspeh",
-            f"Nivelacija za datum {datum_qdate.toString('yyyy-MM-dd')} je uspešno kreirana.\nDodato stavki: {broj_uspesnih}"
+            f"Nivelacija za datum {datum_str} je uspešno kreirana.\n"
+            f"Dodato stavki: {len(stavke)}"
         )
 
     

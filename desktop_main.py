@@ -1436,29 +1436,61 @@ class MainWindow(QMainWindow):
 
             # Snimanje podataka u `karticaart`
             cursor.execute("""
-            SELECT 
-                k.sifra,
-                k.cena,
-                SUM(k.kolic) AS ukupna_kolicina,
-                MAX(k.cena2) AS nabavna_cena,
-                MAX(k.popproc1) AS rabat_proc,
-                SUM(k.popsum) AS ukupna_vrednost,
-                MAX(k.artikliid) AS artikli_id,
-                MAX(a.robna_grupa_id) AS grupa,
-                MAX(a.porez_id) AS porezid,
-                MAX(p.tarifa) AS tarifa,
-                MAX(p.stopa) AS stopa
-            FROM "kasa"."kasa1" k
-            LEFT JOIN "kasa"."artikli" a ON a.sifra = k.sifra
-            LEFT JOIN "kasa"."porezi" p ON p.id = a.porez_id
-            WHERE k.zatvoren = TRUE AND k.kasa = %s AND k.broj = %s
-            GROUP BY k.sifra, k.cena
-            """, (int(KASA), novi_broj_racuna))
+                SELECT
+                    k.sifra,
+                    k.cena AS prodajna_cena,
+                    k.cena2 AS originalna_cena,
+                    SUM(k.kolic) AS ukupna_kolicina,
+                    MAX(z.cenanabavna) AS nabavna_cena,
+                    MAX(k.popproc1) AS rabat_proc,
+                    SUM(k.popsum) AS ukupan_popust,
+                    MAX(k.artikliid) AS artikli_id,
+                    MAX(a.robna_grupa_id) AS grupa,
+                    MAX(a.porez_id) AS porezid,
+                    MAX(p.tarifa) AS tarifa,
+                    MAX(p.stopa) AS stopa
+                FROM "kasa"."kasa1" k
+                LEFT JOIN "kasa"."artikli" a
+                    ON a.id = k.artikliid
+                LEFT JOIN "kasa"."porezi" p
+                    ON p.id = a.porez_id
+                LEFT JOIN "kasa"."zaliheart" z
+                    ON z.god = k.god
+                AND z.sifobj = k.sifobj
+                AND z.lokacija_id = %s
+                AND z.artikliid = k.artikliid
+                WHERE k.zatvoren = TRUE
+                AND k.kasa = %s
+                AND k.broj = %s
+                GROUP BY
+                    k.sifra,
+                    k.cena,
+                    k.cena2
+                """, (
+                    GLAVNA_LOKACIJA_ID,
+                    int(KASA),
+                    novi_broj_racuna
+                ))
 
             artikli = cursor.fetchall()
 
             for artikal in artikli:
-                sifra, prodajna_cena, ukupna_kolicina, nabavna_cena, rabat_proc, ukupna_vrednost, artikli_id, grupa, porezid, tarifa, stopa = artikal
+                (
+                    sifra,
+                    prodajna_cena,
+                    originalna_cena,
+                    ukupna_kolicina,
+                    nabavna_cena,
+                    rabat_proc,
+                    ukupan_popust,
+                    artikli_id,
+                    grupa,
+                    porezid,
+                    tarifa,
+                    stopa
+                ) = artikal
+
+                nabavna_cena = nabavna_cena or 0
 
                 # Računanje poreza
                 preracunata_stopa = float((stopa * 100) / (stopa + 100)) if stopa else 0
@@ -1466,16 +1498,53 @@ class MainWindow(QMainWindow):
 
                 cursor.execute("""
                 INSERT INTO "kasa"."karticaart"
-                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, lokacija_id, porezid, ui, kasa, idpartneri, kreirao, kreirano)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
+                (
+                    god, kar, broj, sifra,
+                    cena, staracena, cenanabavna,
+                    kolicina, rabatproc, rabatdinarski,
+                    porez, porezproc, tarifa, grupa,
+                    vrsta, dokstatus, datum, opis,
+                    artikliid, sifobj, lokacija_id,
+                    porezid, ui, kasa,
+                    idpartneri, kreirao, kreirano
+                )
+                VALUES (
+                    %s, %s, %s, %s,
+                    %s, %s, %s,
+                    %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, CURRENT_DATE, %s,
+                    %s, %s, %s,
+                    %s, %s, %s,
+                    NULL, 'sistem', CURRENT_TIMESTAMP
+                )
                 """, (
-                    GODINA, 1, novi_broj_racuna, sifra, round(prodajna_cena, 2), round(nabavna_cena, 2), round(ukupna_kolicina, 3),
-                    round(rabat_proc, 2), round(ukupna_vrednost, 2), porez, stopa, tarifa, grupa,
-                    8 if tiptransakcije == 0 else 9, dokstatus,
-                    f"Fiskalni račun {dokstatus}", artikli_id, SIFOBJEKTA, GLAVNA_LOKACIJA_ID, porezid, ui, int(KASA)
+                    GODINA,
+                    1,
+                    novi_broj_racuna,
+                    sifra,
+                    round(prodajna_cena, 2),
+                    round(originalna_cena, 2),
+                    round(nabavna_cena, 2),
+                    round(ukupna_kolicina, 3),
+                    round(rabat_proc or 0, 2),
+                    round(ukupan_popust or 0, 2),
+                    porez,
+                    stopa,
+                    tarifa,
+                    grupa,
+                    8 if tiptransakcije == 0 else 9,
+                    dokstatus,
+                    f"Fiskalni račun {dokstatus}",
+                    artikli_id,
+                    SIFOBJEKTA,
+                    GLAVNA_LOKACIJA_ID,
+                    porezid,
+                    ui,
+                    int(KASA)
                 ))
                 
-                sifra, prodajna_cena, ukupna_kolicina, *_ = artikal
+                #sifra, prodajna_cena, ukupna_kolicina, *_ = artikal
                 #self.azuriraj_zalihe(sifra, ukupna_kolicina, dodaj=False)  # Smanjujemo zalihu
 
             conn.commit()
