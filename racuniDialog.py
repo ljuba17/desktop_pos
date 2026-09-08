@@ -86,26 +86,57 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
     # Signal za prenos podataka (broj računa PU, vreme transakcije)
     signal_prenesi_podatke = pyqtSignal(str, str)
     
-    def __init__(self, kasasum, kasa, artikli, ip_stampe, lservis, parent=None):
+    def __init__(
+        self,
+        kasasum,
+        kasa,
+        artikli,
+        ip_stampe,
+        lservis,
+        sifobj,
+        parent=None
+    ):
         super().__init__(parent)
         self.setupUi(self)
 
-        # ✅ Dodajemo potrebne podatke
-        self.kasasum = kasasum  # Model za zaglavlja računa
-        self.kasa = kasa        # Model za stavke računa
-        self.artikli = artikli  # ✅ Dodato - sada imamo artikle!
-        self.ip_stampe = ip_stampe  # IP adresa štampača
-        self.lservis = lservis  # 📌 Da li je servisni mod
-        
-        # ✅ Povezivanje funkcionalnosti
-        self.populate_hdr_table()  # Popunjavanje tabele sa računima
-        self.pretrazifrEdit.textChanged.connect(self.filter_hdr_table)  # Filtriranje tabele
-        self.hdrTable.cellClicked.connect(self.handle_hdr_table_click)  # Klik na tabelu
-        self.hdrTable.cellClicked.connect(self.oznaci_red)
-        # Dodajemo polja za prenos podataka nazad u glavni prozor
+        # Početni podaci sadrže fiskalizovane račune
+        # iz poslednjih 30 dana.
+        self.kasasum = kasasum
+        self.kasa = kasa
+        self.artikli = artikli
+        self.ip_stampe = ip_stampe
+        self.lservis = lservis
+        self.sifobj = sifobj
+
+        # Čuvamo početne podatke da ih vratimo kada
+        # korisnik obriše tekst pretrage.
+        self.pocetni_kasasum = list(kasasum)
+        self.pocetna_kasa = list(kasa)
+
         self.selected_brracpu = None
-        self.selected_vreme_stampe = None        
-        
+        self.selected_vreme_stampe = None
+
+        # Odložena pretraga sprečava izvršavanje SQL upita
+        # posle svakog znaka bez kratke pauze.
+        self.timer_pretrage = QtCore.QTimer(self)
+        self.timer_pretrage.setSingleShot(True)
+        self.timer_pretrage.setInterval(350)
+        self.timer_pretrage.timeout.connect(
+            self.pretrazi_racune_u_bazi
+        )
+
+        self.populate_hdr_table()
+
+        self.pretrazifrEdit.textChanged.connect(
+            self.zakazi_pretragu
+        )
+        self.hdrTable.cellClicked.connect(
+            self.handle_hdr_table_click
+        )
+        self.hdrTable.cellClicked.connect(
+            self.oznaci_red
+        )
+
     def izaberi_racun(self, row):
         """
         Prenosi odabrane podatke u glavni prozor i zatvara dijalog.
@@ -145,6 +176,10 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
         """
         ✅ Popunjava hdrTable podacima iz modela kasasum, a refundirane račune ističe vizuelno.
         """
+        self.hdrTable.clearContents()
+        self.hdrTable.setRowCount(0)
+        self.stavkeTable.clearContents()
+        self.stavkeTable.setRowCount(0)
         self.hdrTable.setColumnCount(9)  # 📌 Dodajemo kolonu za tip transakcije
         self.hdrTable.setHorizontalHeaderLabels([
             "Broj računa PU", "Vreme štampe računa", "Vrednost",
@@ -307,14 +342,188 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
                 font.setPointSize(10)  # Veći font za istaknuti red
                 item.setFont(font)
 
-    def filter_hdr_table(self):
+    def zakazi_pretragu(self, tekst):
+        termin = tekst.strip()
+
+        self.timer_pretrage.stop()
+
+        # Za manje od tri znaka vraćamo početni prikaz
+        # fiskalnih računa iz poslednjih 30 dana.
+        if len(termin) < 3:
+            self.kasasum = list(self.pocetni_kasasum)
+            self.kasa = list(self.pocetna_kasa)
+            self.populate_hdr_table()
+            return
+
+        # SQL pretraga počinje tek nakon kratke pauze
+        # u kucanju.
+        self.timer_pretrage.start()
+
+    def pretrazi_racune_u_bazi(self):
         """
-        Filtrira hdrTable na osnovu unosa u pretrazifrEdit.
+        Pretražuje fiskalizovane račune kroz kompletnu
+        istoriju i učitava samo stavke pronađenih računa.
         """
-        search_term = self.pretrazifrEdit.text().lower()
-        for row in range(self.hdrTable.rowCount()):
-            item = self.hdrTable.item(row, 0)  # Broj računa PU
-            self.hdrTable.setRowHidden(row, search_term not in item.text().lower())
+        termin = self.pretrazifrEdit.text().strip()
+
+        if len(termin) < 3:
+            return
+
+        conn = None
+        cursor = None
+
+        try:
+            conn = psycopg2.connect(
+                dbname=os.getenv("DB_NAME"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT")
+            )
+            cursor = conn.cursor()
+
+            obrazac_pretrage = f"%{termin}%"
+
+            # Pretraga zaglavlja kroz sve poslovne godine.
+            cursor.execute("""
+                SELECT
+                    brracpu,
+                    vremetransakcije,
+                    ukiznos,
+                    broj,
+                    kasa,
+                    god,
+                    sifobj,
+                    tiptransakcije,
+                    vrgotovina,
+                    vrkartica,
+                    vrcek,
+                    vrfaktura,
+                    kodkupca,
+                    oznakakupca
+                FROM kasa.kasasum
+                WHERE sifobj = %s
+                  AND tipracuna = '0'
+                  AND NULLIF(BTRIM(brracpu), '') IS NOT NULL
+                  AND brracpu ILIKE %s
+                ORDER BY
+                    datum DESC,
+                    vremetransakcije DESC
+                LIMIT 100
+            """, (
+                self.sifobj,
+                obrazac_pretrage
+            ))
+
+            self.kasasum = [
+                {
+                    "brracpu": row[0],
+                    "vreme_stampe": row[1],
+                    "vrednost": row[2],
+                    "broj": row[3],
+                    "kasa": row[4],
+                    "god": row[5],
+                    "sifobj": row[6],
+                    "tiptransakcije": row[7],
+                    "vrgotovina": row[8],
+                    "vrkartica": row[9],
+                    "vrcek": row[10],
+                    "vrfaktura": row[11],
+                    "kodkupca": row[12],
+                    "oznakakupca": row[13]
+                }
+                for row in cursor.fetchall()
+            ]
+
+            # Učitavanje stavki samo za pronađenih
+            # najviše 100 računa.
+            cursor.execute("""
+                WITH pronadjeni_racuni AS (
+                    SELECT
+                        god,
+                        sifobj,
+                        kasa,
+                        broj
+                    FROM kasa.kasasum
+                    WHERE sifobj = %s
+                      AND tipracuna = '0'
+                      AND NULLIF(
+                          BTRIM(brracpu),
+                          ''
+                      ) IS NOT NULL
+                      AND brracpu ILIKE %s
+                    ORDER BY
+                        datum DESC,
+                        vremetransakcije DESC
+                    LIMIT 100
+                )
+                SELECT
+                    k.broj,
+                    k.sifra,
+                    a.naziv,
+                    k.kolic,
+                    k.cena,
+                    k.kolic * k.cena AS vrednost,
+                    k.popsum,
+                    k.god,
+                    k.sifobj,
+                    k.kasa,
+                    k.cena2,
+                    k.popproc1,
+                    k.popdin1
+                FROM kasa.kasa k
+                JOIN pronadjeni_racuni pr
+                  ON pr.god = k.god
+                 AND pr.sifobj = k.sifobj
+                 AND pr.kasa = k.kasa
+                 AND pr.broj = k.broj
+                LEFT JOIN kasa.artikli a
+                  ON a.sifra = k.sifra
+                ORDER BY
+                    k.god DESC,
+                    k.broj DESC,
+                    k.id
+            """, (
+                self.sifobj,
+                obrazac_pretrage
+            ))
+
+            self.kasa = [
+                {
+                    "broj": row[0],
+                    "sifra": row[1],
+                    "naziv": row[2],
+                    "kolic": row[3],
+                    "cena": row[4],
+                    "vrednost": row[5],
+                    "popsum": row[6],
+                    "god": row[7],
+                    "sifobj": row[8],
+                    "kasa": row[9],
+                    "cena2": row[10],
+                    "popproc1": row[11],
+                    "popdin1": row[12]
+                }
+                for row in cursor.fetchall()
+            ]
+
+            self.populate_hdr_table()
+
+        except Exception as e:
+            print(f"❌ Greška pri pretrazi računa: {e}")
+            QtWidgets.QMessageBox.critical(
+                self,
+                "Greška",
+                "Greška pri pretrazi fiskalnih računa:\n"
+                f"{e}"
+            )
+
+        finally:
+            if cursor is not None:
+                cursor.close()
+
+            if conn is not None:
+                conn.close()
 
     def handle_hdr_table_click(self, row, column):
         """
@@ -326,8 +535,12 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
                 broj = self.hdrTable.item(row, 5).text()
                 
                 # Dobijamo poslednje dve cifre trenutne godine
-                trenutna_godina = datetime.now().year
-                godina = str(trenutna_godina)[-2:]  # Poslednje dve cifre godine, kao string
+                godina = str(
+                    self.kasasum[row].get(
+                        "god",
+                        datetime.now().year
+                    )
+                )[-2:]
 
                 # Provera IP adrese za lokalnu putanju
                 if self.ip_stampe == "127.0.0.1":
@@ -356,8 +569,12 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
         """
         try:
             broj = self.hdrTable.item(row, 5).text()  # Dohvatamo broj iz skrivene kolone
-            trenutna_godina = datetime.now().year
-            godina = str(trenutna_godina)[-2:]  # Poslednje dve cifre godine, kao string
+            godina = str(
+                self.kasasum[row].get(
+                    "god",
+                    datetime.now().year
+                )
+            )[-2:]
             # Provera IP adrese za lokalnu putanju
             if self.ip_stampe == "127.0.0.1":
                 slika_putanja = f"C:\\myLPFR\\exchange\\from-sdc\\Receipt-{broj}-{godina}.png"
@@ -438,7 +655,14 @@ class RacuniDialog(QtWidgets.QDialog, Ui_racuniDialog):
             #print(f"🔍 Debug: broj_skriven = {broj_skriven} (tip: {type(broj_skriven)})")
 
             # ✅ Pronalazimo odgovarajući zapis u kasasum
-            zapis_kasasum = next((r for r in self.kasasum if str(r["broj"]) == broj_skriven), None)
+            zapis_kasasum = next(
+                (
+                    zapis
+                    for zapis in self.kasasum
+                    if zapis["brracpu"] == broj_racuna
+                ),
+                None
+            )
             if not zapis_kasasum:
                 print("❌ Greška: Nije pronađen zapis u kasasum!")
                 return

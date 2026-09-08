@@ -2295,10 +2295,15 @@ class MainWindow(QMainWindow):
     # Otvaranje dialoga refundacije
     def otvori_racuni_dialog(self):
         """
-        Otvara dijalog za pregled i selekciju fiskalnih računa.
+        Otvara dijalog za pregled i izbor fiskalnih računa.
+
+        Pri otvaranju učitava samo fiskalizovane račune
+        iz poslednjih 30 dana.
         """
+        conn = None
+        cursor = None
+
         try:
-            # ✅ Dohvatanje podataka iz baze za kasasum i kasa
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
                 user=os.getenv("DB_USER"),
@@ -2308,15 +2313,34 @@ class MainWindow(QMainWindow):
             )
             cursor = conn.cursor()
 
-            # ✅ Dohvatanje podataka iz kasasum (zaglavlja računa) - dodajemo kodkupca i oznakakupca
+            # Fiskalizovana zaglavlja računa iz poslednjih 30 dana.
             cursor.execute("""
-            SELECT brracpu, vremetransakcije, ukiznos, broj, kasa, god, sifobj, tiptransakcije, 
-                vrgotovina, vrkartica, vrcek, vrfaktura, kodkupca, oznakakupca  
-            FROM "kasa"."kasasum"
-            WHERE sifobj = %s AND brracpu IS NOT NULL AND tipracuna = '0'
-            ORDER BY vremetransakcije DESC
+                SELECT
+                    brracpu,
+                    vremetransakcije,
+                    ukiznos,
+                    broj,
+                    kasa,
+                    god,
+                    sifobj,
+                    tiptransakcije,
+                    vrgotovina,
+                    vrkartica,
+                    vrcek,
+                    vrfaktura,
+                    kodkupca,
+                    oznakakupca
+                FROM kasa.kasasum
+                WHERE sifobj = %s
+                  AND tipracuna = '0'
+                  AND NULLIF(BTRIM(brracpu), '') IS NOT NULL
+                  AND datum >= CURRENT_DATE - 29
+                ORDER BY
+                    datum DESC,
+                    vremetransakcije DESC
             """, (SIFOBJEKTA,))
-            self.kasasum = [  
+
+            self.kasasum = [
                 {
                     "brracpu": row[0],
                     "vreme_stampe": row[1],
@@ -2325,26 +2349,59 @@ class MainWindow(QMainWindow):
                     "kasa": row[4],
                     "god": row[5],
                     "sifobj": row[6],
-                    "tiptransakcije": row[7],  
-                    "vrgotovina": row[8],  
-                    "vrkartica": row[9],  
-                    "vrcek": row[10],  
-                    "vrfaktura": row[11],  
-                    "kodkupca": row[12],  # ✅ Dodato!
-                    "oznakakupca": row[13]  # ✅ Dodato!
+                    "tiptransakcije": row[7],
+                    "vrgotovina": row[8],
+                    "vrkartica": row[9],
+                    "vrcek": row[10],
+                    "vrfaktura": row[11],
+                    "kodkupca": row[12],
+                    "oznakakupca": row[13]
                 }
                 for row in cursor.fetchall()
             ]
 
-            # ✅ Dohvatanje podataka iz kasa (stavke računa) - dodajemo popsum
+            # Stavke samo za fiskalizovane račune
+            # iz poslednjih 30 dana.
             cursor.execute("""
-            SELECT k.broj, k.sifra, a.naziv, k.kolic, k.cena, (k.kolic * k.cena) AS vrednost, 
-                k.popsum, k.god, k.sifobj, k.kasa
-            FROM "kasa"."kasa" k
-            LEFT JOIN "kasa"."artikli" a ON a.sifra = k.sifra
-            WHERE k.sifobj = %s
+                SELECT
+                    k.broj,
+                    k.sifra,
+                    a.naziv,
+                    k.kolic,
+                    k.cena,
+                    k.kolic * k.cena AS vrednost,
+                    k.popsum,
+                    k.god,
+                    k.sifobj,
+                    k.kasa,
+                    k.cena2,
+                    k.popproc1,
+                    k.popdin1
+                FROM kasa.kasa k
+                LEFT JOIN kasa.artikli a
+                  ON a.sifra = k.sifra
+                WHERE k.sifobj = %s
+                  AND EXISTS (
+                      SELECT 1
+                      FROM kasa.kasasum ks
+                      WHERE ks.god = k.god
+                        AND ks.sifobj = k.sifobj
+                        AND ks.kasa = k.kasa
+                        AND ks.broj = k.broj
+                        AND ks.tipracuna = '0'
+                        AND NULLIF(
+                            BTRIM(ks.brracpu),
+                            ''
+                        ) IS NOT NULL
+                        AND ks.datum >= CURRENT_DATE - 29
+                  )
+                ORDER BY
+                    k.god DESC,
+                    k.broj DESC,
+                    k.id
             """, (SIFOBJEKTA,))
-            self.kasa = [  
+
+            self.kasa = [
                 {
                     "broj": row[0],
                     "sifra": row[1],
@@ -2352,22 +2409,31 @@ class MainWindow(QMainWindow):
                     "kolic": row[3],
                     "cena": row[4],
                     "vrednost": row[5],
-                    "popsum": row[6],  # ✅ Dodato!
+                    "popsum": row[6],
                     "god": row[7],
                     "sifobj": row[8],
-                    "kasa": row[9]
+                    "kasa": row[9],
+                    "cena2": row[10],
+                    "popproc1": row[11],
+                    "popdin1": row[12]
                 }
                 for row in cursor.fetchall()
             ]
 
-            # ✅ Dohvatanje podataka iz artikli
+            # Šifarnik artikala potreban je prilikom
+            # pripreme stavki refundacije.
             cursor.execute("""
-            SELECT id, sifra, naziv, tip
-            FROM "kasa"."artikli"
+                SELECT
+                    id,
+                    sifra,
+                    naziv,
+                    tip
+                FROM kasa.artikli
             """)
+
             self.artikli = [
                 {
-                    "id": row[0],  
+                    "id": row[0],
                     "sifra": row[1],
                     "naziv": row[2],
                     "tip": row[3]
@@ -2375,23 +2441,46 @@ class MainWindow(QMainWindow):
                 for row in cursor.fetchall()
             ]
 
-            conn.close()
+            ip_stampe, lservis = (
+                self.ucitaj_konfiguraciju_kase()
+            )
 
-            # ✅ IP adresa štampača (pročitana iz baze ili konfiguracije)
-            ip_stampe, lservis = self.ucitaj_konfiguraciju_kase()
+            dialog = RacuniDialog(
+                self.kasasum,
+                self.kasa,
+                self.artikli,
+                ip_stampe,
+                lservis,
+                SIFOBJEKTA,
+                parent=self
+            )
 
-            # ✅ Otvaranje dijaloga
-            dialog = RacuniDialog(self.kasasum, self.kasa, self.artikli, ip_stampe, lservis, parent=self)
+            dialog.signal_prenesi_podatke.connect(
+                self.prenesi_podatke_iz_dijaloga
+            )
+            dialog.signal_prenesi_podatke.connect(
+                self.prikazi_stavke_na_osnovu_brracpu
+            )
 
-            # ✅ Povezivanje signala za prenos podataka
-            dialog.signal_prenesi_podatke.connect(self.prenesi_podatke_iz_dijaloga)
-            dialog.signal_prenesi_podatke.connect(self.prikazi_stavke_na_osnovu_brracpu)
-
-            # Prikaz dijaloga
             dialog.exec()
 
         except Exception as e:
-            print(f"❌ Greška pri otvaranju dijaloga: {e}")
+            print(
+                f"❌ Greška pri otvaranju dijaloga: {e}"
+            )
+            QMessageBox.critical(
+                self,
+                "Greška",
+                "Greška pri otvaranju pregleda računa:\n"
+                f"{e}"
+            )
+
+        finally:
+            if cursor is not None:
+                cursor.close()
+
+            if conn is not None:
+                conn.close()
 
     # Funkcija za prenos broja računa PU i vremena transakcije
     def prenesi_podatke_iz_dijaloga(self, broj_racuna_pu, vreme_transakcije):
@@ -2485,24 +2574,48 @@ class MainWindow(QMainWindow):
                 nova_stavka = {
                     "sifra": sifra,
                     "kolic": stavka["kolic"],
-                    "cena": stavka["cena"],
-                    "cena2": stavka.get("cena2", stavka["cena"]),  # Cena sa popustom
-                    "god": GODINA,  # Postavljamo trenutnu godinu iz konfiguracije
-                    "broj": trenutni_broj_racuna,  # Ažuriramo broj na privremeni
+                    "originalna_kolicina": stavka["kolic"],
+
+                    # Originalni račun u tabeli kasa:
+                    # cena  = stvarno naplaćena cena
+                    # cena2 = originalna cena pre popusta
+                    #
+                    # Radna korpa refundacije:
+                    # cena  = originalna cena pre popusta
+                    # cena2 = stvarno naplaćena cena
+                    "cena": stavka.get(
+                        "cena2",
+                        stavka["cena"]
+                    ),
+                    "cena2": stavka["cena"],
+
+                    "god": GODINA,
+                    "broj": trenutni_broj_racuna,
                     "sifobj": sifobj,
                     "kasa": kasa,
-                    "kar": 1,  # Dodajemo kar (fiksna vrednost)
-                    "smena": 1,  # Dodajemo smena (fiksna vrednost)
-                    "sto": aktivan_kupac,  # Dodajemo aktivan kupac (sto)
-                    "popproc1": stavka.get("popproc1", 0),  # Popust u procentima
-                    "popdin1": stavka.get("popdin1", 0),  # Popust u dinarima
+                    "kar": 1,
+                    "smena": 1,
+                    "sto": aktivan_kupac,
+                    "popproc1": stavka.get(
+                        "popproc1",
+                        0
+                    ),
+                    "popdin1": stavka.get(
+                        "popdin1",
+                        0
+                    ),
+                    "popsum": stavka.get(
+                        "popsum",
+                        0
+                    ),
                     "datum": datum,
                     "kreirao": "sistem",
                     "ststatus": "A",
                     "zatvoren": False,
-                    "tip": artikl["tip"],  # Tip artikla
-                    "artikliid": artikl["id"]  # ID iz artikli
+                    "tip": artikl["tip"],
+                    "artikliid": artikl["id"]
                 }
+
                 self.kasa1.append(nova_stavka)
 
             # Snimanje stavki iz kasa1 u bazu (tabela kasa1) sa ID dohvatom
@@ -2518,9 +2631,34 @@ class MainWindow(QMainWindow):
 
                 for stavka in self.kasa1:
                     cursor.execute("""
-                    INSERT INTO "kasa"."kasa1" 
-                    (sifra, kolic, cena, cena2, god, broj, sifobj, kasa, kar, smena, sto, popproc1, popdin1, datum, kreirao, ststatus, zatvoren, tip, artikliid)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO "kasa"."kasa1" (
+                        sifra,
+                        kolic,
+                        cena,
+                        cena2,
+                        god,
+                        broj,
+                        sifobj,
+                        kasa,
+                        kar,
+                        smena,
+                        sto,
+                        popproc1,
+                        popdin1,
+                        popsum,
+                        datum,
+                        kreirao,
+                        ststatus,
+                        zatvoren,
+                        tip,
+                        artikliid
+                    )
+                    VALUES (
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s
+                    )
                     RETURNING id
                     """, (
                         stavka["sifra"],
@@ -2536,6 +2674,7 @@ class MainWindow(QMainWindow):
                         stavka["sto"],
                         stavka["popproc1"],
                         stavka["popdin1"],
+                        stavka["popsum"],
                         stavka["datum"],
                         stavka["kreirao"],
                         stavka["ststatus"],
@@ -2602,56 +2741,163 @@ class MainWindow(QMainWindow):
         self.refund_total()
     
     def azuriraj_kolicinu(self, item):
+        if self.aktivan_mod != "refundacija":
+            return
+
+        if item.column() != 3:
+            return
+
+        row = item.row()
+        prethodna_kolicina = None
+
         try:
-            if self.aktivan_mod != "refundacija":
-                return
+            tekst_kolicine = item.text().strip().replace(",", ".")
+            nova_kolicina = float(tekst_kolicine)
 
-            row = item.row()
-            column = item.column()
-
-            if column != 3:
-                return
-
-            nova_kolicina = float(item.text()) if item.text() else 0
             if nova_kolicina <= 0:
-                raise ValueError("❌ Količina mora biti veća od 0.")
+                raise ValueError(
+                    "Količina mora biti veća od nule."
+                )
 
             id_stavke_item = self.stavkeTable.item(row, 0)
-            if not id_stavke_item:
-                raise ValueError("❌ ID stavke nije pronađen.")
+            if id_stavke_item is None:
+                raise ValueError(
+                    "ID stavke nije pronađen."
+                )
 
             id_stavke = int(id_stavke_item.text())
-            stavka = next((s for s in self.kasa1 if s["id"] == id_stavke), None)
-            if not stavka:
-                raise ValueError(f"❌ Stavka sa ID-jem {id_stavke} nije pronađena u modelu kasa1.")
 
-            originalna_kolicina = stavka["kolic"]
+            stavka = next(
+                (
+                    zapis
+                    for zapis in self.kasa1
+                    if zapis["id"] == id_stavke
+                ),
+                None
+            )
+
+            if stavka is None:
+                raise ValueError(
+                    f"Stavka sa ID-jem {id_stavke} "
+                    "nije pronađena."
+                )
+
+            prethodna_kolicina = float(stavka["kolic"])
+
+            originalna_kolicina = float(
+                stavka.get(
+                    "originalna_kolicina",
+                    prethodna_kolicina
+                )
+            )
+
             if nova_kolicina > originalna_kolicina:
-                QMessageBox.warning(self, "Greška", f"Količina ne može biti veća od originalne ({originalna_kolicina:.3f}).")
-                item.setText(f"{originalna_kolicina:.3f}")
-                return
+                raise ValueError(
+                    "Količina ne može biti veća od "
+                    f"originalne ({originalna_kolicina:.3f})."
+                )
+
+            popust_po_jedinici = float(
+                stavka.get("popdin1", 0) or 0
+            )
+
+            novi_popsum = round(
+                popust_po_jedinici * nova_kolicina,
+                2
+            )
+
+            nova_vrednost = round(
+                float(stavka["cena2"]) * nova_kolicina,
+                2
+            )
+
+            # Najpre ažuriramo bazu. Model i prikaz menjamo
+            # tek kada je upis uspešan.
+            self.azuriraj_kolicinu_u_bazi(
+                id_stavke,
+                nova_kolicina,
+                novi_popsum
+            )
 
             stavka["kolic"] = nova_kolicina
-            stavka["vrednost"] = nova_kolicina * stavka["cena"]
+            stavka["popsum"] = novi_popsum
+            stavka["vrednost"] = nova_vrednost
 
-            vrednost_item = self.stavkeTable.item(row, 7)
-            if vrednost_item is None:
-                vrednost_item = QTableWidgetItem()
-                self.stavkeTable.setItem(row, 7, vrednost_item)
+            self.stavkeTable.blockSignals(True)
 
-            vrednost_item.setText(f"{stavka['vrednost']:.2f}")
+            try:
+                item.setText(f"{nova_kolicina:.3f}")
+
+                vrednost_item = self.stavkeTable.item(
+                    row,
+                    7
+                )
+
+                if vrednost_item is None:
+                    vrednost_item = QTableWidgetItem()
+                    self.stavkeTable.setItem(
+                        row,
+                        7,
+                        vrednost_item
+                    )
+
+                vrednost_item.setText(
+                    f"{nova_vrednost:.2f}"
+                )
+
+            finally:
+                self.stavkeTable.blockSignals(False)
+
             self.refund_total()
-            self.azuriraj_kolicinu_u_bazi(id_stavke, nova_kolicina)
 
-        except ValueError as ve:
-            print(f"❌ Greška pri ažuriranju količine: {ve}")
-            QMessageBox.warning(self, "Greška", str(ve))
+        except ValueError as e:
+            self.stavkeTable.blockSignals(True)
+
+            try:
+                if prethodna_kolicina is not None:
+                    item.setText(
+                        f"{prethodna_kolicina:.3f}"
+                    )
+            finally:
+                self.stavkeTable.blockSignals(False)
+
+            QMessageBox.warning(
+                self,
+                "Greška",
+                str(e)
+            )
+
         except Exception as e:
-            print(f"❌ Greška pri ažuriranju količine: {e}")
-            QMessageBox.critical(self, "Greška", f"Greška pri ažuriranju količine:\n{e}")
+            self.stavkeTable.blockSignals(True)
+
+            try:
+                if prethodna_kolicina is not None:
+                    item.setText(
+                        f"{prethodna_kolicina:.3f}"
+                    )
+            finally:
+                self.stavkeTable.blockSignals(False)
+
+            print(
+                f"❌ Greška pri ažuriranju količine: {e}"
+            )
+            QMessageBox.critical(
+                self,
+                "Greška",
+                "Greška pri ažuriranju količine:\n"
+                f"{e}"
+            )
 
 
-    def azuriraj_kolicinu_u_bazi(self, id_stavke, nova_kolicina):
+    def azuriraj_kolicinu_u_bazi(
+        self,
+        id_stavke,
+        nova_kolicina,
+        novi_popsum=None
+    ):
+        conn = None
+        cursor = None
+
         try:
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
@@ -2661,15 +2907,39 @@ class MainWindow(QMainWindow):
                 port=os.getenv("DB_PORT")
             )
             cursor = conn.cursor()
+
             cursor.execute("""
-            UPDATE "kasa"."kasa1"
-            SET kolic = %s
-            WHERE id = %s
-            """, (nova_kolicina, id_stavke))
+                UPDATE kasa.kasa1
+                SET
+                    kolic = %s,
+                    popsum = COALESCE(%s, popsum)
+                WHERE id = %s
+                  AND zatvoren = FALSE
+            """, (
+                nova_kolicina,
+                novi_popsum,
+                id_stavke
+            ))
+
+            if cursor.rowcount != 1:
+                raise ValueError(
+                    "Radna stavka refundacije nije pronađena "
+                    "ili je već zatvorena."
+                )
+
             conn.commit()
-            conn.close()
-        except Exception as e:
-            print(f"❌ Greška pri ažuriranju baze: {e}")
+
+        except Exception:
+            if conn is not None:
+                conn.rollback()
+            raise
+
+        finally:
+            if cursor is not None:
+                cursor.close()
+
+            if conn is not None:
+                conn.close()
 
 
     def povezi_signale_stavkeTable(self):
@@ -2708,6 +2978,7 @@ class MainWindow(QMainWindow):
         """
         ✅ Snima refundaciju računa u baze: kasa, kasasum i karticaart.
         """
+        conn = None
         try:
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
@@ -2740,7 +3011,7 @@ class MainWindow(QMainWindow):
             cursor.execute("""
             INSERT INTO "kasa"."kasa" 
             (god, kar, broj, sto, zatvoren, kasa, smena, sifra, kolic, cena, popproc1, popdin1, popsum, datum, sifobj, dokstatus, kreirao, artikliid, tip, cena2, ststatus)
-            SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, ABS(kolic), cena, popproc1, popdin1, popsum, datum, sifobj, %s, 'sistem', artikliid, tip, cena2, ststatus
+            SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, ABS(kolic), cena2, popproc1, popdin1, popsum, datum, sifobj, %s, 'sistem', artikliid, tip, cena, ststatus
             FROM "kasa"."kasa1"
             WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
             """, (novi_broj_racuna, dokstatus, int(KASA), self.aktivan_kupac))
@@ -2772,48 +3043,153 @@ class MainWindow(QMainWindow):
             ))
 
             # Snimanje podataka u `karticaart` (negativna količina)
+            # Priprema podataka za karticaart.
+            #
+            # U radnoj tabeli kasa1:
+            # cena  = originalna cena pre popusta
+            # cena2 = stvarno plaćena cena
             cursor.execute("""
-            SELECT 
-                k.sifra,
-                k.cena,
-                SUM(k.kolic) AS ukupna_kolicina,
-                MAX(k.cena2) AS nabavna_cena,
-                MAX(k.popproc1) AS rabat_proc,
-                SUM(k.popsum) AS ukupna_vrednost,
-                MAX(k.artikliid) AS artikli_id,
-                MAX(a.robna_grupa_id) AS grupa,
-                MAX(a.porez_id) AS porezid,
-                MAX(p.tarifa) AS tarifa,
-                MAX(p.stopa) AS stopa
-            FROM "kasa"."kasa1" k
-            LEFT JOIN "kasa"."artikli" a ON a.sifra = k.sifra
-            LEFT JOIN "kasa"."porezi" p ON p.id = a.porez_id
-            WHERE k.zatvoren = TRUE AND k.kasa = %s AND k.broj = %s
-            GROUP BY k.sifra, k.cena
-            """, (int(KASA), novi_broj_racuna))
+                SELECT
+                    k.sifra,
+                    k.cena2 AS prodajna_cena,
+                    k.cena AS originalna_cena,
+                    SUM(k.kolic) AS ukupna_kolicina,
+                    COALESCE(
+                        MAX(z.cenanabavna),
+                        0
+                    ) AS nabavna_cena,
+                    MAX(k.popproc1) AS rabat_proc,
+                    SUM(k.popsum) AS ukupan_popust,
+                    MAX(k.artikliid) AS artikli_id,
+                    MAX(a.robna_grupa_id) AS grupa,
+                    MAX(a.porez_id) AS porezid,
+                    MAX(p.tarifa) AS tarifa,
+                    MAX(p.stopa) AS stopa
+                FROM kasa.kasa1 k
+                LEFT JOIN kasa.artikli a
+                  ON a.id = k.artikliid
+                LEFT JOIN kasa.porezi p
+                  ON p.id = a.porez_id
+                LEFT JOIN kasa.zaliheart z
+                  ON z.artikliid = k.artikliid
+                 AND z.god = k.god
+                 AND z.sifobj = k.sifobj
+                 AND z.lokacija_id = %s
+                WHERE k.zatvoren = TRUE
+                  AND k.kasa = %s
+                  AND k.broj = %s
+                GROUP BY
+                    k.sifra,
+                    k.cena2,
+                    k.cena
+            """, (
+                GLAVNA_LOKACIJA_ID,
+                int(KASA),
+                novi_broj_racuna
+            ))
 
             artikli = cursor.fetchall()
 
             for artikal in artikli:
-                sifra, prodajna_cena, ukupna_kolicina, nabavna_cena, rabat_proc, ukupna_vrednost, artikli_id, grupa, porezid, tarifa, stopa = artikal
+                (
+                    sifra,
+                    prodajna_cena,
+                    originalna_cena,
+                    ukupna_kolicina,
+                    nabavna_cena,
+                    rabat_proc,
+                    ukupan_popust,
+                    artikli_id,
+                    grupa,
+                    porezid,
+                    tarifa,
+                    stopa
+                ) = artikal
 
                 # Računanje poreza
-                preracunata_stopa = float((stopa * 100) / (stopa + 100)) if stopa else 0
-                porez = round(float((prodajna_cena * preracunata_stopa / 100) * ukupna_kolicina), 2)
+                # Refundacija ima negativnu količinu, pa je
+                # i iznos poreza u kartici artikla negativan.
+                preracunata_stopa = (
+                    float((stopa * 100) / (stopa + 100))
+                    if stopa
+                    else 0
+                )
+
+                porez = -round(
+                    float(
+                        (
+                            prodajna_cena
+                            * preracunata_stopa
+                            / 100
+                        )
+                        * ukupna_kolicina
+                    ),
+                    2
+                )
 
                 cursor.execute("""
-                INSERT INTO "kasa"."karticaart"
-                (god, kar, broj, sifra, cena, cenanabavna, kolicina, rabatproc, rabatdinarski, porez, porezproc, tarifa, grupa, vrsta, dokstatus, datum, opis, artikliid, sifobj, lokacija_id, porezid, ui, kasa, idpartneri, kreirao, kreirano)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, CURRENT_DATE, %s, %s, %s, %s, %s, %s, %s, NULL, 'sistem', CURRENT_TIMESTAMP)
+                    INSERT INTO kasa.karticaart (
+                        god,
+                        kar,
+                        broj,
+                        sifra,
+                        cena,
+                        staracena,
+                        cenanabavna,
+                        kolicina,
+                        rabatproc,
+                        rabatdinarski,
+                        porez,
+                        porezproc,
+                        tarifa,
+                        grupa,
+                        vrsta,
+                        dokstatus,
+                        datum,
+                        opis,
+                        artikliid,
+                        sifobj,
+                        lokacija_id,
+                        porezid,
+                        ui,
+                        kasa,
+                        idpartneri,
+                        kreirao,
+                        kreirano
+                    )
+                    VALUES (
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s,
+                        %s, CURRENT_DATE, %s, %s, %s,
+                        %s, %s, %s, %s, NULL,
+                        'sistem', CURRENT_TIMESTAMP
+                    )
                 """, (
-                    GODINA, 1, novi_broj_racuna, sifra, round(prodajna_cena, 2), round(nabavna_cena, 2), -round(ukupna_kolicina, 3),
-                    round(rabat_proc, 2), round(ukupna_vrednost, 2), porez, stopa, tarifa, grupa,
-                    9, dokstatus,
-                    "Fiskalni račun PR", artikli_id, SIFOBJEKTA, GLAVNA_LOKACIJA_ID, porezid, ui, int(KASA)
+                    GODINA,
+                    1,
+                    novi_broj_racuna,
+                    sifra,
+                    round(prodajna_cena, 2),
+                    round(originalna_cena, 2),
+                    round(nabavna_cena, 2),
+                    -round(ukupna_kolicina, 3),
+                    round(rabat_proc, 2),
+                    round(ukupan_popust, 2),
+                    porez,
+                    stopa,
+                    tarifa,
+                    grupa,
+                    9,
+                    dokstatus,
+                    "Fiskalni račun PR",
+                    artikli_id,
+                    SIFOBJEKTA,
+                    GLAVNA_LOKACIJA_ID,
+                    porezid,
+                    ui,
+                    int(KASA)
                 ))
-                
-                sifra, prodajna_cena, ukupna_kolicina, *_ = artikal
-                #self.azuriraj_zalihe(sifra, ukupna_kolicina, dodaj=True)  # Vraćamo robu na zalihu
 
             conn.commit()
             #print(f"✅ Refundacija uspešno snimljena u bazi sa brojem {novi_broj_racuna}.")
