@@ -16,6 +16,7 @@ from lxml import etree
 import requests
 import datetime
 import uuid
+from decimal import Decimal
 
 
 
@@ -152,8 +153,32 @@ class eFaktureDialog(QDialog):
             )
             cursor = conn.cursor()
             # Dohvati podatke o okruzenju
-            cursor.execute("SELECT demoef FROM kasa.fvr LIMIT 1")
-            fvr_demo = cursor.fetchone()
+            # Dohvati okruženje i API ključeve.
+            cursor.execute("""
+                SELECT
+                    demoef,
+                    kljuc_api,
+                    kljuc_demo_api
+                FROM kasa.fvr
+                LIMIT 1
+            """)
+
+            fvr_podaci = cursor.fetchone()
+
+            if not fvr_podaci:
+                self.info2Label.setText(
+                    "Nisu pronađeni podaci firme."
+                )
+                self.info2Label.setStyleSheet(
+                    "background-color: #f8d7da;"
+                )
+                return
+
+            (
+                fvr_demo,
+                produkcioni_api_kljuc,
+                demo_api_kljuc,
+            ) = fvr_podaci
 
             # Dohvati podatke o fakturi
             cursor.execute("""
@@ -188,19 +213,30 @@ class eFaktureDialog(QDialog):
             if jbkjs:
                 body["jbkjs"] = jbkjs
 
-            # === Odredi API ključ i URL za proveru u produkcionom okruženju ===
-            cursor.execute("SELECT kljuc_api FROM kasa.fvr LIMIT 1")
-            rezultat_api = cursor.fetchone()
-            if not rezultat_api:
-                self.info2Label.setText("Nedostaje API ključ.")
-                self.info2Label.setStyleSheet("background-color: #f8d7da;")
-                return
-
-            api_key = rezultat_api[0]
+            # === Odredi URL i API ključ prema okruženju ===
             if fvr_demo:
-                sef_url = "https://demoefaktura.mfin.gov.rs/api/publicApi/Company/CheckIfCompanyRegisteredOnEfaktura"
+                sef_url = (
+                    "https://demoefaktura.mfin.gov.rs"
+                    "/api/publicApi/Company/"
+                    "CheckIfCompanyRegisteredOnEfaktura"
+                )
+                api_key = demo_api_kljuc
             else:
-                sef_url = "https://efaktura.mfin.gov.rs/api/publicApi/Company/CheckIfCompanyRegisteredOnEfaktura"
+                sef_url = (
+                    "https://efaktura.mfin.gov.rs"
+                    "/api/publicApi/Company/"
+                    "CheckIfCompanyRegisteredOnEfaktura"
+                )
+                api_key = produkcioni_api_kljuc
+
+            if not api_key or not str(api_key).strip():
+                self.info2Label.setText(
+                    "Nedostaje API ključ za izabrano SEF okruženje."
+                )
+                self.info2Label.setStyleSheet(
+                    "background-color: #f8d7da;"
+                )
+                return
 
             print("📡 Proveravam kupca na SEF-u:", body)
 
@@ -353,18 +389,62 @@ class eFaktureDialog(QDialog):
 
             query = """
                 SELECT
-                    ka.sifra, a.naziv, jm.jm, ka.kolicina,
-                    ROUND((ka.cenanabavna * (1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100))::numeric, 2),
-                    ka.rabatproc,
-                    ROUND((ka.cena * ka.kolicina)::numeric * (ka.rabatproc::numeric / 100), 2),
-                    ROUND(ka.kolicina::numeric * ka.cena::numeric * ROUND((1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100)::numeric, 4),2),
-                    ka.porezproc, ka.porez,
-                    ROUND((ka.cena * ka.kolicina)::numeric, 2),
-                    ka.tarifa, ka.id
+                    ka.sifra,                                                   -- 0
+                    a.naziv,                                                    -- 1
+                    jm.jm,                                                      -- 2
+                    ka.kolicina,                                                -- 3
+
+                    ROUND(
+                        (
+                            COALESCE(NULLIF(ka.staracena, 0), ka.cena)::numeric
+                            /
+                            (1 + COALESCE(ka.porezproc, 0)::numeric / 100)
+                        ),
+                        2
+                    ) AS originalna_cena_bez_pdv,                               -- 4
+
+                    COALESCE(ka.rabatproc, 0),                                  -- 5
+
+                    ROUND(
+                        (
+                            (
+                                COALESCE(NULLIF(ka.staracena, 0), ka.cena)::numeric
+                                - ka.cena::numeric
+                            )
+                            * ka.kolicina::numeric
+                            /
+                            (1 + COALESCE(ka.porezproc, 0)::numeric / 100)
+                        ),
+                        2
+                    ) AS popust_bez_pdv,                                        -- 6
+
+                    ROUND(
+                        (
+                            ka.cena::numeric * ka.kolicina::numeric
+                            - COALESCE(ka.porez, 0)::numeric
+                        ),
+                        2
+                    ) AS iznos_bez_pdv,                                         -- 7
+
+                    COALESCE(ka.porezproc, 0),                                  -- 8
+                    COALESCE(ka.porez, 0),                                      -- 9
+
+                    ROUND(
+                        ka.cena::numeric * ka.kolicina::numeric,
+                        2
+                    ) AS iznos_sa_pdv,                                          -- 10
+
+                    ka.tarifa,                                                  -- 11
+                    ka.id                                                       -- 12
+
                 FROM kasa.karticaart ka
-                LEFT JOIN kasa.artikli a ON a.sifra = ka.sifra
-                LEFT JOIN kasa.jedmere jm ON jm.id = a.jedinica_mere_id
-                WHERE ka.god = %s AND ka.sifobj = %s AND ka.brfakt = %s
+                LEFT JOIN kasa.artikli a
+                    ON a.id = ka.artikliid
+                LEFT JOIN kasa.jedmere jm
+                    ON jm.id = a.jedinica_mere_id
+                WHERE ka.god = %s
+                AND ka.sifobj = %s
+                AND ka.brfakt = %s
                 ORDER BY ka.id
             """
             cursor.execute(query, (god, sifobj, brojfakture))
@@ -426,7 +506,6 @@ class eFaktureDialog(QDialog):
                     d["datum_izdavanja"] = d["datum"]
                 podaci["detalji_avansa"] = detalji_avansa
 
-            print("POZIV: napravi_efaktura_xml_iz_podataka će se izvršiti")
             return self.napravi_efaktura_xml_iz_podataka(podaci, folder_izvestaja)
 
         except Exception as e:
@@ -657,27 +736,166 @@ class eFaktureDialog(QDialog):
 
             # === Stavke ===
             for idx, s in enumerate(podaci["stavke"], start=1):
-                line = etree.SubElement(root, f"{{{nsmap['cac']}}}InvoiceLine")
-                line.append(safe_el("ID", idx))
-                line.append(safe_el("InvoicedQuantity", f"{s[3]:.3f}", attribs={"unitCode": s[2]}))
-                line.append(safe_el("LineExtensionAmount", f"{s[7]:.2f}", attribs={"currencyID": "RSD"}))
+                kolicina = Decimal(str(s[3]))
+                originalna_neto_cena = Decimal(str(s[4]))
+                rabat_proc = Decimal(str(s[5]))
+                popust_bez_pdv = Decimal(str(s[6]))
+                iznos_bez_pdv = Decimal(str(s[7]))
+                stopa_pdv = Decimal(str(s[8]))
+                if kolicina == Decimal("0"):
+                    raise ValueError(
+                        f"Stavka {s[0]} ima količinu nula."
+                    )
 
-                charge = etree.SubElement(line, f"{{{nsmap['cac']}}}AllowanceCharge")
-                charge.append(safe_el("ChargeIndicator", "false"))
-                charge.append(safe_el("Amount", "0", attribs={"currencyID": "RSD"}))
+                ubl_jedinicna_cena = (
+                    (
+                        iznos_bez_pdv
+                        + popust_bez_pdv
+                    )
+                    / kolicina
+                ).quantize(
+                    Decimal("0.000001")
+                )
 
-                item = etree.SubElement(line, f"{{{nsmap['cac']}}}Item")
-                item.append(safe_el("Name", s[1]))
-                seller_id = etree.SubElement(item, f"{{{nsmap['cac']}}}SellersItemIdentification")
-                seller_id.append(safe_el("ID", s[0]))
-                taxcat = etree.SubElement(item, f"{{{nsmap['cac']}}}ClassifiedTaxCategory")
-                taxcat.append(safe_el("ID", "S"))
-                taxcat.append(safe_el("Percent", int(s[8])))
-                tax_scheme = etree.SubElement(taxcat, f"{{{nsmap['cac']}}}TaxScheme")
-                tax_scheme.append(safe_el("ID", "VAT"))
+                line = etree.SubElement(
+                    root,
+                    f"{{{nsmap['cac']}}}InvoiceLine"
+                )
 
-                price = etree.SubElement(line, f"{{{nsmap['cac']}}}Price")
-                price.append(safe_el("PriceAmount", f"{s[4]:.2f}", attribs={"currencyID": "RSD"}))
+                line.append(
+                    safe_el("ID", idx)
+                )
+
+                line.append(
+                    safe_el(
+                        "InvoicedQuantity",
+                        f"{kolicina:.3f}",
+                        attribs={
+                            "unitCode": s[2]
+                        }
+                    )
+                )
+
+                line.append(
+                    safe_el(
+                        "LineExtensionAmount",
+                        f"{iznos_bez_pdv:.2f}",
+                        attribs={
+                            "currencyID": "RSD"
+                        }
+                    )
+                )
+
+                # Popust na nivou stavke dodajemo samo kada postoji.
+                if popust_bez_pdv > Decimal("0.00"):
+                    charge = etree.SubElement(
+                        line,
+                        f"{{{nsmap['cac']}}}AllowanceCharge"
+                    )
+
+                    charge.append(
+                        safe_el("ChargeIndicator", "false")
+                    )
+
+                    charge.append(
+                        safe_el(
+                            "AllowanceChargeReason",
+                            "Popust"
+                        )
+                    )
+
+                    if rabat_proc > Decimal("0.00"):
+                        charge.append(
+                            safe_el(
+                                "MultiplierFactorNumeric",
+                                f"{rabat_proc / Decimal('100'):.4f}"
+                            )
+                        )
+
+                    charge.append(
+                        safe_el(
+                            "Amount",
+                            f"{popust_bez_pdv:.2f}",
+                            attribs={
+                                "currencyID": "RSD"
+                            }
+                        )
+                    )
+
+                    osnovica_popusta = (
+                        iznos_bez_pdv
+                        + popust_bez_pdv
+                    ).quantize(
+                        Decimal("0.01")
+                    )
+
+                    charge.append(
+                        safe_el(
+                            "BaseAmount",
+                            f"{osnovica_popusta:.2f}",
+                            attribs={
+                                "currencyID": "RSD"
+                            }
+                        )
+                    )
+
+                item = etree.SubElement(
+                    line,
+                    f"{{{nsmap['cac']}}}Item"
+                )
+
+                item.append(
+                    safe_el("Name", s[1])
+                )
+
+                seller_id = etree.SubElement(
+                    item,
+                    f"{{{nsmap['cac']}}}SellersItemIdentification"
+                )
+
+                seller_id.append(
+                    safe_el("ID", s[0])
+                )
+
+                taxcat = etree.SubElement(
+                    item,
+                    f"{{{nsmap['cac']}}}ClassifiedTaxCategory"
+                )
+
+                taxcat.append(
+                    safe_el("ID", "S")
+                )
+
+                taxcat.append(
+                    safe_el(
+                        "Percent",
+                        f"{stopa_pdv:.2f}"
+                    )
+                )
+
+                tax_scheme = etree.SubElement(
+                    taxcat,
+                    f"{{{nsmap['cac']}}}TaxScheme"
+                )
+
+                tax_scheme.append(
+                    safe_el("ID", "VAT")
+                )
+
+                price = etree.SubElement(
+                    line,
+                    f"{{{nsmap['cac']}}}Price"
+                )
+
+                price.append(
+                    safe_el(
+                        "PriceAmount",
+                        f"{ubl_jedinicna_cena:.6f}",
+                        attribs={
+                            "currencyID": "RSD"
+                        }
+                    )
+                )
 
             # === Snimi fajl ===
             xml_path = os.path.join(folder_izvestaja, f"eFaktura_{podaci['faktura']['broj']}.xml")
@@ -794,12 +1012,20 @@ class eFaktureDialog(QDialog):
         folder_izvestaja = os.path.join(BASE_DIR, "izvestaji\\efakture")
         os.makedirs(folder_izvestaja, exist_ok=True)
         #folder_izvestaja = r"D:\pos_desktop\desktop_pos\izvestaji\efakture"   # stari deo koda gde je explicitno naveden folder
-        xml_path = self.generisi_efaktura_xml(self.faktura_id, folder_izvestaja)
-        print("DEBUG xml_path:", xml_path, type(xml_path))
+        xml_path = self.generisi_efaktura_xml(
+            self.faktura_id,
+            folder_izvestaja
+        )
+
+
         if xml_path:
             self.posalji_efakturu_na_sef(xml_path)
         else:
-            QMessageBox.critical(self, "Greška", "Generisanje XML fajla nije uspelo. Proverite podatke fakture.") 
+            QMessageBox.critical(
+                self,
+                "Greška",
+                "Generisanje XML fajla nije uspelo. Proverite podatke fakture."
+            )
     
     def posalji_efakturu_na_sef(self, xml_putanja):
         # === Preuzimanje podataka iz baze ===
@@ -817,7 +1043,6 @@ class eFaktureDialog(QDialog):
             send_to_cir = "Yes" if self.crfCheck.isChecked() else "No"
             url_sa_parametrima = f"{url}?requestId={request_id}&sendToCir={send_to_cir}"
 
-            print("DEBUG: Slanje na URL:", url_sa_parametrima)
 
             headers = {
                 "Content-Type": "application/xml",
@@ -825,9 +1050,11 @@ class eFaktureDialog(QDialog):
                 "apikey": apikey
             }
 
-            print("DEBUG: Slanje POST zahteva...")
             response = requests.post(url_sa_parametrima, headers=headers, data=xml_sadrzaj)
-            print("DEBUG: Status:", response.status_code)
+            print(
+                "SEF HTTP status:",
+                response.status_code
+            )
 
             if response.status_code == 200:
                 odgovor = response.json()

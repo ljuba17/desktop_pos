@@ -152,7 +152,7 @@ class FaktureDialog(QDialog):
         self.stavkefaktTable.setColumnWidth(1, 150)  # Druga kolona širine 150 naziv iz artikli
         self.stavkefaktTable.setColumnWidth(2, 80)  # Treća kolona širine 80 jm iz jedmere
         self.stavkefaktTable.setColumnWidth(3, 100)  # Četvrta kolona širine 100 kolicina iz karticaart
-        self.stavkefaktTable.setColumnWidth(4, 90)  # Peta kolona širine 90 iz karticaart racuna se po formuli round(karticaart.cenanabavna *  ((1 - ((KARTICAART.POREZPROC*100) / (KARTICAART.POREZPROC +100)) /100)),2)
+        self.stavkefaktTable.setColumnWidth(4, 90)  # Cena bez PDV-a pre popusta
         self.stavkefaktTable.setColumnWidth(5, 90)  # Šesta kolona širine 90 rabatproc iz karticaart
         self.stavkefaktTable.setColumnWidth(6, 100)  # Sedma kolona širine 100 rabatdinarski iz karticaart
         self.stavkefaktTable.setColumnWidth(7, 100)  # osma kolona širine 100 kolona sa indeksom 4 * kolona sa indeksom 3
@@ -839,31 +839,64 @@ class FaktureDialog(QDialog):
             ) as conn:
                 with conn.cursor() as cursor:
                     query = """
-                    SELECT
-                        ka.sifra,                               -- 0
-                        a.naziv,                                -- 1
-                        jm.jm,                                  -- 2
-                        ka.kolicina,                            -- 3
-                        ROUND(
-                            (ka.cenanabavna * (1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100))::numeric, 
-                            2
-                        ) AS cena_bez_pdv,                      -- 4
-                        ka.rabatproc,                           -- 5
-                        ROUND((ka.cena * ka.kolicina)::numeric * (ka.rabatproc::numeric / 100), 2),                       -- 6
-                        ROUND(ka.kolicina::numeric * ka.cena::numeric * ROUND(
-                            (1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100)::numeric, 
-                            4
-                        ),2) AS iznos_bez_pdv,                     -- 7
-                        ka.porezproc,                           -- 8
-                        ka.porez,                               -- 9
-                        ROUND((ka.cena * ka.kolicina)::numeric, 2),  -- 10
-                        ka.tarifa,                              -- 11
-                        ka.id                                   -- 12
-                    FROM kasa.karticaart ka
-                    LEFT JOIN kasa.artikli a ON a.sifra = ka.sifra
-                    LEFT JOIN kasa.jedmere jm ON jm.id = a.jedinica_mere_id
-                    WHERE ka.god = %s AND ka.sifobj = %s AND ka.brfakt = %s
-                    ORDER BY ka.id
+                        SELECT
+                            ka.sifra,                                                   -- 0
+                            a.naziv,                                                    -- 1
+                            jm.jm,                                                      -- 2
+                            ka.kolicina,                                                -- 3
+
+                            ROUND(
+                                (
+                                    COALESCE(NULLIF(ka.staracena, 0), ka.cena)::numeric
+                                    /
+                                    (1 + COALESCE(ka.porezproc, 0)::numeric / 100)
+                                ),
+                                2
+                            ) AS originalna_cena_bez_pdv,                               -- 4
+
+                            COALESCE(ka.rabatproc, 0),                                  -- 5
+
+                            ROUND(
+                                (
+                                    (
+                                        COALESCE(NULLIF(ka.staracena, 0), ka.cena)::numeric
+                                        - ka.cena::numeric
+                                    )
+                                    * ka.kolicina::numeric
+                                    /
+                                    (1 + COALESCE(ka.porezproc, 0)::numeric / 100)
+                                ),
+                                2
+                            ) AS popust_bez_pdv,                                        -- 6
+
+                            ROUND(
+                                (
+                                    ka.cena::numeric * ka.kolicina::numeric
+                                    - COALESCE(ka.porez, 0)::numeric
+                                ),
+                                2
+                            ) AS iznos_bez_pdv,                                         -- 7
+
+                            COALESCE(ka.porezproc, 0),                                  -- 8
+                            COALESCE(ka.porez, 0),                                      -- 9
+
+                            ROUND(
+                                ka.cena::numeric * ka.kolicina::numeric,
+                                2
+                            ) AS iznos_sa_pdv,                                          -- 10
+
+                            ka.tarifa,                                                  -- 11
+                            ka.id                                                       -- 12
+
+                        FROM kasa.karticaart ka
+                        LEFT JOIN kasa.artikli a
+                            ON a.id = ka.artikliid
+                        LEFT JOIN kasa.jedmere jm
+                            ON jm.id = a.jedinica_mere_id
+                        WHERE ka.god = %s
+                        AND ka.sifobj = %s
+                        AND ka.brfakt = %s
+                        ORDER BY ka.id
                     """
                     cursor.execute(query, (godina, sifobj, brojfakture))
                     stavke = cursor.fetchall()
@@ -1031,14 +1064,43 @@ class FaktureDialog(QDialog):
                     k.sifra,
                     a.naziv,
                     j.jm,
-                    k.kolicina,
-                    k.cenanabavna,
-                    k.rabatdinarski
+                    COALESCE(k.kolicina, 0) AS kolicina,
+
+                    COALESCE(
+                        NULLIF(k.staracena, 0),
+                        k.cena,
+                        0
+                    ) AS cena_pre_popusta,
+
+                    ROUND(
+                        (
+                            (
+                                COALESCE(
+                                    NULLIF(k.staracena, 0),
+                                    k.cena,
+                                    0
+                                )
+                                - COALESCE(k.cena, 0)
+                            )
+                            * COALESCE(k.kolicina, 0)
+                        )::numeric,
+                        2
+                    )::double precision AS ukupan_popust
+
                 FROM kasa.karticaart k
-                JOIN kasa.artikli a ON a.sifra = k.sifra
-                JOIN kasa.jedmere j ON j.id = a.jedinica_mere_id
-                WHERE k.brfakt = %s
-            """, (brojfakture,))
+                JOIN kasa.artikli a
+                    ON a.id = k.artikliid
+                JOIN kasa.jedmere j
+                    ON j.id = a.jedinica_mere_id
+                WHERE k.god = %s
+                AND k.sifobj = %s
+                AND k.brfakt = %s
+                ORDER BY k.id
+            """, (
+                GODINA,
+                SIFOBJEKTA,
+                brojfakture,
+            ))
             stavke = cursor.fetchall()
         finally:
             cursor.close()
@@ -1272,18 +1334,62 @@ class FaktureDialog(QDialog):
 
             query = """
             SELECT
-                ka.sifra, a.naziv, jm.jm, ka.kolicina,
-                ROUND((ka.cenanabavna * (1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100))::numeric, 2) AS cena_bez_pdv,
-                ka.rabatproc,
-                ROUND(((ka.cenanabavna * (1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100)) * ka.kolicina)::numeric * (ka.rabatproc::numeric / 100), 2),
-                ROUND(ka.kolicina::numeric * ka.cena::numeric * ROUND((1 - ((ka.porezproc * 100)::numeric / (ka.porezproc + 100)::numeric) / 100)::numeric, 4),2),
-                ka.porezproc, ka.porez,
-                ROUND((ka.cena * ka.kolicina)::numeric, 2),
-                ka.tarifa, ka.id
+                ka.sifra,                                                   -- 0
+                a.naziv,                                                    -- 1
+                jm.jm,                                                      -- 2
+                ka.kolicina,                                                -- 3
+
+                ROUND(
+                    (
+                        COALESCE(NULLIF(ka.staracena, 0), ka.cena)::numeric
+                        /
+                        (1 + COALESCE(ka.porezproc, 0)::numeric / 100)
+                    ),
+                    2
+                ) AS originalna_cena_bez_pdv,                               -- 4
+
+                COALESCE(ka.rabatproc, 0),                                  -- 5
+
+                ROUND(
+                    (
+                        (
+                            COALESCE(NULLIF(ka.staracena, 0), ka.cena)::numeric
+                            - ka.cena::numeric
+                        )
+                        * ka.kolicina::numeric
+                        /
+                        (1 + COALESCE(ka.porezproc, 0)::numeric / 100)
+                    ),
+                    2
+                ) AS popust_bez_pdv,                                        -- 6
+
+                ROUND(
+                    (
+                        ka.cena::numeric * ka.kolicina::numeric
+                        - COALESCE(ka.porez, 0)::numeric
+                    ),
+                    2
+                ) AS iznos_bez_pdv,                                         -- 7
+
+                COALESCE(ka.porezproc, 0),                                  -- 8
+                COALESCE(ka.porez, 0),                                      -- 9
+
+                ROUND(
+                    ka.cena::numeric * ka.kolicina::numeric,
+                    2
+                ) AS iznos_sa_pdv,                                          -- 10
+
+                ka.tarifa,                                                  -- 11
+                ka.id                                                       -- 12
+
             FROM kasa.karticaart ka
-            LEFT JOIN kasa.artikli a ON a.sifra = ka.sifra
-            LEFT JOIN kasa.jedmere jm ON jm.id = a.jedinica_mere_id
-            WHERE ka.god = %s AND ka.sifobj = %s AND ka.brfakt = %s
+            LEFT JOIN kasa.artikli a
+                ON a.id = ka.artikliid
+            LEFT JOIN kasa.jedmere jm
+                ON jm.id = a.jedinica_mere_id
+            WHERE ka.god = %s
+            AND ka.sifobj = %s
+            AND ka.brfakt = %s
             ORDER BY ka.id
             """
             cursor.execute(query, (GODINA, SIFOBJEKTA, brojfakture))
@@ -1425,7 +1531,7 @@ class FaktureDialog(QDialog):
             pdv_iznos = float(pdv_iznos)
             ukupno = float(ukupno)
 
-            suma_bez_popusta += cena_bez_pdv * kolicina
+            suma_bez_popusta += osnovica + popust
             suma_popust += popust
             suma_osnovica += osnovica
             suma_pdv += pdv_iznos
