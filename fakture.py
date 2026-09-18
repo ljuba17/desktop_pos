@@ -676,13 +676,13 @@ class FaktureDialog(QDialog):
                         vrsta, opis, ui, porez, porezproc, grupa, valuta, rabatproc,
                         rabatdinarski, god, kar, kreirao, kreirano, izmenio, izmenjen,
                         porezid, vm, idpartneri, marza, dobit, prenetpdv, zavtroskovi,
-                        koltren, kolpop, dokstatus, brfakt, artikliid, netofcena, kasa, staracena
+                        koltren, kolpop, dokstatus, brfakt, artikliid, netofcena, kasa, staracena, ne_menja_zalihe
                     ) VALUES (
                         %s, %s, %s, %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, %s, %s, %s, %s,
                         %s, %s, %s, %s, now(), %s, %s, %s,
                         %s, %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s, %s, %s, %s
+                        %s, %s, %s, %s, %s, %s, %s, %s, true
                     )
                 """, (
                     sifra, SIFOBJEKTA, lokacija_id, broj_racuna, datum, kolicina, cena, cenanabavna, tarifa,

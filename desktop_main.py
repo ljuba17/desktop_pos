@@ -1888,7 +1888,12 @@ class MainWindow(QMainWindow):
 
             # 1. Pronađi zaglavlje iz kasasum
             cursor.execute("""
-                SELECT god, sifobj, broj, dokstatus
+                SELECT
+                    god,
+                    sifobj,
+                    broj,
+                    dokstatus,
+                    refbrracpu
                 FROM "kasa"."kasasum"
                 WHERE brracpu = %s
             """, (broj_racunaPU,))
@@ -1898,11 +1903,47 @@ class MainWindow(QMainWindow):
                 print("Nije pronađen fiskalni račun.")
                 return
 
-            god, sifobj, broj, dokstatus = kasasum
+            god, sifobj, broj, dokstatus, refbrracpu = kasasum
 
             if dokstatus not in ('PP', 'PR'):
                 print(f"Dokument nije prometna prodaja/refundacija: {dokstatus}")
                 return
+
+            # Refundacija fiskalnog računa koji je zamenjen eFakturom
+            # nije stvarni povrat robe i ne sme povećati zalihe.
+            if dokstatus == 'PR' and refbrracpu:
+                cursor.execute("""
+                    SELECT EXISTS (
+                        SELECT 1
+                        FROM kasa.kasasum original
+                        JOIN kasa.fakture f
+                        ON f.god = original.god
+                        AND f.sifobj = original.sifobj
+                        AND f.brracpu = original.brracpu
+                        WHERE original.brracpu = %s
+                        AND original.dokstatus = 'PP'
+                    )
+                """, (refbrracpu,))
+
+                administrativna_refundacija = cursor.fetchone()[0]
+
+                if administrativna_refundacija:
+                    cursor.execute("""
+                        UPDATE kasa.karticaart
+                        SET ne_menja_zalihe = true
+                        WHERE god = %s
+                        AND sifobj = %s
+                        AND broj = %s
+                        AND vrsta = 9
+                    """, (god, sifobj, broj))
+
+                    conn.commit()
+
+                    print(
+                        "Refundacija fiskalnog računa povezanog sa "
+                        "eFakturom evidentirana je bez promene zaliha."
+                    )
+                    return
 
             # 2. Izvuci stavke iz karticaart
             cursor.execute("""
