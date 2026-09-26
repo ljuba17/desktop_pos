@@ -36,6 +36,7 @@ import json
 from PyQt6.QtGui import QAction
 from functools import partial
 import warnings
+from poslovna_godina_guard import proveri_aktivnu_godinu as proveri_godinu_u_bazi
 
 
 
@@ -66,6 +67,8 @@ def get_db_connection():
         port=os.getenv("DB_PORT")
     )
 
+def proveri_aktivnu_godinu(cursor):
+    proveri_godinu_u_bazi(cursor, GODINA)
 
 def ucitaj_glavnu_lokaciju(conn, sifobj):
     """
@@ -1007,6 +1010,8 @@ class MainWindow(QMainWindow):
     #################################################################################################
     # Dodavanje artikla u bazu i prikaz u tabeli prozora, brisanje stavki i azuriranje totala    
     def dodaj_u_kasa1(self):
+        conn = None
+        cursor = None
         try:
             # Validacija unosa
             sifra = self.sifraEdit.text().strip()
@@ -1041,6 +1046,7 @@ class MainWindow(QMainWindow):
                 port=os.getenv("DB_PORT")
             )
             cursor = conn.cursor()
+            proveri_aktivnu_godinu(cursor)
             cursor.execute("""SELECT id, tip FROM "kasa"."artikli" WHERE sifra = %s""", (sifra,))
             result = cursor.fetchone()
             if not result:
@@ -1117,11 +1123,19 @@ class MainWindow(QMainWindow):
                                 cena_sa_popustom, vrednost)
 
             conn.commit()
-            cursor.close()
-            conn.close()
 
         except Exception as e:
-            print(f"❌ Greška pri upisu u bazu `kasa1`: {e}")
+            if conn:
+                conn.rollback()
+            print(f"Greška pri upisu u bazu `kasa1`: {e}")
+            self.show_warning_message(str(e))
+
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+
 
     def dodaj_u_korpu(self, id_stavke, sifra, naziv, kolicina, cena_bez_popusta, proc_popust, cena_sa_popustom, vrednost):
         row_count = self.stavkeTable.rowCount()
@@ -1164,33 +1178,44 @@ class MainWindow(QMainWindow):
         self.sifraEdit.setFocus()
 
     def obrisi_stavku(self, id_stavke):
-        """✅ Brisanje artikla iz baze `kasa1` i tabele `stavkeTable`."""
-        try:
-            # ✅ Brisanje iz baze
-            conn = psycopg2.connect(
-                dbname=os.getenv("DB_NAME"),
-                user=os.getenv("DB_USER"),
-                password=os.getenv("DB_PASSWORD"),
-                host=os.getenv("DB_HOST"),
-                port=os.getenv("DB_PORT")
-            )
-            cursor = conn.cursor()
-            cursor.execute("""DELETE FROM "kasa"."kasa1" WHERE id = %s;""", (id_stavke,))
-            conn.commit()
-            cursor.close()
-            conn.close()
+        """Briše otvorenu stavku korpe iz aktivne godine."""
+        conn = None
+        cursor = None
 
-            # ✅ Brisanje iz tabele
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            proveri_aktivnu_godinu(cursor)
+
+            cursor.execute("""
+                DELETE FROM kasa.kasa1
+                WHERE god = %s
+                  AND id = %s
+                  AND zatvoren = FALSE
+            """, (int(GODINA), id_stavke))
+
+            if cursor.rowcount != 1:
+                raise ValueError("Otvorena stavka korpe nije pronađena.")
+
+            conn.commit()
+
             for row in range(self.stavkeTable.rowCount()):
                 if int(self.stavkeTable.item(row, 0).text()) == id_stavke:
                     self.stavkeTable.removeRow(row)
                     break
 
             self.azuriraj_total()
-            #print(f"✅ Stavka sa ID-om {id_stavke} uspešno obrisana.")
 
         except Exception as e:
-            print(f"❌ Greška pri brisanju stavke: {e}")
+            if conn:
+                conn.rollback()
+            self.show_warning_message(str(e))
+
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
     def azuriraj_total(self):
         total = 0
@@ -1218,10 +1243,22 @@ class MainWindow(QMainWindow):
                 port=os.getenv("DB_PORT")
             )
             cursor = conn.cursor()
-            cursor.execute(
-                "SELECT id, sifra, (SELECT naziv FROM \"kasa\".\"artikli\" WHERE sifra = k.sifra), kolic, cena2, popproc1, cena, kolic*cena FROM \"kasa\".\"kasa1\" k WHERE sto = %s AND kasa = %s AND zatvoren = False",
-                (self.aktivan_kupac, KASA)
-            )
+            cursor.execute("""
+                SELECT
+                    k.id,
+                    k.sifra,
+                    (SELECT a.naziv FROM kasa.artikli a WHERE a.sifra = k.sifra),
+                    k.kolic,
+                    k.cena2,
+                    k.popproc1,
+                    k.cena,
+                    k.kolic * k.cena
+                FROM kasa.kasa1 k
+                WHERE k.sto = %s
+                  AND k.kasa = %s
+                  AND k.god = %s
+                  AND k.zatvoren = FALSE
+            """, (self.aktivan_kupac, int(KASA), int(GODINA)))
             rows = cursor.fetchall()
             for row in rows:
                 row_count = self.stavkeTable.rowCount()
@@ -1302,6 +1339,17 @@ class MainWindow(QMainWindow):
             
     def izvrsi_stampu(self):
         """✅ Pokreće odgovarajuću funkciju za fiskalizaciju u zavisnosti od aktivnog moda."""
+        conn = None
+        try:
+            conn = get_db_connection()
+            with conn.cursor() as cursor:
+                proveri_aktivnu_godinu(cursor)
+        except Exception as e:
+            self.show_warning_message(str(e))
+            return
+        finally:
+            if conn:
+                conn.close()
         if self.aktivan_mod == "promet":
             self.fiskalizuj_korpu()
         elif self.aktivan_mod == "refundacija":
@@ -1378,6 +1426,8 @@ class MainWindow(QMainWindow):
             # Početak transakcije
             conn.autocommit = False
 
+            proveri_aktivnu_godinu(cursor)
+
             # Dohvatanje novog broja računa
             novi_broj_racuna = self.dohvati_broj_racuna()
             if novi_broj_racuna is None:
@@ -1407,15 +1457,26 @@ class MainWindow(QMainWindow):
             (god, kar, broj, sto, zatvoren, kasa, smena, sifra, kolic, cena, popproc1, popdin1, popsum, datum, sifobj, dokstatus, kreirao, artikliid, tip, cena2, ststatus)
             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, kolic, cena, popproc1, popdin1, popsum, datum, sifobj, %s, 'sistem', artikliid, tip, cena2, ststatus
             FROM "kasa"."kasa1"
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, dokstatus, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                dokstatus,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Ažuriranje podataka u `kasa1` kao zatvorenih
             cursor.execute("""
             UPDATE "kasa"."kasa1"
             SET broj = %s, zatvoren = TRUE, kreirao = 'sistem'
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Snimanje podataka u `kasasum`
             cursor.execute("""
@@ -1460,6 +1521,8 @@ class MainWindow(QMainWindow):
                 AND z.lokacija_id = %s
                 AND z.artikliid = k.artikliid
                 WHERE k.zatvoren = TRUE
+                AND k.god = %s
+                AND k.sifobj = %s
                 AND k.kasa = %s
                 AND k.broj = %s
                 GROUP BY
@@ -1468,8 +1531,10 @@ class MainWindow(QMainWindow):
                     k.cena2
                 """, (
                     GLAVNA_LOKACIJA_ID,
+                    int(GODINA),
+                    SIFOBJEKTA,
                     int(KASA),
-                    novi_broj_racuna
+                    novi_broj_racuna,
                 ))
 
             artikli = cursor.fetchall()
@@ -2089,6 +2154,8 @@ class MainWindow(QMainWindow):
             cursor = conn.cursor()
             conn.autocommit = False  # Početak transakcije
 
+            proveri_aktivnu_godinu(cursor)
+
             # Dohvatanje novog broja računa
             novi_broj_racuna = self.dohvati_broj_racuna()
             if novi_broj_racuna is None:
@@ -2112,15 +2179,26 @@ class MainWindow(QMainWindow):
             (god, kar, broj, sto, zatvoren, kasa, smena, sifra, kolic, cena, popproc1, popdin1, popsum, datum, sifobj, dokstatus, kreirao, artikliid, tip, cena2, ststatus)
             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, ABS(kolic), cena, popproc1, popdin1, popsum, datum, sifobj, %s, 'sistem', artikliid, tip, cena2, ststatus
             FROM "kasa"."kasa1"
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, dokstatus, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                dokstatus,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Ažuriranje podataka u `kasa1` kao zatvorenih
             cursor.execute("""
             UPDATE "kasa"."kasa1"
             SET broj = %s, zatvoren = TRUE, kreirao = 'sistem'
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Snimanje podataka u `kasasum`
             cursor.execute("""
@@ -2157,9 +2235,18 @@ class MainWindow(QMainWindow):
             FROM "kasa"."kasa1" k
             LEFT JOIN "kasa"."artikli" a ON a.sifra = k.sifra
             LEFT JOIN "kasa"."porezi" p ON p.id = a.porez_id
-            WHERE k.zatvoren = TRUE AND k.kasa = %s AND k.broj = %s
+            WHERE k.zatvoren = TRUE
+              AND k.god = %s
+              AND k.sifobj = %s
+              AND k.kasa = %s
+              AND k.broj = %s
             GROUP BY k.sifra, k.cena
-            """, (int(KASA), novi_broj_racuna))
+            """, (
+                int(GODINA),
+                SIFOBJEKTA,
+                int(KASA),
+                novi_broj_racuna,
+            ))
 
             artikli = cursor.fetchall()
 
@@ -2660,6 +2747,8 @@ class MainWindow(QMainWindow):
                 self.kasa1.append(nova_stavka)
 
             # Snimanje stavki iz kasa1 u bazu (tabela kasa1) sa ID dohvatom
+            conn = None
+            cursor = None
             try:
                 conn = psycopg2.connect(
                     dbname=os.getenv("DB_NAME"),
@@ -2669,6 +2758,7 @@ class MainWindow(QMainWindow):
                     port=os.getenv("DB_PORT")
                 )
                 cursor = conn.cursor()
+                proveri_aktivnu_godinu(cursor)
 
                 for stavka in self.kasa1:
                     cursor.execute("""
@@ -2727,12 +2817,19 @@ class MainWindow(QMainWindow):
                     stavka["id"] = generisani_id  # Čuvamo ID u stavku
 
                 conn.commit()
-                conn.close()
-                #print(f"✅ Stavke su uspešno snimljene u bazu (kasa1) za privremeni broj računa: {trenutni_broj_racuna}")
 
             except Exception as e:
-                print(f"❌ Greška pri snimanju u bazu: {e}")
+                if conn:
+                    conn.rollback()
+                print(f"Greška pri snimanju u bazu: {e}")
                 raise
+
+            finally:
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
+                #print(f"✅ Stavke su uspešno snimljene u bazu (kasa1) za privremeni broj računa: {trenutni_broj_racuna}")
 
             # Popunjavanje stavkeTable sa stavkama iz kasa1
             self.populate_stavkeTable()
@@ -2929,7 +3026,6 @@ class MainWindow(QMainWindow):
                 f"{e}"
             )
 
-
     def azuriraj_kolicinu_u_bazi(
         self,
         id_stavke,
@@ -2940,26 +3036,23 @@ class MainWindow(QMainWindow):
         cursor = None
 
         try:
-            conn = psycopg2.connect(
-                dbname=os.getenv("DB_NAME"),
-                user=os.getenv("DB_USER"),
-                password=os.getenv("DB_PASSWORD"),
-                host=os.getenv("DB_HOST"),
-                port=os.getenv("DB_PORT")
-            )
+            conn = get_db_connection()
             cursor = conn.cursor()
+            proveri_aktivnu_godinu(cursor)
 
             cursor.execute("""
                 UPDATE kasa.kasa1
                 SET
                     kolic = %s,
                     popsum = COALESCE(%s, popsum)
-                WHERE id = %s
+                WHERE god = %s
+                  AND id = %s
                   AND zatvoren = FALSE
             """, (
                 nova_kolicina,
                 novi_popsum,
-                id_stavke
+                int(GODINA),
+                id_stavke,
             ))
 
             if cursor.rowcount != 1:
@@ -2978,7 +3071,6 @@ class MainWindow(QMainWindow):
         finally:
             if cursor is not None:
                 cursor.close()
-
             if conn is not None:
                 conn.close()
 
@@ -3030,6 +3122,7 @@ class MainWindow(QMainWindow):
             )
             cursor = conn.cursor()
             conn.autocommit = False  # Početak transakcije
+            proveri_aktivnu_godinu(cursor)
 
             # Dohvatanje novog broja računa
             novi_broj_racuna = self.dohvati_broj_racuna()
@@ -3054,15 +3147,26 @@ class MainWindow(QMainWindow):
             (god, kar, broj, sto, zatvoren, kasa, smena, sifra, kolic, cena, popproc1, popdin1, popsum, datum, sifobj, dokstatus, kreirao, artikliid, tip, cena2, ststatus)
             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, ABS(kolic), cena2, popproc1, popdin1, popsum, datum, sifobj, %s, 'sistem', artikliid, tip, cena, ststatus
             FROM "kasa"."kasa1"
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, dokstatus, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                dokstatus,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Ažuriranje podataka u `kasa1` kao zatvorenih
             cursor.execute("""
             UPDATE "kasa"."kasa1"
             SET broj = %s, zatvoren = TRUE, kreirao = 'sistem'
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Snimanje podataka u `kasasum`
             cursor.execute("""
@@ -3117,6 +3221,8 @@ class MainWindow(QMainWindow):
                  AND z.sifobj = k.sifobj
                  AND z.lokacija_id = %s
                 WHERE k.zatvoren = TRUE
+                  AND k.god = %s
+                  AND k.sifobj = %s
                   AND k.kasa = %s
                   AND k.broj = %s
                 GROUP BY
@@ -3125,8 +3231,10 @@ class MainWindow(QMainWindow):
                     k.cena
             """, (
                 GLAVNA_LOKACIJA_ID,
+                int(GODINA),
+                SIFOBJEKTA,
                 int(KASA),
-                novi_broj_racuna
+                novi_broj_racuna,
             ))
 
             artikli = cursor.fetchall()

@@ -1,6 +1,7 @@
 import os
 import sys
 import psycopg2
+from poslovna_godina_guard import proveri_aktivnu_godinu
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QDialog, QTableWidgetItem, QPushButton, QMessageBox, QFileDialog
 from PyQt6.QtGui import QColor, QBrush
@@ -1028,102 +1029,189 @@ class eFaktureDialog(QDialog):
             )
     
     def posalji_efakturu_na_sef(self, xml_putanja):
-        # === Preuzimanje podataka iz baze ===
         url, apikey, demo, pib, jbkjs, matbr = self.okruzenje_za_slanje()
 
         if not url or not apikey:
-            QMessageBox.warning(self, "Greška", "Nisu pronađeni parametri za slanje na SEF.")
+            QMessageBox.warning(
+                self,
+                "Greška",
+                "Nisu pronađeni parametri za slanje na SEF."
+            )
             return
+
+        conn = None
+        sef_prihvatio = False
+        request_id = str(uuid.uuid4())
 
         try:
             with open(xml_putanja, "rb") as f:
                 xml_sadrzaj = f.read()
 
-            request_id = str(uuid.uuid4())
-            send_to_cir = "Yes" if self.crfCheck.isChecked() else "No"
-            url_sa_parametrima = f"{url}?requestId={request_id}&sendToCir={send_to_cir}"
-
-
-            headers = {
-                "Content-Type": "application/xml",
-                "Accept": "application/json",
-                "apikey": apikey
-            }
-
-            response = requests.post(url_sa_parametrima, headers=headers, data=xml_sadrzaj)
-            print(
-                "SEF HTTP status:",
-                response.status_code
+            conn = psycopg2.connect(
+                dbname=os.getenv("DB_NAME"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT")
             )
 
-            if response.status_code == 200:
-                odgovor = response.json()
-                print("✅ SEF odgovor:", odgovor)
+            with conn.cursor() as cursor:
+                # Ova provera drži zaključavanje reda aktivne godine
+                # do kraja transakcije, uključujući slanje na SEF.
+                proveri_aktivnu_godinu(cursor, GODINA)
 
+                cursor.execute("""
+                    SELECT god, sifobj, brojfakture, invoiceid
+                    FROM kasa.fakture
+                    WHERE id = %s
+                    FOR UPDATE
+                """, (self.faktura_id,))
+                faktura = cursor.fetchone()
+
+                if faktura is None:
+                    raise ValueError("Izabrana faktura nije pronađena.")
+
+                godina_fakture, sifobj_fakture, brojfakture, invoiceid = faktura
+
+                if int(godina_fakture) != int(GODINA):
+                    raise ValueError(
+                        "Faktura pripada zaključenoj poslovnoj godini. "
+                        "Slanje na SEF mora se obraditi pre otvaranja nove godine."
+                    )
+
+                if sifobj_fakture != SIFOBJEKTA:
+                    raise ValueError(
+                        "Izabrana faktura ne pripada ovom objektu."
+                    )
+
+                if invoiceid:
+                    raise ValueError(
+                        "Faktura već ima SEF InvoiceId. "
+                        "Proveri njen status pre ponovnog slanja."
+                    )
+
+                send_to_cir = (
+                    "Yes" if self.crfCheck.isChecked() else "No"
+                )
+                url_sa_parametrima = (
+                    f"{url}?requestId={request_id}"
+                    f"&sendToCir={send_to_cir}"
+                )
+
+                headers = {
+                    "Content-Type": "application/xml",
+                    "Accept": "application/json",
+                    "apikey": apikey
+                }
+
+                response = requests.post(
+                    url_sa_parametrima,
+                    headers=headers,
+                    data=xml_sadrzaj,
+                    timeout=60
+                )
+
+                print("SEF HTTP status:", response.status_code)
+
+                if response.status_code != 200:
+                    conn.rollback()
+                    print(
+                        "❌ Greška pri slanju:",
+                        response.status_code,
+                        response.text
+                    )
+                    QMessageBox.critical(
+                        self,
+                        "Greška",
+                        "Slanje fakture nije potvrđeno.\n"
+                        f"HTTP status: {response.status_code}\n"
+                        f"RequestId: {request_id}"
+                    )
+                    return
+
+                sef_prihvatio = True
+                odgovor = response.json()
                 invoice_id = odgovor.get("InvoiceId")
                 sales_id = odgovor.get("SalesInvoiceId")
                 cir_id = odgovor.get("circularInvoiceNumber")
 
-                try:
-                    with psycopg2.connect(
-                        dbname=os.getenv("DB_NAME"),
-                        user=os.getenv("DB_USER"),
-                        password=os.getenv("DB_PASSWORD"),
-                        host=os.getenv("DB_HOST"),
-                        port=os.getenv("DB_PORT")
-                    ) as conn:
-                        with conn.cursor() as cursor:
-                            # 1. Ažuriranje fakture
-                            cursor.execute("""
-                                UPDATE kasa.fakture
-                                SET invoiceid = %s,
-                                    salesinvoiceid = %s,
-                                    cirinvoiceid = %s,
-                                    status_salinv = %s,
-                                    datum_stat_salinv = %s
-                                WHERE id = %s
-                            """, (
-                                invoice_id,
-                                sales_id,
-                                cir_id,
-                                'Sent',
-                                datetime.datetime.now(),
-                                self.faktura_id
-                            ))
+                if not invoice_id:
+                    raise ValueError(
+                        "SEF je odgovorio bez InvoiceId. "
+                        f"Proveri zahtev {request_id} pre ponovnog slanja."
+                    )
 
-                            # 2. Dohvatanje brojfakture za ažuriranje stavki
-                            cursor.execute("""
-                                SELECT brojfakture
-                                FROM kasa.fakture
-                                WHERE id = %s
-                            """, (self.faktura_id,))
-                            rezultat = cursor.fetchone()
+                cursor.execute("""
+                    UPDATE kasa.fakture
+                    SET invoiceid = %s,
+                        salesinvoiceid = %s,
+                        cirinvoiceid = %s,
+                        status_salinv = %s,
+                        datum_stat_salinv = %s
+                    WHERE id = %s
+                      AND god = %s
+                """, (
+                    invoice_id,
+                    sales_id,
+                    cir_id,
+                    "Sent",
+                    datetime.datetime.now(),
+                    self.faktura_id,
+                    godina_fakture
+                ))
 
-                            if rezultat:
-                                brojfakture = rezultat[0]
+                if cursor.rowcount != 1:
+                    raise RuntimeError(
+                        "SEF je prihvatio fakturu, ali lokalno "
+                        "zaglavlje nije ažurirano."
+                    )
 
-                                # 3. UVEK postavljamo vrsta = 3 za eFakture
-                                cursor.execute("""
-                                    UPDATE kasa.karticaart
-                                    SET vrsta = 3,
-                                        opis = 'eFaktura'
-                                    WHERE god = %s
-                                    AND sifobj = %s
-                                    AND brfakt = %s
-                                """, (GODINA, SIFOBJEKTA, brojfakture))
+                cursor.execute("""
+                    UPDATE kasa.karticaart
+                    SET vrsta = 3,
+                        opis = 'eFaktura'
+                    WHERE god = %s
+                      AND sifobj = %s
+                      AND brfakt = %s
+                      AND vrsta = 2
+                """, (
+                    godina_fakture,
+                    sifobj_fakture,
+                    brojfakture
+                ))
 
-                        conn.commit()
-                        print("✅ Podaci uspešno upisani u bazu.")
-                except Exception as db_e:
-                    print("❌ Greška pri upisu u bazu:", db_e)
-
-                QMessageBox.information(self, "Uspeh", f"Faktura uspešno poslata.\nInvoiceId: {invoice_id}")
-
-            else:
-                print("❌ Greška pri slanju:", response.status_code, response.text)
-                QMessageBox.critical(self, "Greška", f"Greška pri slanju fakture:\n{response.status_code}\n{response.text}")
+            conn.commit()
+            QMessageBox.information(
+                self,
+                "Uspeh",
+                f"Faktura je poslata na SEF.\nInvoiceId: {invoice_id}"
+            )
 
         except Exception as e:
+            if conn is not None:
+                conn.rollback()
+
+            print(f"❌ Greška pri slanju na SEF: {e}")
+
+            if sef_prihvatio:
+                QMessageBox.critical(
+                    self,
+                    "Potrebna provera",
+                    "SEF je vratio HTTP 200, ali lokalni upis nije potvrđen.\n"
+                    "Nemoj ponovo slati fakturu dok ne proveriš stanje "
+                    f"na SEF-u i u bazi.\nRequestId: {request_id}\n{e}"
+                )
+            else:
+                QMessageBox.critical(
+                    self,
+                    "Greška",
+                    "Ishod slanja nije potvrđen. Proveri SEF pre ponovnog slanja.\n"
+                    f"RequestId: {request_id}\n{e}"
+                )
+
+        finally:
+            if conn is not None:
+                conn.close()
             print("❌ Izuzetak:", e)
             QMessageBox.critical(self, "Greška", f"Greška prilikom slanja XML-a:\n{e}")
 

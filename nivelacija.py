@@ -1,6 +1,7 @@
 import os
 import sys
 import psycopg2
+from poslovna_godina_guard import proveri_aktivnu_godinu
 import webbrowser
 from PyQt6.QtWidgets import QDialog, QMessageBox, QTableWidgetItem, QHeaderView
 from PyQt6.QtCore import QDate
@@ -527,6 +528,12 @@ class NivelacijaDialog(QDialog):
             )
             conn.autocommit = False
             cur = conn.cursor()
+            proveri_aktivnu_godinu(cur, GODINA)
+
+            if datum_qdate.year() != int(GODINA):
+                raise ValueError(
+                    "Datum nivelacije mora pripadati aktivnoj poslovnoj godini."
+                )
 
             # Sprečava istovremeno generisanje istog broja
             # automatske nivelacije za godinu i objekat.

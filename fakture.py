@@ -1,6 +1,7 @@
 import os
 import sys
 import psycopg2
+from poslovna_godina_guard import proveri_aktivnu_godinu
 from PyQt6.QtCore import Qt, QDate
 from PyQt6.QtWidgets import QDialog, QTableWidgetItem, QPushButton, QMessageBox
 from PyQt6.QtGui import QColor, QBrush, QIcon
@@ -583,6 +584,7 @@ class FaktureDialog(QDialog):
                 port=os.getenv("DB_PORT")
             )
             cursor = conn.cursor()
+            proveri_aktivnu_godinu(cursor, GODINA)
 
             # === Pročitaj demoef iz tabele fvr ===
             cursor.execute("SELECT demoef FROM kasa.fvr LIMIT 1")

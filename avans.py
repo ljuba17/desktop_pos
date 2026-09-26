@@ -12,6 +12,7 @@ from functools import partial
 import json
 from datetime import datetime
 from collections import defaultdict
+from poslovna_godina_guard import proveri_aktivnu_godinu
 
 
 # Učitavanje konfiguracije iz kasa.ini
@@ -514,6 +515,8 @@ class AvansDialog(QDialog):
             sto = self.aktivan_kupac
 
             # Unos u bazu
+            conn = None
+            cursor = None
             try:
                 conn = psycopg2.connect(
                     dbname=os.getenv("DB_NAME"),
@@ -523,6 +526,7 @@ class AvansDialog(QDialog):
                     port=os.getenv("DB_PORT")
                 )
                 cursor = conn.cursor()
+                proveri_aktivnu_godinu(cursor, GODINA)
 
                 cursor.execute(
                     """
@@ -538,11 +542,15 @@ class AvansDialog(QDialog):
                 inserted_id = cursor.fetchone()[0]
                 conn.commit()
             except Exception as e:
-                print(f"❌ Greška pri upisu u bazu `kasa1`: {e}")
+                if conn:
+                    conn.rollback()
+                QMessageBox.warning(self, "Poslovna godina", str(e))
                 return
             finally:
-                cursor.close()
-                conn.close()
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
 
             # Dodavanje u tabelu
             self.dodaj_u_korpu(inserted_id, sifra, kontrole["naziv"].text(), kolicina, cena_bez_popusta)
@@ -592,9 +600,10 @@ class AvansDialog(QDialog):
         self.sifraEdit.setFocus()
 
     def obrisi_stavku(self, id_stavke):
-        """✅ Brisanje artikla iz baze `kasa1` i tabele `stavkeTable` ili `stavkeTable_2`."""
+        """Briše otvorenu stavku avansne korpe iz baze i prikaza."""
+        conn = None
+
         try:
-            # ✅ Brisanje iz baze
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
                 user=os.getenv("DB_USER"),
@@ -602,27 +611,56 @@ class AvansDialog(QDialog):
                 host=os.getenv("DB_HOST"),
                 port=os.getenv("DB_PORT")
             )
-            cursor = conn.cursor()
-            cursor.execute("""DELETE FROM "kasa"."kasa1" WHERE id = %s;""", (id_stavke,))
+
+            with conn.cursor() as cursor:
+                proveri_aktivnu_godinu(cursor, GODINA)
+
+                cursor.execute("""
+                    DELETE FROM kasa.kasa1
+                    WHERE id = %s
+                      AND god = %s
+                      AND sifobj = %s
+                      AND kasa = %s
+                      AND zatvoren IS FALSE
+                """, (
+                    id_stavke,
+                    int(GODINA),
+                    SIFOBJEKTA,
+                    int(KASA)
+                ))
+
+                if cursor.rowcount != 1:
+                    raise ValueError(
+                        "Stavka avansne korpe nije pronađena "
+                        "ili je već zatvorena."
+                    )
+
             conn.commit()
-            cursor.close()
-            conn.close()
 
-            # ✅ Odabir tabele na osnovu trenutne strane
             trenutna_strana = self.stackedWidget.currentIndex()
-            tabela = self.stavkeTable if trenutna_strana == 0 else self.stavkeTable_2
+            tabela = (
+                self.stavkeTable
+                if trenutna_strana == 0
+                else self.stavkeTable_2
+            )
 
-            # ✅ Brisanje iz tabele
             for row in range(tabela.rowCount()):
-                if int(tabela.item(row, 0).text()) == id_stavke:
+                polje_id = tabela.item(row, 0)
+                if polje_id is not None and int(polje_id.text()) == int(id_stavke):
                     tabela.removeRow(row)
                     break
 
             self.azuriraj_total()
-            #print(f"✅ Stavka sa ID-om {id_stavke} uspešno obrisana.")
 
         except Exception as e:
+            if conn is not None:
+                conn.rollback()
             print(f"❌ Greška pri brisanju stavke: {e}")
+            QMessageBox.warning(self, "Brisanje stavke", str(e))
+
+        finally:
+            if conn is not None:
+                conn.close()
 
     def azuriraj_total(self):
         """✅ Ažurira ukupnu vrednost računa za odgovarajuću stranicu."""
@@ -743,11 +781,29 @@ class AvansDialog(QDialog):
             dugme.setEnabled(False)
 
     def izvrsi_stampu(self):
-        """✅ Pokreće odgovarajuću funkciju za fiskalizaciju u zavisnosti od aktivnog moda."""
+        """Pokreće fiskalizaciju samo za aktivnu poslovnu godinu."""
+        conn = None
+        try:
+            conn = psycopg2.connect(
+                dbname=os.getenv("DB_NAME"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT")
+            )
+            with conn.cursor() as cursor:
+                proveri_aktivnu_godinu(cursor, GODINA)
+
+        except Exception as e:
+            self.show_warning_message(str(e))
+            return
+
+        finally:
+            if conn is not None:
+                conn.close()
+
         if self.aktivan_mod == "promet":
             self.fiskalizuj_avans()
-        #elif self.aktivan_mod == "refundacija":
-           #self.fiskalizuj_racun_refundacije()
         else:
             self.show_warning_message("Nepoznat mod rada!")
     
@@ -789,6 +845,7 @@ class AvansDialog(QDialog):
     # Cuvanje podataka u bazi
     def snimi_racun(self):
         """✅ Snimanje podataka o računu u bazu."""
+        conn = None
         try:
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
@@ -801,6 +858,7 @@ class AvansDialog(QDialog):
 
             # Početak transakcije
             conn.autocommit = False
+            proveri_aktivnu_godinu(cursor, GODINA)
 
             # Dohvatanje novog broja računa
             novi_broj_racuna = self.dohvati_broj_racuna()
@@ -848,15 +906,26 @@ class AvansDialog(QDialog):
             (god, kar, broj, sto, zatvoren, kasa, smena, sifra, kolic, cena, popproc1, popdin1, popsum, datum, sifobj, dokstatus, kreirao, artikliid, tip, cena2, ststatus)
             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, kolic, cena, popproc1, popdin1, popsum, datum, sifobj, %s, 'sistem', artikliid, tip, cena2, ststatus
             FROM "kasa"."kasa1"
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, dokstatus, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                dokstatus,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Ažuriranje podataka u `kasa1` kao zatvorenih
             cursor.execute("""
             UPDATE "kasa"."kasa1"
             SET broj = %s, zatvoren = TRUE, kreirao = 'sistem'
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Snimanje podataka u `kasasum`
             cursor.execute("""
@@ -889,9 +958,18 @@ class AvansDialog(QDialog):
             FROM "kasa"."kasa1" k
             LEFT JOIN "kasa"."artikli" a ON a.sifra = k.sifra
             LEFT JOIN "kasa"."porezi" p ON p.id = a.porez_id
-            WHERE k.zatvoren = TRUE AND k.kasa = %s AND k.broj = %s
+            WHERE k.zatvoren = TRUE
+              AND k.god = %s
+              AND k.sifobj = %s
+              AND k.kasa = %s
+              AND k.broj = %s
             GROUP BY k.sifra, k.cena
-            """, (int(KASA), novi_broj_racuna))
+            """, (
+                int(GODINA),
+                SIFOBJEKTA,
+                int(KASA),
+                novi_broj_racuna,
+            ))
 
             artikli = cursor.fetchall()
 
@@ -1425,76 +1503,85 @@ class AvansDialog(QDialog):
 
     # kopiranje stavki iz kasa u kasa1 pri formiranju racuna za refundaciju
     def kopiraj_stavke_u_kasa1(self):
-        """Kopira stavke selektovanog računa iz kasa u kasa1 sa novim brojem računa (refundacija)."""
+        """Kopira stavke starog avansa u korpu aktivne poslovne godine."""
+        selected_item = self.avansiTree.currentItem()
+        if not selected_item:
+            QMessageBox.warning(self, "Avans", "Izaberi avansni račun.")
+            return
+
+        if not hasattr(self, "trenutni_broj_racuna"):
+            self.trenutni_broj_racuna = random.randint(
+                int(KASA) * 1000, int(KASA) * 1999
+            )
+
+        brracpu = selected_item.text(0)
+        conn = None
+        cursor = None
+
         try:
-            # Provera da li postoji već generisan broj računa
-            if not hasattr(self, 'trenutni_broj_racuna'):
-                self.trenutni_broj_racuna = random.randint(int(KASA) * 1000, int(KASA) * 1999)
-                print(f"🔢 Generisan novi broj računa: {self.trenutni_broj_racuna}")
-            else:
-                print(f"📌 Koristi se postojeći broj računa: {self.trenutni_broj_racuna}")
-
-            # Dohvati selektovani red iz TreeWidget-a
-            selected_item = self.avansiTree.currentItem()
-            if not selected_item:
-                print("⚠️ Nema selektovanog računa!")
-                return
-
-            brracpu = selected_item.text(0)
-
-            # Konekcija na bazu
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
                 user=os.getenv("DB_USER"),
                 password=os.getenv("DB_PASSWORD"),
                 host=os.getenv("DB_HOST"),
-                port=os.getenv("DB_PORT")
+                port=os.getenv("DB_PORT"),
             )
             cursor = conn.cursor()
+            proveri_aktivnu_godinu(cursor, GODINA)
 
-            # Dohvati podatke o računu iz kasasum
-            cursor.execute(
-                """
-                SELECT god, sifobj, broj
-                FROM "kasa"."kasasum"
+            cursor.execute("""
+                SELECT god, sifobj, kasa, broj
+                FROM kasa.kasasum
                 WHERE brracpu = %s
-                """,
-                (brracpu,)
-            )
-            kasasum_podaci = cursor.fetchone()
-            
-            if not kasasum_podaci:
-                print("❌ Nema podataka u kasasum za ovaj račun!")
-                return
+            """, (brracpu,))
+            izvor = cursor.fetchone()
+            if not izvor:
+                raise ValueError("Izabrani avansni račun nije pronađen.")
 
-            god, sifobj, stari_broj = kasasum_podaci
-            novi_broj_racuna = self.trenutni_broj_racuna
+            izvor_god, izvor_sifobj, izvor_kasa, izvor_broj = izvor
 
-            # Kopiraj stavke iz kasa u kasa1 sa novim brojem računa
-            cursor.execute(
-                """
-                INSERT INTO "kasa"."kasa1" (sifra, sifobj, cena, datum, kolic, broj, kasa, smena, 
-                                            cena2, popproc1, popdin1, popsum, god, kar, ststatus, 
-                                            kreirao, sto, artikliid, tip)
-                SELECT sifra, sifobj, cena, datum, kolic, %s, kasa, smena, 
-                    cena2, popproc1, popdin1, popsum, god, kar, ststatus, 
-                    'sistem', sto, artikliid, tip
-                FROM "kasa"."kasa"
-                WHERE god = %s AND sifobj = %s AND broj = %s
-                """,
-                (novi_broj_racuna, god, sifobj, stari_broj)
-            )
+            cursor.execute("""
+                INSERT INTO kasa.kasa1 (
+                    sifra, sifobj, cena, datum, kolic, broj, kasa, smena,
+                    cena2, popproc1, popdin1, popsum, god, kar, ststatus,
+                    kreirao, sto, artikliid, tip
+                )
+                SELECT
+                    sifra, %s, cena, CURRENT_DATE, kolic, %s, %s, smena,
+                    cena2, popproc1, popdin1, popsum, %s, kar, ststatus,
+                    'sistem', %s, artikliid, tip
+                FROM kasa.kasa
+                WHERE god = %s
+                  AND sifobj = %s
+                  AND kasa = %s
+                  AND broj = %s
+            """, (
+                SIFOBJEKTA,
+                self.trenutni_broj_racuna,
+                int(KASA),
+                int(GODINA),
+                self.aktivan_kupac,
+                izvor_god,
+                izvor_sifobj,
+                izvor_kasa,
+                izvor_broj,
+            ))
 
-            # Sačuvaj promene
+            if cursor.rowcount == 0:
+                raise ValueError("Izabrani avans nema stavki za kopiranje.")
+
             conn.commit()
-            print(f"✅ Refundacija kreirana! Novi broj računa: {novi_broj_racuna}")
-
-            # Zatvori konekciju
-            cursor.close()
-            conn.close()
 
         except Exception as e:
-            print(f"❌ Greška pri kopiranju stavki u kasa1: {e}")
+            if conn:
+                conn.rollback()
+            QMessageBox.warning(self, "Avans", str(e))
+
+        finally:
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
 
     # Funkcija koju koristim za refundaciju pojedinacnog avansa koji je uradjen sa greskom
     def proveri_i_refundiraj(self):
@@ -1767,6 +1854,7 @@ class AvansDialog(QDialog):
         """
         ✅ Snima refundaciju računa u baze: kasa, kasasum i karticaart.
         """
+        conn = None
         try:
             conn = psycopg2.connect(
                 dbname=os.getenv("DB_NAME"),
@@ -1777,6 +1865,7 @@ class AvansDialog(QDialog):
             )
             cursor = conn.cursor()
             conn.autocommit = False  # Početak transakcije
+            proveri_aktivnu_godinu(cursor, GODINA)
 
             # Dohvatanje novog broja računa
             novi_broj_racuna = self.dohvati_broj_racuna()
@@ -1801,15 +1890,26 @@ class AvansDialog(QDialog):
             (god, kar, broj, sto, zatvoren, kasa, smena, sifra, kolic, cena, popproc1, popdin1, popsum, datum, sifobj, dokstatus, kreirao, artikliid, tip, cena2, ststatus)
             SELECT god, kar, %s, sto, TRUE, kasa, smena, sifra, ABS(kolic), cena, popproc1, popdin1, popsum, datum, sifobj, %s, 'sistem', artikliid, tip, cena2, ststatus
             FROM "kasa"."kasa1"
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, dokstatus, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                dokstatus,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Ažuriranje podataka u `kasa1` kao zatvorenih
             cursor.execute("""
             UPDATE "kasa"."kasa1"
             SET broj = %s, zatvoren = TRUE, kreirao = 'sistem'
-            WHERE zatvoren = FALSE AND kasa = %s AND sto = %s
-            """, (novi_broj_racuna, int(KASA), self.aktivan_kupac))
+            WHERE god = %s AND zatvoren = FALSE AND kasa = %s AND sto = %s
+            """, (
+                novi_broj_racuna,
+                int(GODINA),
+                int(KASA),
+                self.aktivan_kupac,
+            ))
 
             # Snimanje podataka u `kasasum`
             cursor.execute("""
@@ -1844,9 +1944,18 @@ class AvansDialog(QDialog):
             FROM "kasa"."kasa1" k
             LEFT JOIN "kasa"."artikli" a ON a.sifra = k.sifra
             LEFT JOIN "kasa"."porezi" p ON p.id = a.porez_id
-            WHERE k.zatvoren = TRUE AND k.kasa = %s AND k.broj = %s
+            WHERE k.zatvoren = TRUE
+              AND k.god = %s
+              AND k.sifobj = %s
+              AND k.kasa = %s
+              AND k.broj = %s
             GROUP BY k.sifra, k.cena
-            """, (int(KASA), novi_broj_racuna))
+            """, (
+                int(GODINA),
+                SIFOBJEKTA,
+                int(KASA),
+                novi_broj_racuna,
+            ))
 
             artikli = cursor.fetchall()
 
@@ -1981,6 +2090,27 @@ class AvansDialog(QDialog):
 
     def fiskalizuj_racun_refundacije(self):
         """Fiskalizuje refundirani račun i šalje ga PU."""
+        conn_provera = None
+
+        try:
+            conn_provera = psycopg2.connect(
+                dbname=os.getenv("DB_NAME"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                host=os.getenv("DB_HOST"),
+                port=os.getenv("DB_PORT")
+            )
+            with conn_provera.cursor() as cursor:
+                proveri_aktivnu_godinu(cursor, GODINA)
+
+        except Exception as e:
+            self.show_warning_message(str(e))
+            return
+
+        finally:
+            if conn_provera is not None:
+                conn_provera.close()
+
         try:
             # Učitavanje konfiguracije kase
             ip_stampe, lservis = self.main_window.ucitaj_konfiguraciju_kase()
@@ -1998,18 +2128,25 @@ class AvansDialog(QDialog):
             kasir = "Kasir 1"
 
             # Generisanje JSON-a i slanje na štampač
-            json_fajl = self.generisi_json_refundacija(broj_racuna, stavke, uplata, kasir, ip_stampe)
+            json_fajl = self.generisi_json_refundacija(
+                broj_racuna, stavke, uplata, kasir, ip_stampe
+            )
             if not json_fajl:
-                raise Exception("Generisanje JSON fajla za refundaciju nije uspelo.")
+                raise Exception(
+                    "Generisanje JSON fajla za refundaciju nije uspelo."
+                )
 
             # Čekanje na odgovor iz PU
-            status, fajl_odgovora = self.main_window.obradi_odgovor(broj_racuna, ip_stampe)
+            status, fajl_odgovora = self.main_window.obradi_odgovor(
+                broj_racuna, ip_stampe
+            )
             if status == "success":
-                #print("✅ Refundacija uspešno fiskalizovana.")
                 self.main_window.azuriraj_kasasum(broj_racuna, ip_stampe)
-                #self.resetuj_kontrole()
             elif status == "error":
-                print("❌ Greška pri fiskalizaciji refundacije. Proverite fajl sa greškom.")
+                print(
+                    "❌ Greška pri fiskalizaciji refundacije. "
+                    "Proverite fajl sa greškom."
+                )
             else:
                 print("❌ Odgovor nije stigao u zadatom vremenu.")
 
