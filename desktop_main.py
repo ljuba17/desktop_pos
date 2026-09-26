@@ -2650,147 +2650,161 @@ class MainWindow(QMainWindow):
     # Funkcija za prikaz stavki na osnovu izabranog broja računa PU
     def prikazi_stavke_na_osnovu_brracpu(self, brracpu, vreme_transakcije):
         """
-        Prebacuje stavke iz izabranog računa u stavkeTable glavnog prozora i model kasa1.
-        Takođe snima stavke u bazu u model kasa1.
+        Učitava izvorni fiskalni račun iz bilo koje godine i priprema
+        njegovu refundaciju u korpi aktivne poslovne godine.
         """
+        conn = None
+
         try:
-            # Pronalazimo zapis u kasasum koristeći brracpu
-            zapis_kasasum = next((record for record in self.kasasum if record["brracpu"] == brracpu), None)
-            if not zapis_kasasum:
-                raise ValueError(f"❌ Nema zapisa u kasasum za brracpu: {brracpu}")
+            conn = get_db_connection()
 
-            # Preuzimamo potrebna polja iz pronađenog zapisa
-            god = zapis_kasasum.get("god")
-            sifobj = zapis_kasasum.get("sifobj")
-            kasa = zapis_kasasum.get("kasa")
-            broj = zapis_kasasum.get("broj")
-
-            #print(f"✅ Pronađeni podaci u kasasum: god={god}, sifobj={sifobj}, kasa={kasa}, broj={broj}")
-
-            if god is None or sifobj is None or kasa is None or broj is None:
-                raise ValueError(f"❌ Nedostaju podaci u zapisu kasasum za brracpu: {brracpu}")
-
-            # Generisanje privremenog broja računa
-            trenutni_broj_racuna = random.randint(int(kasa) * 1000, int(kasa) * 1999)
-
-            # Filtriramo stavke iz modela kasa koristeći god, sifobj, kasa i broj
-            stavke = [
-                stavka for stavka in self.kasa
-                if stavka["god"] == god and stavka["sifobj"] == sifobj and stavka["kasa"] == kasa and stavka["broj"] == broj
-            ]
-
-            if not stavke:
-                raise ValueError(f"❌ Nema stavki za brracpu: {brracpu} sa podacima god={god}, sifobj={sifobj}, kasa={kasa}, broj={broj}")
-
-            # Provera aktivnog kupca
-            aktivan_kupac = self.button_group.checkedId()
-            if aktivan_kupac == -1:  # Ako nijedno dugme nije označeno, podrazumevano na 1
-                print("⚠️ Nije izabran nijedan aktivan kupac. Podrazumevana vrednost 'sto' postavljena na 1.")
-                aktivan_kupac = 1
-
-            # Dodavanje stavki u model kasa1 sa ažuriranim privremenim brojem računa
-            self.kasa1 = []
-            datum = datetime.now().date()
-
-            for stavka in stavke:
-                # Preuzimanje podataka iz modela artikli za trenutnu šifru
-                sifra = stavka["sifra"]
-                artikl = next((art for art in self.artikli if art["sifra"] == sifra), None)
-                if not artikl:
-                    raise ValueError(f"❌ Artikli podaci nisu pronađeni za šifru: {sifra}")
-
-                nova_stavka = {
-                    "sifra": sifra,
-                    "kolic": stavka["kolic"],
-                    "originalna_kolicina": stavka["kolic"],
-
-                    # Originalni račun u tabeli kasa:
-                    # cena  = stvarno naplaćena cena
-                    # cena2 = originalna cena pre popusta
-                    #
-                    # Radna korpa refundacije:
-                    # cena  = originalna cena pre popusta
-                    # cena2 = stvarno naplaćena cena
-                    "cena": stavka.get(
-                        "cena2",
-                        stavka["cena"]
-                    ),
-                    "cena2": stavka["cena"],
-
-                    "god": GODINA,
-                    "broj": trenutni_broj_racuna,
-                    "sifobj": sifobj,
-                    "kasa": kasa,
-                    "kar": 1,
-                    "smena": 1,
-                    "sto": aktivan_kupac,
-                    "popproc1": stavka.get(
-                        "popproc1",
-                        0
-                    ),
-                    "popdin1": stavka.get(
-                        "popdin1",
-                        0
-                    ),
-                    "popsum": stavka.get(
-                        "popsum",
-                        0
-                    ),
-                    "datum": datum,
-                    "kreirao": "sistem",
-                    "ststatus": "A",
-                    "zatvoren": False,
-                    "tip": artikl["tip"],
-                    "artikliid": artikl["id"]
-                }
-
-                self.kasa1.append(nova_stavka)
-
-            # Snimanje stavki iz kasa1 u bazu (tabela kasa1) sa ID dohvatom
-            conn = None
-            cursor = None
-            try:
-                conn = psycopg2.connect(
-                    dbname=os.getenv("DB_NAME"),
-                    user=os.getenv("DB_USER"),
-                    password=os.getenv("DB_PASSWORD"),
-                    host=os.getenv("DB_HOST"),
-                    port=os.getenv("DB_PORT")
-                )
-                cursor = conn.cursor()
+            with conn.cursor() as cursor:
                 proveri_aktivnu_godinu(cursor)
 
-                for stavka in self.kasa1:
+                cursor.execute("""
+                    SELECT god, sifobj, kasa, broj
+                    FROM kasa.kasasum
+                    WHERE brracpu = %s
+                      AND sifobj = %s
+                      AND tipracuna = '0'
+                      AND tiptransakcije = '0'
+                    LIMIT 2
+                """, (brracpu, SIFOBJEKTA))
+
+                zaglavlja = cursor.fetchall()
+                if len(zaglavlja) != 1:
+                    raise ValueError(
+                        "Izvorni fiskalni račun nije pronađen "
+                        "ili broj PU nije jedinstven."
+                    )
+
+                izvorna_godina, sifobj, izvorna_kasa, broj = zaglavlja[0]
+
+                cursor.execute("""
+                    SELECT
+                        k.sifra,
+                        k.kolic,
+                        k.cena,
+                        COALESCE(k.cena2, k.cena),
+                        k.popproc1,
+                        k.popdin1,
+                        k.popsum
+                    FROM kasa.kasa k
+                    WHERE k.god = %s
+                      AND k.sifobj = %s
+                      AND k.kasa = %s
+                      AND k.broj = %s
+                    ORDER BY k.id
+                """, (
+                    izvorna_godina,
+                    sifobj,
+                    izvorna_kasa,
+                    broj
+                ))
+
+                izvorne_stavke = cursor.fetchall()
+                if not izvorne_stavke:
+                    raise ValueError(
+                        f"Nema stavki za izvorni fiskalni račun {brracpu}."
+                    )
+
+                aktivan_kupac = self.button_group.checkedId()
+                if aktivan_kupac == -1:
+                    aktivan_kupac = 1
+
+                trenutni_broj_racuna = random.randint(
+                    int(KASA) * 1000,
+                    int(KASA) * 1999
+                )
+                datum = datetime.now().date()
+
+                nove_stavke = []
+
+                for (
+                    sifra,
+                    kolic,
+                    naplacena_cena,
+                    originalna_cena,
+                    popproc1,
+                    popdin1,
+                    popsum
+                ) in izvorne_stavke:
+                    artikl = next(
+                        (
+                            art for art in self.artikli
+                            if art["sifra"] == sifra
+                        ),
+                        None
+                    )
+                    if artikl is None:
+                        raise ValueError(
+                            f"Artikal nije pronađen za šifru: {sifra}"
+                        )
+
+                    nove_stavke.append({
+                        "sifra": sifra,
+                        "kolic": kolic,
+                        "originalna_kolicina": kolic,
+
+                        # Izvorna kasa:
+                        # cena  = stvarno naplaćena cena
+                        # cena2 = cena pre popusta
+                        #
+                        # Korpa refundacije:
+                        # cena  = cena pre popusta
+                        # cena2 = stvarno naplaćena cena
+                        "cena": originalna_cena,
+                        "cena2": naplacena_cena,
+
+                        "god": int(GODINA),
+                        "broj": trenutni_broj_racuna,
+                        "sifobj": SIFOBJEKTA,
+                        "kasa": int(KASA),
+                        "kar": 1,
+                        "smena": 1,
+                        "sto": aktivan_kupac,
+                        "popproc1": popproc1 or 0,
+                        "popdin1": popdin1 or 0,
+                        "popsum": popsum or 0,
+                        "datum": datum,
+                        "kreirao": "sistem",
+                        "ststatus": "A",
+                        "zatvoren": False,
+                        "tip": artikl["tip"],
+                        "artikliid": artikl["id"]
+                    })
+
+                for stavka in nove_stavke:
                     cursor.execute("""
-                    INSERT INTO "kasa"."kasa1" (
-                        sifra,
-                        kolic,
-                        cena,
-                        cena2,
-                        god,
-                        broj,
-                        sifobj,
-                        kasa,
-                        kar,
-                        smena,
-                        sto,
-                        popproc1,
-                        popdin1,
-                        popsum,
-                        datum,
-                        kreirao,
-                        ststatus,
-                        zatvoren,
-                        tip,
-                        artikliid
-                    )
-                    VALUES (
-                        %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s,
-                        %s, %s, %s, %s, %s
-                    )
-                    RETURNING id
+                        INSERT INTO kasa.kasa1 (
+                            sifra,
+                            kolic,
+                            cena,
+                            cena2,
+                            god,
+                            broj,
+                            sifobj,
+                            kasa,
+                            kar,
+                            smena,
+                            sto,
+                            popproc1,
+                            popdin1,
+                            popsum,
+                            datum,
+                            kreirao,
+                            ststatus,
+                            zatvoren,
+                            tip,
+                            artikliid
+                        )
+                        VALUES (
+                            %s, %s, %s, %s, %s,
+                            %s, %s, %s, %s, %s,
+                            %s, %s, %s, %s, %s,
+                            %s, %s, %s, %s, %s
+                        )
+                        RETURNING id
                     """, (
                         stavka["sifra"],
                         stavka["kolic"],
@@ -2813,30 +2827,22 @@ class MainWindow(QMainWindow):
                         stavka["tip"],
                         stavka["artikliid"]
                     ))
-                    generisani_id = cursor.fetchone()[0]  # Dohvatamo generisani ID
-                    stavka["id"] = generisani_id  # Čuvamo ID u stavku
+                    stavka["id"] = cursor.fetchone()[0]
 
-                conn.commit()
+            conn.commit()
 
-            except Exception as e:
-                if conn:
-                    conn.rollback()
-                print(f"Greška pri snimanju u bazu: {e}")
-                raise
-
-            finally:
-                if cursor:
-                    cursor.close()
-                if conn:
-                    conn.close()
-                #print(f"✅ Stavke su uspešno snimljene u bazu (kasa1) za privremeni broj računa: {trenutni_broj_racuna}")
-
-            # Popunjavanje stavkeTable sa stavkama iz kasa1
+            self.kasa1 = nove_stavke
             self.populate_stavkeTable()
 
         except Exception as e:
+            if conn is not None:
+                conn.rollback()
             print(f"❌ Greška pri prikazu stavki: {e}")
-            QMessageBox.critical(self, "Greška", f"Greška pri prikazu stavki:\n{e}")
+            QMessageBox.critical(
+                self,
+                "Greška",
+                f"Greška pri prikazu stavki:\n{e}"
+            )
 
     def populate_stavkeTable(self):
         """
